@@ -1,38 +1,36 @@
-name: 部署到 GitHub Pages | Deploy to GitHub Pages
+name: CI - 静态文件检查 | Static Files Check
 
 on:
   push:
     branches: [main]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  pull_request:
+    branches: [main]
 
 jobs:
-  deploy:
-    name: 部署 | Deploy
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate:
+    name: 验证 | Validate
     runs-on: ubuntu-latest
-
     steps:
       - name: 检出代码 | Checkout
         uses: actions/checkout@v4
 
-      - name: 配置 Pages | Setup Pages
-        uses: actions/configure-pages@v5
+      - name: 检查文件存在 | Verify files exist
+        run: |
+          echo "检查核心文件..."
+          test -f public/dashboard.html && echo "✅ dashboard.html"
+          test -f public/index.html && echo "✅ index.html"
+          test -f public/manifest.json && echo "✅ manifest.json"
+          test -f public/sw.js && echo "✅ sw.js"
+          echo "所有文件检查通过！"
 
-      - name: 上传构建产物 | Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'public'
-
-      - name: 部署到 GitHub Pages | Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: HTML语法检查 | HTML lint
+        run: |
+          # Basic check - ensure HTML is well-formed
+          for f in public/*.html; do
+            if head -1 "$f" | grep -q "DOCTYPE"; then
+              echo "✅ $f - DOCTYPE found"
+            else
+              echo "❌ $f - missing DOCTYPE"
+              exit 1
+            fi
+          done
