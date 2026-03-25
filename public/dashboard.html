@@ -285,6 +285,8 @@ tr:hover td{background:rgba(51,65,85,.4)}
   <span class="stat-item">pm-toolkit <strong>v0.7.0</strong></span>
 </div>
 
+<div class="stats-bar" id="mcpStatus" style="border-bottom:1px solid var(--border);gap:16px;font-size:12px"></div>
+
 <!-- MAIN TABS -->
 <div class="main-tabs">
   <button class="main-tab active" data-tab="overview" onclick="switchMain('overview',this)">总览</button>
@@ -446,6 +448,8 @@ tr:hover td{background:rgba(51,65,85,.4)}
     <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
   </div>
   <button class="panel-btn" onclick="togglePanel('history')">查看历史</button>
+  <button class="panel-btn" onclick="Object.keys(MCP_ENDPOINTS).forEach(r=>promptMCPConfig(r))">配置MCP连接</button>
+  <button class="panel-btn" onclick="Promise.all([syncPlatforms(),syncDeals(),syncRoadmap()]).then(()=>showToast('同步完成','success'))">同步MCP数据</button>
   <button class="panel-btn panel-btn-danger" onclick="clearAllCache()">清除缓存</button>
   <button class="panel-btn" id="pwaInstallBtn" style="display:none" onclick="pwaInstall()">安装应用 (PWA)</button>
   <div style="margin-top:24px;font-size:12px;color:var(--text-dim)">
@@ -1070,6 +1074,106 @@ function pwaInstall(){if(deferredPWAPrompt){deferredPWAPrompt.prompt();deferredP
 
 // ─── SERVICE WORKER ─────────────────────────────────────
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>showToast('离线缓存不可用','warning'))}
+
+// ─── MCP API INTEGRATION ────────────────────────────────────
+const MCP_ENDPOINTS = {
+  'media-ops': { url: '', status: 'offline' },
+  'ops-flow': { url: '', status: 'offline' },
+  'sales-crm': { url: '', status: 'offline' },
+  'pm-toolkit': { url: '', status: 'offline' }
+};
+
+async function configureMCP(repo, url) {
+  MCP_ENDPOINTS[repo].url = url;
+  try {
+    const res = await fetch(url + '/health', { signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      MCP_ENDPOINTS[repo].status = 'online';
+      showToast(repo + ' MCP已连接', 'success', 2000);
+    } else {
+      MCP_ENDPOINTS[repo].status = 'error';
+      showToast(repo + ' MCP连接失败', 'error', 2000);
+    }
+  } catch (e) {
+    MCP_ENDPOINTS[repo].status = 'offline';
+  }
+  renderMCPStatus();
+}
+
+async function callMCP(repo, tool, params = {}) {
+  const ep = MCP_ENDPOINTS[repo];
+  if (!ep.url || ep.status !== 'online') return null;
+  try {
+    const res = await fetch(ep.url + '/tools/' + tool, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+      signal: AbortSignal.timeout(10000)
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+function renderMCPStatus() {
+  const el = document.getElementById('mcpStatus');
+  if (!el) return;
+  el.innerHTML = Object.entries(MCP_ENDPOINTS).map(([repo, ep]) => {
+    const color = ep.status === 'online' ? 'var(--green)' : ep.status === 'error' ? 'var(--red)' : 'var(--text-dim)';
+    const label = ep.status === 'online' ? '在线' : ep.status === 'error' ? '错误' : '离线';
+    return `<span class="stat-item" style="cursor:pointer" onclick="promptMCPConfig('${repo}')"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:4px"></span>${repo} <strong>${label}</strong></span>`;
+  }).join('');
+}
+
+function promptMCPConfig(repo) {
+  const url = prompt(repo + ' MCP Server URL:', MCP_ENDPOINTS[repo].url || 'http://localhost:3000');
+  if (url) configureMCP(repo, url);
+}
+
+// Sync functions - try MCP first, fall back to localStorage
+async function syncPlatforms() {
+  const data = await callMCP('media-ops', 'list_platforms');
+  if (data && data.platforms) {
+    PLATFORMS = data.platforms;
+    savePlatforms();
+    renderPlatformTable();
+    showToast('平台数据已从MCP同步', 'success', 2000);
+    return true;
+  }
+  return false;
+}
+
+async function syncDeals() {
+  const data = await callMCP('sales-crm', 'get_pipeline');
+  if (data && data.stages) {
+    DEAL_STAGES = data.stages.map(s => ({
+      id: s.id || s.name, label: s.name || s.label,
+      count: s.count || 0, color: s.color || '#3b82f6'
+    }));
+    saveDeals();
+    renderSales();
+    showToast('商机数据已从MCP同步', 'success', 2000);
+    return true;
+  }
+  return false;
+}
+
+async function syncRoadmap() {
+  const data = await callMCP('pm-toolkit', 'list_milestones');
+  if (data && data.milestones) {
+    ROADMAP = data.milestones.map(m => ({
+      lane: m.priority || 'P1', title: m.title || m.name,
+      status: m.status || 'planned', date: m.date || ''
+    }));
+    saveRoadmap();
+    renderPM();
+    showToast('路线图已从MCP同步', 'success', 2000);
+    return true;
+  }
+  return false;
+}
 
 // ─── INIT ───────────────────────────────────────────────
 loadPrefs();
