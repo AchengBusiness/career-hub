@@ -421,7 +421,6 @@ td[contenteditable="true"]:focus{box-shadow:inset 0 0 0 1px var(--accent)}
 <!-- ==================== TAB 5: PM-TOOLKIT ==================== -->
 <div id="pane-pm" class="tab-pane">
   <div class="pm-section">
-    <div class="pm-title">产品路线图</div>
     <div class="roadmap-lanes" id="roadmapLanes"></div>
   </div>
   <div class="pm-section">
@@ -670,32 +669,65 @@ function renderPreview(){
 }
 
 // ─── MEDIA-OPS: REGIONAL DATA ───────────────────────────
-const REGIONS={
-  us:{label:'美国/北美',tips:['Get to the point fast - US audiences value directness','Quantify results: "3 steps to boost efficiency 40%"','Add subtitles for accessibility and SEO','Encourage comments with closing questions','Post 7-10 AM EST for career content','Stay authentic - "real talk" builds trust'],taboos:['Avoid strong political stances','No exaggerated claims ("best ever", "#1")','Be careful with race/gender topics'],tags:['#ProductivityTips','#CareerGrowth','#SideHustle','#WorkSmarter'],times:'Weekdays 7-9 AM EST, Lunch 12-1 PM, Weekends 10-11 AM',audience:'Value efficiency + freedom, interested in AI tools, fast engagement, side hustle mindset'},
-  uk:{label:'英国',tips:['Balance professionalism with dry humor','Long-form analysis performs well','Use British spelling (colour, organisation)','Reference British culture (tea, weather, pub)','Post evenings 7-9 PM GMT','Sustainability topics resonate strongly'],taboos:['Never confuse England/Scotland/Wales/NI identities','Brexit remains divisive','Stay neutral on Royal Family topics'],tags:['#UKCareer','#WorkLifeBalance','#BritishLife','#SelfImprovement'],times:'Weekdays 7-9 PM GMT, Lunch 12-1 PM, Weekends 9-11 AM',audience:'Well-educated, value humor + manners, interested in leadership and work-life balance'},
-  europe:{label:'欧洲',tips:['Consider multilingual audiences - English primary','Europeans value privacy - avoid data tracking themes','Sustainability/green topics have high engagement','Academic depth welcome in DACH + Nordics','Post 5-9 PM CET on weekdays','Nordic audiences love work-life balance content'],taboos:['Don\'t generalize "Europe" - cultures vary greatly','WWII/far-right topics extremely sensitive','Ensure GDPR compliance for any forms'],tags:['#EuropeanLife','#Sustainability','#FutureOfWork','#Innovation'],times:'CET weekdays 5-9 PM, weekends 10 AM - 12 PM',audience:'High education, value environment + equality, prefer depth over hype'},
-  japan:{label:'日本',tips:['Use polite, indirect language - avoid commanding tone','High visual quality expected - clean layouts essential','Slower narrative pace, detailed storytelling','Add anime/craftsman/seasonal cultural references','Tutorials perform well on TikTok + YouTube','Post 8-11 PM JST weekdays, 2-5 PM weekends'],taboos:['No casual remarks about WWII history','Hard-sell tactics backfire badly','Low-quality visuals damage brand perception'],tags:['#Japan','#Learning','#WorkStyle','#Technology'],times:'Weekdays 8-11 PM JST, Lunch 12-1 PM, Weekends 2-5 PM',audience:'Detail-oriented, quality-focused, strong community belonging, love anime + tech + food'},
-  korea:{label:'韩国',tips:['Thumbnails must be eye-catching - clicks depend on visuals','Leverage K-pop, beauty, K-drama cultural hooks','Warm, community-oriented tone works best','Use trending Korean hashtags','Maintain consistent posting frequency','Peak hours: 9-11 PM KST'],taboos:['Never touch cultural origin disputes (kimchi, hanzi)','Don\'t criticize Korean beauty/food culture','Political issues (THAAD, territory) cause boycotts'],tags:['#KoreanLife','#SelfDevelopment','#Kpop','#Beauty'],times:'Weekdays 9-11 PM KST, Weekends 2-6 PM, Lunch 12-1 PM',audience:'Trend-conscious, K-culture influenced, high engagement, beauty + career + overseas life content'},
-  sea:{label:'东南亚',tips:['Keep content fun, relatable, light-hearted','Respect religious diversity (Islam in MY/ID)','E-commerce content performs very well','Food + travel content goes viral easily','Use local slang and memes for connection','Peak: 7-10 PM local time'],taboos:['Religious topics very sensitive in MY/ID','Don\'t treat SEA countries as identical','Colonial history still emotional in some countries'],tags:['#SEAlife','#TravelAsia','#FoodTour','#OnlineBusiness'],times:'Weekdays 7-10 PM UTC+7/8, Lunch 12-1 PM, Weekends active all day',audience:'Young, mobile-first, e-commerce active, love food + travel + side income + TikTok'},
-  me:{label:'中东',tips:['Emphasize family + community values','Adjust posting times during Ramadan (after sunset)','Arabic subtitles greatly boost local engagement','Business/entrepreneurship content popular in Gulf','Conservative, dignified visual style preferred','Include holiday greetings (Eid al-Fitr, Eid al-Adha)'],taboos:['Never criticize or mock Islam','Alcohol/gambling content prohibited','Keep gender-related content conservative'],tags:['#MiddleEast','#Business','#Entrepreneurship','#Arabic'],times:'Weekdays 9 PM - 12 AM AST, Ramadan: 10 PM - 2 AM peak',audience:'Faith-driven, family-oriented, business + real estate + religion focus, high purchasing power'},
-  africa:{label:'非洲',tips:['Emphasize community building and mutual support','Mobile-first: keep videos lightweight, fast-loading','Incorporate local music and visual styles','Entrepreneurship + side income topics very popular','Tailor language: English (East), French (West)','Share real success stories for inspiration'],taboos:['Never use poverty/backwardness stereotypes','Tribal politics sensitive in some regions','COVID + political stability are sensitive topics'],tags:['#AfricanCreator','#Hustle','#AfricaRising','#Entrepreneurship'],times:'Weekdays 6-9 PM WAT/EAT, Lunch 12-1 PM also active',audience:'Young, energetic, entrepreneurial, fastest-growing mobile internet market, hungry for business + education + entertainment'},
-  latam:{label:'拉丁美洲',tips:['Passionate, emotional tone - cold style fails','Spanish primary, Portuguese for Brazil','Family + music + food are core cultural connectors','TikTok + Instagram growing fast in LATAM','Story-driven narratives over dry logic','Post 8-11 PM local time, weekends afternoons'],taboos:['Don\'t lump all LATAM countries together','Politics extremely complex (VZ, Cuba, etc.)','Never mock Latino accents, food, or traditions'],tags:['#Latinx','#Emprendimiento','#FamiliaLatina','#TikTokLatino'],times:'Weekdays 8-11 PM local, Weekends 3-6 PM active',audience:'Emotion-driven, family-first, love music + food, mobile social active, entertainment + side hustle content'}
+const DEFAULT_REGIONS={
+  us:{label:'美国/北美',tips:['直奔主题 - 美国受众重视直接表达','量化成果："3步提升效率40%"','添加字幕提高可访问性和SEO','用问题结尾鼓励评论互动','职场内容最佳发布时间：东部7-10 AM','保持真实 - "真诚分享"建立信任'],taboos:['避免强烈政治立场（两党极化严重）','禁止夸大宣传（"最好的"、"第一名"等）','种族/性别/LGBTQ话题需谨慎措辞','枪支管控话题极度敏感','宗教话题避免偏向任何一方'],tags:['#ProductivityTips','#CareerGrowth','#SideHustle','#WorkSmarter'],times:'工作日 东部7-9 AM，午间12-1 PM，周末10-11 AM',audience:'重视效率和自由，对AI工具感兴趣，快速互动，副业思维'},
+  uk:{label:'英国',tips:['专业性与英式幽默相结合','长篇深度分析表现好','使用英式拼写（colour, organisation）','引用英国文化元素（茶、天气、酒吧）','最佳发布时间：晚间 GMT 7-9 PM','可持续发展话题共鸣强'],taboos:['绝不混淆英格兰/苏格兰/威尔士/北爱尔兰身份','脱欧话题仍然分裂严重','王室话题保持中立','阶级话题非常敏感','爱尔兰统一问题避免触碰'],tags:['#UKCareer','#WorkLifeBalance','#BritishLife','#SelfImprovement'],times:'工作日 GMT 7-9 PM，午间12-1 PM，周末9-11 AM',audience:'受教育程度高，重视幽默和礼仪，关注领导力和工作生活平衡'},
+  europe:{label:'欧洲',tips:['考虑多语言受众 - 英语为主','欧洲人重视隐私 - 避免数据追踪话题','可持续/环保话题互动率高','德语区+北欧欢迎学术深度内容','工作日 CET 5-9 PM 发布','北欧受众喜爱工作生活平衡内容'],taboos:['不要笼统说"欧洲" - 各国文化差异巨大','二战/纳粹/极右话题极度敏感','必须遵守GDPR数据保护规定','难民/移民话题争议大','东欧与西欧刻板印象禁止'],tags:['#EuropeanLife','#Sustainability','#FutureOfWork','#Innovation'],times:'CET 工作日5-9 PM，周末10 AM - 12 PM',audience:'高教育水平，重视环境和平等，偏好深度内容而非炒作'},
+  japan:{label:'日本',tips:['使用礼貌、间接的语言 - 避免命令式口吻','高视觉质量是必须的 - 排版要干净','叙事节奏慢，注重细节和故事性','加入动漫/匠人/季节文化元素','教程类内容在TikTok和YouTube表现好','工作日 JST 8-11 PM，周末2-5 PM'],taboos:['绝对禁止随意评论二战历史','强行推销会严重适得其反','低质量视觉素材会损害品牌形象','天皇相关话题禁止触碰','原子弹/核辐射话题极度敏感'],tags:['#Japan','#Learning','#WorkStyle','#Technology'],times:'工作日 JST 8-11 PM，午间12-1 PM，周末2-5 PM',audience:'注重细节，追求品质，社区归属感强，喜爱动漫+科技+美食'},
+  korea:{label:'韩国',tips:['封面缩略图必须抓眼球 - 点击率取决于视觉','利用K-pop、美妆、韩剧文化元素','温暖的社区化语气效果最好','使用韩国热门话题标签','保持稳定的发布频率','黄金时段：KST 9-11 PM'],taboos:['绝不触碰文化起源争议（泡菜、汉字等）','不要批评韩国美妆/饮食文化','政治问题（萨德、领土）会引发抵制','日韩历史争议（慰安妇等）极敏感','朝鲜相关话题需极其谨慎'],tags:['#KoreanLife','#SelfDevelopment','#Kpop','#Beauty'],times:'工作日 KST 9-11 PM，周末2-6 PM，午间12-1 PM',audience:'追求潮流，受K文化影响，高互动率，关注美妆+职场+海外生活'},
+  sea:{label:'东南亚',tips:['内容保持有趣、接地气、轻松','尊重宗教多样性（马来/印尼以伊斯兰教为主）','电商内容表现非常好','美食+旅游内容容易爆火','使用当地俚语和梗增加亲切感','黄金时段：当地时间7-10 PM'],taboos:['宗教话题在马来/印尼非常敏感','不要把东南亚各国一概而论','殖民历史在某些国家仍是情感禁区','泰国王室话题绝对禁止（冒犯罪）','缅甸政治局势话题需回避'],tags:['#SEAlife','#TravelAsia','#FoodTour','#OnlineBusiness'],times:'工作日 UTC+7/8 7-10 PM，午间12-1 PM，周末全天活跃',audience:'年轻化，移动端优先，电商活跃，喜爱美食+旅游+副业+TikTok'},
+  me:{label:'中东',tips:['强调家庭和社区价值观','斋月期间调整发布时间（日落后）','阿拉伯语字幕大幅提升本地互动','海湾地区创业/商业内容受欢迎','视觉风格保守、有格调','重要节日问候（开斋节、宰牲节）'],taboos:['绝对禁止批评或嘲讽伊斯兰教','酒精/赌博内容被严格禁止','性别相关内容必须保守','以色列相关话题极度敏感','禁止任何亵渎宗教的内容'],tags:['#MiddleEast','#Business','#Entrepreneurship','#Arabic'],times:'工作日 AST 9 PM - 12 AM，斋月：10 PM - 2 AM高峰',audience:'信仰驱动，家庭导向，关注商业+房产+宗教，高购买力'},
+  africa:{label:'非洲',tips:['强调社区建设和互助精神','移动端优先：视频保持轻量、快速加载','融入当地音乐和视觉风格','创业+副业话题非常受欢迎','语言因地区而异：东部英语，西部法语','分享真实的成功故事激励他人'],taboos:['绝对禁止使用贫穷/落后的刻板印象','部落政治在某些地区敏感','政治稳定性话题需谨慎','不要用"非洲"笼统概括54个国家','疾病/饥荒等负面标签避免使用'],tags:['#AfricanCreator','#Hustle','#AfricaRising','#Entrepreneurship'],times:'工作日 WAT/EAT 6-9 PM，午间12-1 PM同样活跃',audience:'年轻有活力，创业精神强，移动互联网增长最快，渴望商业+教育+娱乐'},
+  latam:{label:'拉丁美洲',tips:['热情感性的语气 - 冷淡风格行不通','西班牙语为主，巴西用葡萄牙语','家庭+音乐+美食是核心文化纽带','TikTok和Instagram在拉美增长迅速','故事叙事优于干巴巴的逻辑','发布时间：当地8-11 PM，周末下午'],taboos:['不要把所有拉美国家混为一谈','政治极度复杂（委内瑞拉、古巴等）','绝不嘲讽拉丁口音、食物或传统','毒品/暴力话题避免美化','美国干预拉美历史是敏感话题'],tags:['#Latinx','#Emprendimiento','#FamiliaLatina','#TikTokLatino'],times:'工作日当地8-11 PM，周末3-6 PM活跃',audience:'情感驱动，家庭至上，喜爱音乐+美食，移动社交活跃，娱乐+副业内容'}
 };
+let REGIONS=JSON.parse(localStorage.getItem('chub_regions'))||JSON.parse(JSON.stringify(DEFAULT_REGIONS));
+function saveRegions(){localStorage.setItem('chub_regions',JSON.stringify(REGIONS))}
 
+let regionEditMode=false;
 function renderRegion(){
   const k=document.getElementById('regionSelect').value;
   const d=REGIONS[k];if(!d)return;
-  document.getElementById('regionPanel').innerHTML=`<div class="region-panel">
+  const editToolbar=`<div class="toolbar" style="margin-top:12px;margin-bottom:0">
+    <button class="toolbar-btn${regionEditMode?' active':''}" onclick="toggleRegionEdit()">${regionEditMode?'退出编辑':'编辑模式'}</button>
+    ${regionEditMode?'<button class="toolbar-btn" onclick="resetRegions()">重置默认</button>':''}
+    <span class="edit-indicator">${regionEditMode?'编辑中':'只读模式'}</span>
+  </div>`;
+  const editBtns=regionEditMode?`<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+    <button class="toolbar-btn" onclick="editRegionField('${k}','tips')">编辑技巧</button>
+    <button class="toolbar-btn" onclick="editRegionField('${k}','taboos')">编辑禁忌</button>
+    <button class="toolbar-btn" onclick="editRegionField('${k}','tags')">编辑标签</button>
+    <button class="toolbar-btn" onclick="editRegionField('${k}','times')">编辑时间</button>
+    <button class="toolbar-btn" onclick="editRegionField('${k}','audience')">编辑画像</button>
+  </div>`:'';
+  document.getElementById('regionPanel').innerHTML=editToolbar+`<div class="region-panel">
     <div class="region-header">${d.label}</div>
     <div class="region-grid">
       <div class="region-section"><div class="section-title">发布技巧</div><ul class="tip-list">${d.tips.map(t=>'<li>'+t+'</li>').join('')}</ul></div>
       <div class="region-section"><div class="section-title">禁忌话题</div>${d.taboos.map(t=>'<div class="taboo-card">! '+t+'</div>').join('')}<div style="margin-top:16px"><div class="section-title">推荐标签</div><div>${d.tags.map(t=>'<span class="ht">'+t+'</span>').join('')}</div></div></div>
       <div class="region-section"><div class="section-title">最佳发布时间</div><div style="font-size:13px;line-height:1.8">${d.times}</div><div style="margin-top:16px"><div class="section-title">受众画像</div><div style="font-size:13px;line-height:1.7">${d.audience}</div></div></div>
-    </div></div>`;
+    </div>${editBtns}</div>`;
+}
+function toggleRegionEdit(){regionEditMode=!regionEditMode;renderRegion()}
+function editRegionField(rk,field){
+  const d=REGIONS[rk];if(!d)return;
+  if(Array.isArray(d[field])){
+    const val=prompt('编辑（每行一条，用换行分隔）：',d[field].join('\n'));
+    if(val===null)return;
+    d[field]=val.split('\n').map(s=>s.trim()).filter(Boolean);
+  }else{
+    const val=prompt('编辑：',d[field]);
+    if(val===null)return;
+    d[field]=val;
+  }
+  saveRegions();renderRegion();showToast('地区数据已更新','success',1500);
+}
+function resetRegions(){
+  if(!confirm('确定重置所有地区数据？'))return;
+  REGIONS=JSON.parse(JSON.stringify(DEFAULT_REGIONS));saveRegions();renderRegion();showToast('已重置为默认数据','success');
 }
 
 // ─── OPS-FLOW: TEMPLATES ────────────────────────────────
-const TEMPLATES=[
+const DEFAULT_TEMPLATES=[
   {id:'daily-report',name:'日报生成',cat:'reporting',desc:'自动生成每日工作摘要并通过邮件发送',trigger:'定时：每天18:00',steps:['收集数据','生成报告','发送邮件'],vars:['email（必填）','timezone（默认：Asia/Shanghai）']},
   {id:'weekly-digest',name:'周报汇总',cat:'reporting',desc:'将每周指标和成果汇编为周报摘要',trigger:'定时：周一9:00',steps:['汇总周数据','生成摘要','发送给团队'],vars:['email（必填）','includeCharts（默认：true）']},
   {id:'data-sync',name:'数据同步',cat:'data',desc:'跨平台数据同步与ETL管道',trigger:'定时：每30分钟 + Webhook',steps:['从来源提取','数据转换','验证结构','加载到目标'],vars:['source（必填）','destination（必填）','mapping（可选）']},
@@ -707,24 +739,70 @@ const TEMPLATES=[
   {id:'customer-onboard',name:'客户入驻',cat:'crm',desc:'新客户入驻自动化流程',trigger:'事件 / Webhook',steps:['创建账户','发送欢迎邮件','预约入驻通话','分配客户成功经理'],vars:['customerData（必填）','plan（必填）']},
   {id:'feedback-collect',name:'反馈收集',cat:'crm',desc:'自动收集并分类用户反馈',trigger:'定时：周五10:00 + 订单事件',steps:['发送问卷','收集回复','分类反馈','生成洞察'],vars:['surveyTemplate（必填）','minResponses（默认：10）']},
 ];
+let TEMPLATES=JSON.parse(localStorage.getItem('chub_templates'))||JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
+function saveTemplates(){localStorage.setItem('chub_templates',JSON.stringify(TEMPLATES))}
 const CAT_LABELS={all:'全部',reporting:'报告',data:'数据',monitoring:'监控',content:'内容',marketing:'营销',crm:'CRM'};
 let activeCat='all';
+let opsEditMode=false;
 
 function renderOps(){
   const pills=document.getElementById('catPills');
   pills.innerHTML=Object.entries(CAT_LABELS).map(([k,v])=>`<button class="cat-pill${k===activeCat?' active':''}" onclick="filterCat('${k}')">${v}</button>`).join('');
   const filtered=activeCat==='all'?TEMPLATES:TEMPLATES.filter(t=>t.cat===activeCat);
-  document.getElementById('tplGrid').innerHTML=filtered.map(t=>`<div class="tpl-card" onclick="this.classList.toggle('expanded')">
+  // Toolbar
+  const toolbarHtml=`<div class="toolbar" style="margin-bottom:16px">
+    <button class="toolbar-btn${opsEditMode?' active':''}" onclick="toggleOpsEdit()">${opsEditMode?'退出编辑':'编辑模式'}</button>
+    ${opsEditMode?'<button class="toolbar-btn primary" onclick="addTemplate()">+ 添加模板</button><button class="toolbar-btn" onclick="resetTemplates()">重置默认</button>':''}
+    <span class="edit-indicator">${opsEditMode?'编辑中 - 点击卡片可编辑':'只读模式 - 点击卡片展开详情'}</span>
+  </div>`;
+  const cardsHtml=filtered.map((t,fi)=>{
+    const ri=TEMPLATES.indexOf(t);
+    const editBtns=opsEditMode?`<div style="display:flex;gap:6px;margin-top:10px">
+      <button class="toolbar-btn" onclick="event.stopPropagation();editTemplate(${ri})">编辑</button>
+      <button class="toolbar-btn danger" onclick="event.stopPropagation();deleteTemplate(${ri})">删除</button>
+    </div>`:'';
+    return`<div class="tpl-card" onclick="${opsEditMode?'':'this.classList.toggle(\'expanded\')'}">
     <div class="tpl-name">${t.name}</div>
     <div class="tpl-desc">${t.desc}</div>
     <div class="tpl-meta"><span class="tpl-badge">${t.cat}</span><span class="tpl-badge">${t.trigger}</span><span class="tpl-badge">${t.steps.length} 步骤</span></div>
+    ${editBtns}
     <div class="tpl-detail">
       <div class="section-title">工作流步骤</div>
       <div class="step-flow">${t.steps.map((s,i)=>(i>0?'<span class="step-arrow">&rarr;</span>':'')+`<span class="step-node">${i+1}. ${s}</span>`).join('')}</div>
       <div class="var-list"><strong>变量：</strong> ${t.vars.join(' | ')}</div>
-    </div></div>`).join('');
+    </div></div>`;
+  }).join('');
+  document.getElementById('tplGrid').innerHTML=toolbarHtml+cardsHtml;
 }
 function filterCat(c){activeCat=c;renderOps()}
+function toggleOpsEdit(){opsEditMode=!opsEditMode;renderOps()}
+function editTemplate(i){
+  const t=TEMPLATES[i];if(!t)return;
+  const name=prompt('模板名称：',t.name);if(name===null)return;
+  const desc=prompt('描述：',t.desc);if(desc===null)return;
+  const trigger=prompt('触发方式：',t.trigger);if(trigger===null)return;
+  const steps=prompt('步骤（用逗号分隔）：',t.steps.join('，'));if(steps===null)return;
+  const cat=prompt('分类（reporting/data/monitoring/content/marketing/crm）：',t.cat);if(cat===null)return;
+  t.name=name;t.desc=desc;t.trigger=trigger;t.steps=steps.split(/[,，]/).map(s=>s.trim()).filter(Boolean);t.cat=cat;
+  saveTemplates();renderOps();showToast('模板已更新','success',1500);
+}
+function deleteTemplate(i){
+  if(!confirm('确定删除 "'+TEMPLATES[i].name+'" ？'))return;
+  TEMPLATES.splice(i,1);saveTemplates();renderOps();showToast('模板已删除','info',1500);
+}
+function addTemplate(){
+  const name=prompt('模板名称：');if(!name)return;
+  const desc=prompt('描述：')||'';
+  const cat=prompt('分类（reporting/data/monitoring/content/marketing/crm）：')||'content';
+  const trigger=prompt('触发方式：')||'手动';
+  const steps=prompt('步骤（用逗号分隔）：')||'步骤1，步骤2';
+  TEMPLATES.push({id:'custom_'+Date.now(),name,cat,desc,trigger,steps:steps.split(/[,，]/).map(s=>s.trim()).filter(Boolean),vars:['自定义变量']});
+  saveTemplates();renderOps();showToast('模板已添加','success');
+}
+function resetTemplates(){
+  if(!confirm('确定重置所有模板为默认数据？'))return;
+  TEMPLATES=JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));saveTemplates();renderOps();showToast('已重置为默认模板','success');
+}
 
 // ─── SALES-CRM: FUNNEL DATA ────────────────────────────
 const DEF_DEAL=[{id:'contact',label:'初次接触',count:24,color:'#3b82f6'},{id:'qualified',label:'意向确认',count:18,color:'#06b6d4'},{id:'proposal',label:'方案报价',count:11,color:'#8b5cf6'},{id:'negotiation',label:'谈判中',count:6,color:'#f59e0b'},{id:'closed_won',label:'已成交',count:3,color:'#10b981'}];
@@ -766,7 +844,7 @@ function editLeadCount(i){
 }
 
 // ─── PM-TOOLKIT: ROADMAP + SPRINT + FEEDBACK ────────────
-const ROADMAP=[
+const DEF_ROADMAP=[
   {lane:'P0',title:'MCP Server v1.0',status:'completed',date:'2026-01'},
   {lane:'P0',title:'RAG知识库',status:'completed',date:'2026-02'},
   {lane:'P0',title:'多平台发布',status:'in_progress',date:'2026-03'},
@@ -777,36 +855,125 @@ const ROADMAP=[
   {lane:'P2',title:'仪表盘v2',status:'in_progress',date:'2026-03'},
   {lane:'P3',title:'Chrome插件',status:'planned',date:'2026-Q3'},
 ];
-const SPRINT_TASKS={
+const DEF_SPRINT={
   todo:['添加OAuth登录','编写API文档','配置CI/CD'],
   in_progress:['统一仪表盘','地区文化测试'],
   review:['内容分发器v2'],
   done:['MCP注册更新','平台对比表','Service Worker配置'],
 };
-const FEEDBACK=[
+const DEF_FEEDBACK=[
   {text:'添加深色/浅色主题切换',votes:28,cat:'feature'},
   {text:'小屏手机布局错乱',votes:22,cat:'bug'},
   {text:'导出仪表盘数据为CSV',votes:19,cat:'feature'},
   {text:'优化素材库搜索功能',votes:15,cat:'improve'},
   {text:'添加定时发布提醒通知',votes:12,cat:'feature'},
 ];
+let ROADMAP=JSON.parse(localStorage.getItem('chub_roadmap'))||JSON.parse(JSON.stringify(DEF_ROADMAP));
+let SPRINT_TASKS=JSON.parse(localStorage.getItem('chub_sprint'))||JSON.parse(JSON.stringify(DEF_SPRINT));
+let FEEDBACK=JSON.parse(localStorage.getItem('chub_feedback'))||JSON.parse(JSON.stringify(DEF_FEEDBACK));
+function saveRoadmap(){localStorage.setItem('chub_roadmap',JSON.stringify(ROADMAP))}
+function saveSprint(){localStorage.setItem('chub_sprint',JSON.stringify(SPRINT_TASKS))}
+function saveFeedback(){localStorage.setItem('chub_feedback',JSON.stringify(FEEDBACK))}
+let pmEditMode=false;
 
 function renderPM(){
+  // PM toolbar
+  const pmToolbar=`<div class="toolbar" style="margin-bottom:16px">
+    <button class="toolbar-btn${pmEditMode?' active':''}" onclick="togglePmEdit()">${pmEditMode?'退出编辑':'编辑模式'}</button>
+    ${pmEditMode?'<button class="toolbar-btn" onclick="resetPmData()">重置默认</button>':''}
+    <span class="edit-indicator">${pmEditMode?'编辑中 - 点击项目可编辑':'只读模式'}</span>
+  </div>`;
+
+  // Roadmap
   const lanes=['P0','P1','P2','P3'];
-  document.getElementById('roadmapLanes').innerHTML=lanes.map(l=>{
+  const roadmapHtml=lanes.map(l=>{
     const items=ROADMAP.filter(r=>r.lane===l);
-    return`<div class="lane"><span class="lane-label">${l}</span><div class="lane-items">${items.map(r=>`<div class="ms-chip"><span class="dot dot-${r.status}"></span>${r.title}<span style="font-size:11px;color:var(--text-dim);margin-left:4px">${r.date}</span></div>`).join('')}</div></div>`;
+    return`<div class="lane"><span class="lane-label">${l}</span><div class="lane-items">${items.map((r,_)=>{
+      const ri=ROADMAP.indexOf(r);
+      const editClick=pmEditMode?`onclick="editRoadmapItem(${ri})"`:'';
+      const delBtn=pmEditMode?`<span style="margin-left:4px;cursor:pointer;color:var(--red);font-size:11px" onclick="event.stopPropagation();deleteRoadmapItem(${ri})">x</span>`:'';
+      return`<div class="ms-chip" style="${pmEditMode?'cursor:pointer':''}" ${editClick}><span class="dot dot-${r.status}"></span>${r.title}<span style="font-size:11px;color:var(--text-dim);margin-left:4px">${r.date}</span>${delBtn}</div>`;
+    }).join('')}${pmEditMode?`<div class="ms-chip" style="cursor:pointer;border-style:dashed;color:var(--accent)" onclick="addRoadmapItem('${l}')">+ 添加</div>`:''}</div></div>`;
   }).join('');
 
+  document.getElementById('roadmapLanes').innerHTML=pmToolbar+'<div style="margin-bottom:8px;font-size:15px;font-weight:600">产品路线图</div>'+roadmapHtml;
+
+  // Sprint Board
   const cols=[['todo','待处理'],['in_progress','进行中'],['review','待审核'],['done','已完成']];
   document.getElementById('sprintBoard').innerHTML=cols.map(([k,label])=>{
     const tasks=SPRINT_TASKS[k]||[];
-    return`<div class="sprint-col"><div class="sprint-col-title">${label}<span class="cnt">${tasks.length}</span></div>${tasks.map(t=>`<div class="task-chip">${t}</div>`).join('')}</div>`;
+    const taskHtml=tasks.map((t,ti)=>{
+      const editClick=pmEditMode?`onclick="editSprintTask('${k}',${ti})"`:'';
+      const delBtn=pmEditMode?`<span style="float:right;cursor:pointer;color:var(--red);font-size:11px" onclick="event.stopPropagation();deleteSprintTask('${k}',${ti})">x</span>`:'';
+      return`<div class="task-chip" style="${pmEditMode?'cursor:pointer':''}" ${editClick}>${t}${delBtn}</div>`;
+    }).join('');
+    const addBtn=pmEditMode?`<div class="task-chip" style="cursor:pointer;border-style:dashed;color:var(--accent);text-align:center" onclick="addSprintTask('${k}')">+ 添加</div>`:'';
+    return`<div class="sprint-col"><div class="sprint-col-title">${label}<span class="cnt">${tasks.length}</span></div>${taskHtml}${addBtn}</div>`;
   }).join('');
 
+  // Feedback
   const catCls={feature:'fb-feature',bug:'fb-bug',improve:'fb-improve'};
   const catLabel={feature:'新功能',bug:'Bug',improve:'优化'};
-  document.getElementById('fbList').innerHTML=FEEDBACK.map(f=>`<div class="fb-item"><div class="fb-votes">${f.votes}</div><div class="fb-text">${f.text}</div><span class="fb-cat ${catCls[f.cat]}">${catLabel[f.cat]}</span></div>`).join('');
+  const fbAddBtn=pmEditMode?`<div style="margin-top:12px"><button class="toolbar-btn primary" onclick="addFeedback()">+ 添加反馈</button></div>`:'';
+  document.getElementById('fbList').innerHTML=FEEDBACK.sort((a,b)=>b.votes-a.votes).map((f,i)=>{
+    const editClick=pmEditMode?`onclick="editFeedback(${i})"`:'';
+    const voteClick=pmEditMode?'':`onclick="voteFeedback(${i})"`;
+    const delBtn=pmEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:8px" onclick="event.stopPropagation();deleteFeedback(${i})">x</span>`:'';
+    return`<div class="fb-item" style="${pmEditMode?'cursor:pointer':''}" ${editClick}><div class="fb-votes" style="cursor:pointer" ${voteClick}>${f.votes}</div><div class="fb-text">${f.text}</div><span class="fb-cat ${catCls[f.cat]}">${catLabel[f.cat]}</span>${delBtn}</div>`;
+  }).join('')+fbAddBtn;
+}
+
+function togglePmEdit(){pmEditMode=!pmEditMode;renderPM()}
+function resetPmData(){
+  if(!confirm('确定重置所有项目管理数据？'))return;
+  ROADMAP=JSON.parse(JSON.stringify(DEF_ROADMAP));SPRINT_TASKS=JSON.parse(JSON.stringify(DEF_SPRINT));FEEDBACK=JSON.parse(JSON.stringify(DEF_FEEDBACK));
+  saveRoadmap();saveSprint();saveFeedback();renderPM();showToast('已重置为默认数据','success');
+}
+// Roadmap CRUD
+function editRoadmapItem(i){
+  const r=ROADMAP[i];if(!r)return;
+  const title=prompt('标题：',r.title);if(title===null)return;
+  const date=prompt('日期：',r.date);if(date===null)return;
+  const status=prompt('状态（completed/in_progress/planned/delayed）：',r.status);if(status===null)return;
+  const lane=prompt('优先级（P0/P1/P2/P3）：',r.lane);if(lane===null)return;
+  r.title=title;r.date=date;r.status=status;r.lane=lane;
+  saveRoadmap();renderPM();showToast('路线图已更新','success',1500);
+}
+function deleteRoadmapItem(i){ROADMAP.splice(i,1);saveRoadmap();renderPM();showToast('已删除','info',1500)}
+function addRoadmapItem(lane){
+  const title=prompt('标题：');if(!title)return;
+  const date=prompt('日期（如2026-04）：')||'2026-Q2';
+  ROADMAP.push({lane,title,status:'planned',date});saveRoadmap();renderPM();showToast('已添加到路线图','success');
+}
+// Sprint CRUD
+function editSprintTask(col,ti){
+  const val=prompt('编辑任务：',SPRINT_TASKS[col][ti]);if(val===null)return;
+  const newCol=prompt('移动到（todo/in_progress/review/done）：',col);if(newCol===null)return;
+  SPRINT_TASKS[col].splice(ti,1);
+  if(!SPRINT_TASKS[newCol])SPRINT_TASKS[newCol]=[];
+  SPRINT_TASKS[newCol].push(val);
+  saveSprint();renderPM();showToast('任务已更新','success',1500);
+}
+function deleteSprintTask(col,ti){SPRINT_TASKS[col].splice(ti,1);saveSprint();renderPM();showToast('已删除','info',1500)}
+function addSprintTask(col){
+  const val=prompt('新任务名称：');if(!val)return;
+  if(!SPRINT_TASKS[col])SPRINT_TASKS[col]=[];
+  SPRINT_TASKS[col].push(val);saveSprint();renderPM();showToast('任务已添加','success');
+}
+// Feedback CRUD
+function voteFeedback(i){FEEDBACK[i].votes++;saveFeedback();renderPM();showToast('+1 投票','success',1000)}
+function editFeedback(i){
+  const text=prompt('反馈内容：',FEEDBACK[i].text);if(text===null)return;
+  const cat=prompt('分类（feature/bug/improve）：',FEEDBACK[i].cat);if(cat===null)return;
+  const votes=prompt('票数：',FEEDBACK[i].votes);if(votes===null)return;
+  FEEDBACK[i].text=text;FEEDBACK[i].cat=cat;FEEDBACK[i].votes=parseInt(votes)||0;
+  saveFeedback();renderPM();showToast('反馈已更新','success',1500);
+}
+function deleteFeedback(i){FEEDBACK.splice(i,1);saveFeedback();renderPM();showToast('已删除','info',1500)}
+function addFeedback(){
+  const text=prompt('反馈内容：');if(!text)return;
+  const cat=prompt('分类（feature/bug/improve）：')||'feature';
+  FEEDBACK.push({text,votes:1,cat});saveFeedback();renderPM();showToast('反馈已添加','success');
 }
 
 // ─── PANELS ─────────────────────────────────────────────
@@ -826,8 +993,7 @@ function closeAllPanels(){
 // ─── CACHE CLEAR ────────────────────────────────────────
 function clearAllCache(){
   if(window.caches)caches.keys().then(ks=>ks.forEach(k=>caches.delete(k)));
-  localStorage.removeItem('chub_prefs');
-  localStorage.removeItem('chub_history');
+  ['chub_prefs','chub_history','chub_platforms','chub_deals','chub_leads','chub_templates','chub_roadmap','chub_sprint','chub_feedback','chub_regions'].forEach(k=>localStorage.removeItem(k));
   showToast('缓存已清除 | 2秒后刷新...','success');
   setTimeout(()=>location.reload(),2000);
 }
