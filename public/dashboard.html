@@ -83,7 +83,7 @@ td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(51,65,85,.4)}
 .platform-name{font-weight:600;display:flex;align-items:center;gap:6px}
-.overseas-row td:first-child .platform-name::after{content:'OS';font-size:10px;background:var(--overseas);color:#fff;padding:1px 5px;border-radius:3px;font-weight:500}
+/* OS badge handled by JS rendering - no CSS pseudo-element needed */
 .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
 .badge-p0{background:#7f1d1d;color:#fca5a5}
 .badge-p1{background:#78350f;color:#fcd34d}
@@ -229,9 +229,9 @@ tr:hover td{background:rgba(51,65,85,.4)}
 /* Editable & Sort */
 .sort-header{cursor:pointer;user-select:none;position:relative;padding-right:20px!important}
 .sort-header:hover{color:var(--accent)}
-.sort-header::after{content:'\u2195';position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:11px;opacity:.5}
-.sort-header.sort-asc::after{content:'\u2191';opacity:1;color:var(--accent)}
-.sort-header.sort-desc::after{content:'\u2193';opacity:1;color:var(--accent)}
+.sort-header::after{content:'\2195';position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:11px;opacity:.5}
+.sort-header.sort-asc::after{content:'\2191';opacity:1;color:var(--accent)}
+.sort-header.sort-desc::after{content:'\2193';opacity:1;color:var(--accent)}
 .toolbar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
 .toolbar-btn{background:var(--card-bg);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s}
 .toolbar-btn:hover{color:var(--text);border-color:var(--accent);background:var(--card-hover)}
