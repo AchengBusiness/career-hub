@@ -225,6 +225,44 @@ tr:hover td{background:rgba(51,65,85,.4)}
 @media(max-width:480px){
   .sprint-board{grid-template-columns:1fr}
 }
+
+/* Editable & Sort */
+.sort-header{cursor:pointer;user-select:none;position:relative;padding-right:20px!important}
+.sort-header:hover{color:var(--accent)}
+.sort-header::after{content:'\u2195';position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:11px;opacity:.5}
+.sort-header.sort-asc::after{content:'\u2191';opacity:1;color:var(--accent)}
+.sort-header.sort-desc::after{content:'\u2193';opacity:1;color:var(--accent)}
+.toolbar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.toolbar-btn{background:var(--card-bg);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s}
+.toolbar-btn:hover{color:var(--text);border-color:var(--accent);background:var(--card-hover)}
+.toolbar-btn.active{color:var(--accent);border-color:var(--accent)}
+.toolbar-btn.primary{background:var(--accent);color:#0f172a;border-color:var(--accent);font-weight:600}
+.toolbar-btn.primary:hover{opacity:.85}
+.toolbar-btn.danger{color:var(--red);border-color:var(--red)}
+.toolbar-btn.danger:hover{background:#7f1d1d;color:#fff}
+td[contenteditable="true"]{outline:none;background:rgba(56,189,248,.08);border-radius:3px;cursor:text}
+td[contenteditable="true"]:focus{box-shadow:inset 0 0 0 1px var(--accent)}
+.row-actions{display:flex;gap:4px}
+.row-btn{background:none;border:1px solid var(--border);color:var(--text-secondary);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px}
+.row-btn:hover{color:var(--text);border-color:var(--accent)}
+.row-btn.del:hover{color:var(--red);border-color:var(--red)}
+.edit-indicator{font-size:11px;color:var(--text-dim);margin-left:auto}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:500px;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px}
+.modal-field{margin-bottom:12px}
+.modal-field label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:4px}
+.modal-field input,.modal-field select,.modal-field textarea{width:100%;background:#0f172a;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;font-family:inherit}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{outline:none;border-color:var(--accent)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+/* Editable funnel/sprint */
+.editable-count{cursor:pointer;border-bottom:1px dashed var(--text-dim)}
+.editable-count:hover{color:var(--accent);border-color:var(--accent)}
+.inline-input{background:#0f172a;border:1px solid var(--accent);color:var(--text);padding:2px 6px;border-radius:4px;font-size:13px;width:60px;text-align:center;font-family:inherit}
 </style>
 </head>
 <body>
@@ -330,26 +368,11 @@ tr:hover td{background:rgba(51,65,85,.4)}
     <button class="sub-tab" onclick="switchSub('m-regional',this)">地区指南</button>
   </div>
 
-  <!-- Sub: Compare -->
+  <!-- Sub: Compare (dynamic) -->
   <div id="sub-m-compare" class="sub-pane active">
-    <div class="table-wrap"><table><thead><tr>
-      <th>平台</th><th>字数限制</th><th>内容风格</th><th>话题标签</th><th>功能特色</th><th>优先级</th>
-    </tr></thead><tbody>
-      <tr><td><span class="platform-name">Twitter / X</span></td><td><span class="char-limit">280</span></td><td>简洁有力</td><td>2-3</td><td>话题趋势, 订阅</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr><td><span class="platform-name">微博</span></td><td><span class="char-limit">2000</span></td><td>对话感</td><td>2</td><td>超话, 直播</td><td><span class="badge badge-p1">P1</span></td></tr>
-      <tr><td><span class="platform-name">小红书</span></td><td><span class="char-limit">1000</span></td><td>生活方式</td><td>5-10</td><td>图文笔记, 种草</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr><td><span class="platform-name">抖音</span></td><td><span class="char-limit">300</span></td><td>钩子驱动</td><td>3-5</td><td>短视频, 直播带货</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr><td><span class="platform-name">哔哩哔哩</span></td><td><span class="char-limit">2000</span></td><td>知识性</td><td>3-8</td><td>长视频, 专栏, 弹幕</td><td><span class="badge badge-p1">P1</span></td></tr>
-      <tr><td><span class="platform-name">快手</span></td><td><span class="char-limit">300</span></td><td>接地气</td><td>3-5</td><td>下沉市场, 社区</td><td><span class="badge badge-p2">P2</span></td></tr>
-      <tr><td><span class="platform-name">Threads</span></td><td><span class="char-limit">500</span></td><td>对话感</td><td>1-3</td><td>Instagram整合</td><td><span class="badge badge-p1">P1</span></td></tr>
-      <tr><td><span class="platform-name">LinkedIn</span></td><td><span class="char-limit">3000</span></td><td>专业</td><td>3-5</td><td>B2B社交, 文章</td><td><span class="badge badge-p1">P1</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">YouTube</span></td><td><span class="char-limit">5000</span></td><td>SEO优化</td><td>5-15</td><td>长视频, 会员, 超级感谢</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">YouTube Shorts</span></td><td><span class="char-limit">100</span></td><td>病毒钩子</td><td>3-5</td><td>竖版短视频, Shorts推流</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">TikTok</span></td><td><span class="char-limit">2200</span></td><td>病毒钩子</td><td>3-5</td><td>挑战赛, TikTok商城</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">Instagram Reels</span></td><td><span class="char-limit">2200</span></td><td>CTA驱动</td><td>5-10</td><td>Reels加速, 购物标签</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">Instagram Post</span></td><td><span class="char-limit">2200</span></td><td>生活方式</td><td>10-30</td><td>轮播, 精选集</td><td><span class="badge badge-p1">P1</span></td></tr>
-    </tbody></table></div>
-    <p style="margin-top:12px;font-size:12px;color:var(--text-secondary)"><span style="background:var(--overseas);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px">OS</span> = 海外平台</p>
+    <div class="toolbar" id="platformToolbar"></div>
+    <div id="platformTableWrap"></div>
+    <p style="margin-top:12px;font-size:12px;color:var(--text-secondary)"><span style="background:var(--overseas);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px">OS</span> = 海外平台 &nbsp; | &nbsp; 点击单元格可编辑，点击表头可排序</p>
   </div>
 
   <!-- Sub: Preview -->
@@ -483,21 +506,132 @@ function showToast(msg,type='info',dur=3000){
 }
 
 // ─── MEDIA-OPS: PLATFORM DATA ───────────────────────────
-const PLATFORMS=[
-  {id:'twitter',name:'Twitter/X',limit:280,style:'punchy',tags:['#Career','#Growth'],os:false},
-  {id:'weibo',name:'Weibo',limit:2000,style:'conversational',tags:['#Career','#Story'],os:false},
-  {id:'xhs',name:'Xiaohongshu',limit:1000,style:'lifestyle',tags:['#Lifestyle','#Tips'],os:false},
-  {id:'douyin',name:'Douyin',limit:300,style:'hook-driven',tags:['#Skills','#Learn'],os:false},
-  {id:'bili',name:'Bilibili',limit:2000,style:'educational',tags:['#Learning','#Skills'],os:false},
-  {id:'kuai',name:'Kuaishou',limit:300,style:'relatable',tags:['#RealLife','#Community'],os:false},
-  {id:'threads',name:'Threads',limit:500,style:'conversational',tags:['#career','#growth'],os:false},
-  {id:'linkedin',name:'LinkedIn',limit:3000,style:'professional',tags:['#Leadership','#Career'],os:false},
-  {id:'youtube',name:'YouTube',limit:5000,style:'seo-optimized',tags:['#HowTo','#Tutorial'],os:true},
-  {id:'ytshorts',name:'YT Shorts',limit:100,style:'viral-hook',tags:['#Shorts','#Tips'],os:true},
-  {id:'tiktok',name:'TikTok',limit:2200,style:'viral-hook',tags:['#fyp','#LearnOnTikTok'],os:true},
-  {id:'reels',name:'IG Reels',limit:2200,style:'cta-driven',tags:['#Reels','#CareerTips'],os:true},
-  {id:'igpost',name:'IG Post',limit:2200,style:'lifestyle',tags:['#lifestyle','#success'],os:true},
+const DEFAULT_PLATFORMS=[
+  {id:'twitter',name:'Twitter/X',limit:280,style:'punchy',tags:['#Career','#Growth'],os:true,styleLabel:'实时热点, 观点输出',hashtags:'1-2',features:'实时热搜, X Premium长文',priority:'P0'},
+  {id:'weibo',name:'微博',limit:2000,style:'conversational',tags:['#职场','#故事'],os:false,styleLabel:'娱乐热点, 明星互动',hashtags:'2-3',features:'超话社区, 热搜榜, 直播',priority:'P1'},
+  {id:'xhs',name:'小红书',limit:1000,style:'lifestyle',tags:['#生活方式','#干货'],os:false,styleLabel:'种草内容, 生活方式',hashtags:'5-10',features:'种草笔记, 搜索购物决策',priority:'P0'},
+  {id:'douyin',name:'抖音',limit:500,style:'hook-driven',tags:['#技能','#学习'],os:false,styleLabel:'算法推流, 全民参与',hashtags:'3-5',features:'短视频, 抖音电商, 直播带货',priority:'P0'},
+  {id:'bili',name:'哔哩哔哩',limit:2000,style:'educational',tags:['#知识','#学习'],os:false,styleLabel:'知识内容, 二次元文化',hashtags:'3-5',features:'弹幕文化, 知识区, UP主生态',priority:'P1'},
+  {id:'kuai',name:'快手',limit:100,style:'relatable',tags:['#真实','#社区'],os:false,styleLabel:'真实生活, 下沉市场',hashtags:'2-3',features:'老铁社区, 快手电商, 私域流量',priority:'P2'},
+  {id:'threads',name:'Threads',limit:10000,style:'conversational',tags:['#career','#growth'],os:true,styleLabel:'轻社交, 随性对话',hashtags:'1-3',features:'Instagram打通, 社区功能',priority:'P1'},
+  {id:'linkedin',name:'LinkedIn',limit:3000,style:'professional',tags:['#Leadership','#Career'],os:true,styleLabel:'职场专业, 知识分享',hashtags:'3-5',features:'B2B营销, 职场人脉, 领英文章',priority:'P0'},
+  {id:'youtube',name:'YouTube',limit:5000,style:'seo-optimized',tags:['#HowTo','#Tutorial'],os:true,styleLabel:'深度内容, SEO权重高',hashtags:'3-15',features:'全球最大视频平台, 广告变现',priority:'P0'},
+  {id:'ytshorts',name:'YT Shorts',limit:5000,style:'viral-hook',tags:['#Shorts','#Tips'],os:true,styleLabel:'短平快竖屏, 引流主频道',hashtags:'3-5',features:'Shorts算法推流, 引流转化',priority:'P1'},
+  {id:'tiktok',name:'TikTok',limit:4000,style:'viral-hook',tags:['#fyp','#LearnOnTikTok'],os:true,styleLabel:'娱乐化, 病毒式传播',hashtags:'3-5',features:'For You算法, TikTok Shop',priority:'P0'},
+  {id:'reels',name:'IG Reels',limit:2200,style:'cta-driven',tags:['#Reels','#CareerTips'],os:true,styleLabel:'竖屏短视频, 高传播率',hashtags:'3-5',features:'Reels推流, 跨发Facebook, 购物',priority:'P0'},
+  {id:'igpost',name:'IG Post',limit:2200,style:'lifestyle',tags:['#lifestyle','#success'],os:true,styleLabel:'图文精致, 品牌展示',hashtags:'3-10',features:'购物标签, 轮播, 探索页发现',priority:'P1'},
 ];
+let PLATFORMS=JSON.parse(localStorage.getItem('chub_platforms'))||JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
+function savePlatforms(){localStorage.setItem('chub_platforms',JSON.stringify(PLATFORMS))}
+
+// ─── PLATFORM TABLE: SORT + EDIT + RENDER ─────────────
+let platSort={col:null,dir:'asc'};
+let platEditMode=false;
+
+function renderPlatformTable(){
+  const priOrder={P0:0,P1:1,P2:2};
+  if(platSort.col){
+    PLATFORMS.sort((a,b)=>{
+      let va,vb;
+      switch(platSort.col){
+        case'name':va=a.name;vb=b.name;break;
+        case'limit':va=a.limit;vb=b.limit;return platSort.dir==='asc'?va-vb:vb-va;
+        case'priority':va=priOrder[a.priority]||9;vb=priOrder[b.priority]||9;return platSort.dir==='asc'?va-vb:vb-va;
+        case'hashtags':va=a.hashtags;vb=b.hashtags;break;
+        default:va=a[platSort.col]||'';vb=b[platSort.col]||'';
+      }
+      if(typeof va==='string')return platSort.dir==='asc'?va.localeCompare(vb):vb.localeCompare(va);
+      return platSort.dir==='asc'?va-vb:vb-va;
+    });
+  }
+  // Toolbar
+  const tb=document.getElementById('platformToolbar');
+  tb.innerHTML=`
+    <button class="toolbar-btn${platEditMode?' active':''}" onclick="togglePlatEdit()">
+      ${platEditMode?'退出编辑':'编辑模式'}
+    </button>
+    <button class="toolbar-btn" onclick="sortPlatBy('priority')">按优先级排序</button>
+    <button class="toolbar-btn" onclick="sortPlatBy('limit')">按字数排序</button>
+    <button class="toolbar-btn" onclick="sortPlatBy('name')">按名称排序</button>
+    ${platEditMode?'<button class="toolbar-btn primary" onclick="addPlatform()">+ 添加平台</button><button class="toolbar-btn" onclick="resetPlatforms()">重置默认</button>':''}
+    <span class="edit-indicator">${platEditMode?'编辑中 - 点击单元格修改':'只读模式'}</span>
+  `;
+  // Table
+  const cols=[
+    {key:'name',label:'平台'},{key:'limit',label:'字数限制'},{key:'styleLabel',label:'内容风格'},
+    {key:'hashtags',label:'话题标签'},{key:'features',label:'功能特色'},{key:'priority',label:'优先级'}
+  ];
+  const ths=cols.map(c=>{
+    const cls='sort-header'+(platSort.col===c.key?(' sort-'+platSort.dir):'');
+    return`<th class="${cls}" onclick="sortPlatBy('${c.key}')">${c.label}</th>`;
+  }).join('')+(platEditMode?'<th>操作</th>':'');
+
+  const rows=PLATFORMS.map((p,i)=>{
+    const rc=p.os?'overseas-row':'';
+    const ce=platEditMode?'contenteditable="true"':'';
+    const osBadge=p.os?'<span style="font-size:10px;background:var(--overseas);color:#fff;padding:1px 5px;border-radius:3px;margin-left:4px">OS</span>':'';
+    const priCls='badge-'+p.priority.toLowerCase();
+    const actions=platEditMode?`<td><div class="row-actions">
+      <button class="row-btn" onclick="togglePlatOS(${i})">${p.os?'改国内':'改海外'}</button>
+      <button class="row-btn" onclick="cyclePriority(${i})">切换优先级</button>
+      <button class="row-btn del" onclick="deletePlatform(${i})">删除</button>
+    </div></td>`:'';
+    return`<tr class="${rc}" data-idx="${i}">
+      <td><span class="platform-name">${p.name}${osBadge}</span></td>
+      <td ${ce} data-field="limit" data-idx="${i}"><span class="char-limit">${p.limit}</span></td>
+      <td ${ce} data-field="styleLabel" data-idx="${i}">${p.styleLabel}</td>
+      <td ${ce} data-field="hashtags" data-idx="${i}">${p.hashtags}</td>
+      <td ${ce} data-field="features" data-idx="${i}">${p.features}</td>
+      <td><span class="badge ${priCls}">${p.priority}</span></td>
+      ${actions}
+    </tr>`;
+  }).join('');
+
+  document.getElementById('platformTableWrap').innerHTML=`
+    <div class="table-wrap"><table><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table></div>
+  `;
+  // Bind contenteditable blur events
+  if(platEditMode){
+    document.querySelectorAll('#platformTableWrap td[contenteditable]').forEach(td=>{
+      td.addEventListener('blur',function(){
+        const idx=+this.dataset.idx,field=this.dataset.field;
+        let val=this.textContent.trim();
+        if(field==='limit')val=parseInt(val)||0;
+        PLATFORMS[idx][field]=val;
+        savePlatforms();
+        showToast('已保存','success',1500);
+      });
+    });
+  }
+}
+
+function sortPlatBy(col){
+  if(platSort.col===col)platSort.dir=platSort.dir==='asc'?'desc':'asc';
+  else{platSort.col=col;platSort.dir='asc'}
+  renderPlatformTable();
+}
+function togglePlatEdit(){platEditMode=!platEditMode;renderPlatformTable()}
+function togglePlatOS(i){PLATFORMS[i].os=!PLATFORMS[i].os;savePlatforms();renderPlatformTable();showToast('已更新','success',1500)}
+function cyclePriority(i){
+  const cycle={P0:'P1',P1:'P2',P2:'P0'};
+  PLATFORMS[i].priority=cycle[PLATFORMS[i].priority]||'P0';
+  savePlatforms();renderPlatformTable();showToast('优先级已切换','success',1500);
+}
+function deletePlatform(i){
+  PLATFORMS.splice(i,1);savePlatforms();renderPlatformTable();showToast('已删除','info',1500);
+}
+function resetPlatforms(){
+  PLATFORMS=JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
+  savePlatforms();renderPlatformTable();showToast('已重置为默认数据','success');
+}
+function addPlatform(){
+  const name=prompt('平台名称：');if(!name)return;
+  const limit=parseInt(prompt('字数限制：'))||1000;
+  const os=confirm('是否为海外平台？');
+  PLATFORMS.push({id:'custom_'+Date.now(),name,limit,style:'conversational',tags:['#tag'],os,
+    styleLabel:'自定义风格',hashtags:'3-5',features:'自定义功能',priority:'P1'});
+  savePlatforms();renderPlatformTable();showToast('平台已添加，请点击编辑完善信息','success');
+}
 
 function applyStyle(t,s){
   if(!t)return'';
@@ -593,40 +727,42 @@ function renderOps(){
 function filterCat(c){activeCat=c;renderOps()}
 
 // ─── SALES-CRM: FUNNEL DATA ────────────────────────────
-const DEAL_STAGES=[
-  {id:'contact',label:'初次接触',count:24,color:'#3b82f6'},
-  {id:'qualified',label:'意向确认',count:18,color:'#06b6d4'},
-  {id:'proposal',label:'方案报价',count:11,color:'#8b5cf6'},
-  {id:'negotiation',label:'谈判中',count:6,color:'#f59e0b'},
-  {id:'closed_won',label:'已成交',count:3,color:'#10b981'},
-];
-const LEAD_STATUSES=[
-  {id:'new',label:'新线索',count:45,color:'#3b82f6'},
-  {id:'contacted',label:'已接触',count:32,color:'#06b6d4'},
-  {id:'qualified',label:'已意向',count:20,color:'#8b5cf6'},
-  {id:'converted',label:'已转化',count:11,color:'#10b981'},
-  {id:'lost',label:'已流失',count:9,color:'#ef4444'},
-];
+const DEF_DEAL=[{id:'contact',label:'初次接触',count:24,color:'#3b82f6'},{id:'qualified',label:'意向确认',count:18,color:'#06b6d4'},{id:'proposal',label:'方案报价',count:11,color:'#8b5cf6'},{id:'negotiation',label:'谈判中',count:6,color:'#f59e0b'},{id:'closed_won',label:'已成交',count:3,color:'#10b981'}];
+const DEF_LEAD=[{id:'new',label:'新线索',count:45,color:'#3b82f6'},{id:'contacted',label:'已接触',count:32,color:'#06b6d4'},{id:'qualified',label:'已意向',count:20,color:'#8b5cf6'},{id:'converted',label:'已转化',count:11,color:'#10b981'},{id:'lost',label:'已流失',count:9,color:'#ef4444'}];
+let DEAL_STAGES=JSON.parse(localStorage.getItem('chub_deals'))||JSON.parse(JSON.stringify(DEF_DEAL));
+let LEAD_STATUSES=JSON.parse(localStorage.getItem('chub_leads'))||JSON.parse(JSON.stringify(DEF_LEAD));
+function saveDeals(){localStorage.setItem('chub_deals',JSON.stringify(DEAL_STAGES))}
+function saveLeads(){localStorage.setItem('chub_leads',JSON.stringify(LEAD_STATUSES))}
 
 function renderSales(){
-  const maxDeal=DEAL_STAGES[0].count;
+  const maxDeal=Math.max(...DEAL_STAGES.map(s=>s.count),1);
   let fhtml='';
   DEAL_STAGES.forEach((s,i)=>{
     const w=Math.max(Math.round(s.count/maxDeal*100),15);
-    fhtml+=`<div class="funnel-stage"><span class="funnel-label">${s.label}</span><div class="funnel-bar" style="width:${w}%;background:${s.color}">${s.count}</div></div>`;
+    fhtml+=`<div class="funnel-stage"><span class="funnel-label">${s.label}</span><div class="funnel-bar" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editDealCount(${i})">${s.count}</span></div></div>`;
     if(i<DEAL_STAGES.length-1){
-      const conv=Math.round(DEAL_STAGES[i+1].count/s.count*100);
+      const conv=s.count>0?Math.round(DEAL_STAGES[i+1].count/s.count*100):0;
       fhtml+=`<div class="conv-arrow">&darr; ${conv}% 转化率</div>`;
     }
   });
   document.getElementById('dealFunnel').innerHTML=fhtml;
 
-  const maxLead=LEAD_STATUSES[0].count;
-  document.getElementById('leadBars').innerHTML=LEAD_STATUSES.map(s=>{
+  const maxLead=Math.max(...LEAD_STATUSES.map(s=>s.count),1);
+  document.getElementById('leadBars').innerHTML=LEAD_STATUSES.map((s,i)=>{
     const w=Math.max(Math.round(s.count/maxLead*100),8);
     const pct=Math.round(s.count/maxLead*100);
-    return`<div class="lead-row"><span class="lead-label">${s.label}</span><div class="lead-bar-wrap"><div class="lead-bar-fill" style="width:${w}%;background:${s.color}">${s.count}</div></div><span class="lead-stat">${pct}%</span></div>`;
+    return`<div class="lead-row"><span class="lead-label">${s.label}</span><div class="lead-bar-wrap"><div class="lead-bar-fill" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editLeadCount(${i})">${s.count}</span></div></div><span class="lead-stat">${pct}%</span></div>`;
   }).join('');
+}
+function editDealCount(i){
+  const v=prompt('修改 '+DEAL_STAGES[i].label+' 数量：',DEAL_STAGES[i].count);
+  if(v===null)return;const n=parseInt(v);if(isNaN(n)||n<0)return;
+  DEAL_STAGES[i].count=n;saveDeals();renderSales();showToast('商机数据已更新','success',1500);
+}
+function editLeadCount(i){
+  const v=prompt('修改 '+LEAD_STATUSES[i].label+' 数量：',LEAD_STATUSES[i].count);
+  if(v===null)return;const n=parseInt(v);if(isNaN(n)||n<0)return;
+  LEAD_STATUSES[i].count=n;saveLeads();renderSales();showToast('线索数据已更新','success',1500);
 }
 
 // ─── PM-TOOLKIT: ROADMAP + SPRINT + FEEDBACK ────────────
@@ -770,6 +906,7 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catc
 
 // ─── INIT ───────────────────────────────────────────────
 loadPrefs();
+renderPlatformTable();
 renderPreview();
 renderRegion();
 </script>
