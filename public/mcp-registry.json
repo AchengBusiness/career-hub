@@ -1,16 +1,16 @@
 {
   "registry": {
     "name": "Career-Hub MCP Registry",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "description": "四大职业工具的MCP Server统一注册表 | Unified MCP Server registry for four career toolkits",
     "updated": "2026-03-25",
-    "totalTools": 62
+    "totalTools": 70
   },
   "servers": [
     {
       "name": "media-ops",
       "title": "自媒体工具集 | Media Ops",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "repo": "https://github.com/AchengBusiness/media-ops",
       "command": "node",
       "args": ["src/mcp-server/index.js"],
@@ -29,7 +29,15 @@
         { "name": "get_ai_score", "description": "检测内容AI特征评分 | Detect AI feature score (0=human, 1=AI)" },
         { "name": "fetch_trending", "description": "获取指定平台热搜话题 | Fetch trending topics from a specified platform" },
         { "name": "fetch_all_trending", "description": "批量获取多平台热搜话题 | Fetch trending topics from multiple platforms" },
-        { "name": "suggest_topics", "description": "根据细分领域推荐内容选题 | Suggest content topics based on a niche" }
+        { "name": "suggest_topics", "description": "根据细分领域推荐内容选题 | Suggest content topics based on a niche" },
+        { "name": "create_outline", "description": "使用内容框架创建大纲 | Create content outline using framework" },
+        { "name": "get_frameworks", "description": "获取所有可用内容框架 | Get all available content frameworks" },
+        { "name": "generate_titles", "description": "从大纲生成标题建议 | Generate title suggestions from outline" },
+        { "name": "repurpose_content", "description": "一键拆解长文为多平台内容 | Repurpose long-form into multi-platform" },
+        { "name": "adapt_for_platform", "description": "为指定平台适配内容 | Adapt content for a specific platform" },
+        { "name": "add_inspiration", "description": "添加灵感到灵感库 | Add inspiration to swipe file" },
+        { "name": "search_inspiration", "description": "搜索灵感库 | Search swipe file" },
+        { "name": "get_swipe_stats", "description": "获取灵感库统计 | Get swipe file statistics" }
       ]
     },
     {
