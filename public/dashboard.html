@@ -3,45 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>海外内容平台运营仪表盘</title>
+<meta name="theme-color" content="#1e293b">
+<link rel="manifest" href="manifest.json">
+<title>Career-Hub Dashboard</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:#0f172a;--card-bg:#1e293b;--card-hover:#334155;
-  --text:#f1f5f9;--text-secondary:#94a3b8;
+  --text:#f1f5f9;--text-secondary:#94a3b8;--text-dim:#64748b;
   --accent:#38bdf8;--accent2:#818cf8;
-  --green:#22c55e;--yellow:#eab308;--red:#ef4444;
+  --green:#22c55e;--yellow:#eab308;--red:#ef4444;--orange:#f97316;
   --border:#334155;--overseas:#0ea5e9;
+  --accent-media:#38bdf8;--accent-ops:#f97316;--accent-sales:#a855f7;--accent-pm:#22c55e;
+  --toast-success-bg:#14532d;--toast-success-text:#86efac;
+  --toast-warning-bg:#78350f;--toast-warning-text:#fcd34d;
+  --toast-error-bg:#7f1d1d;--toast-error-text:#fca5a5;
+  --toast-info-bg:#1e3a5f;--toast-info-text:#93c5fd;
 }
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;min-height:100vh}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
+
+/* Topbar */
 .topbar{background:var(--card-bg);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px}
-.topbar-title{font-size:16px;font-weight:600;color:var(--text)}
+.topbar-title{font-size:16px;font-weight:600;flex:1}
 .back-link{font-size:13px;color:var(--text-secondary)}
-.back-link:hover{color:var(--accent)}
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--card-bg);padding:0 24px}
-.tab-btn{padding:14px 20px;background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:14px;font-family:inherit;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
-.tab-btn:hover{color:var(--text)}
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab-content{display:none;padding:24px}
-.tab-content.active{display:block}
-/* Table */
+.gear-btn{background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:18px;padding:4px 8px;border-radius:4px}
+.gear-btn:hover{color:var(--text);background:var(--card-hover)}
+
+/* Stats bar */
+.stats-bar{display:flex;gap:24px;padding:12px 24px;background:#162032;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.stat-item{font-size:13px;color:var(--text-secondary)}
+.stat-item strong{color:var(--accent);margin-right:4px}
+
+/* Main tabs */
+.main-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--card-bg);padding:0 24px;overflow-x:auto}
+.main-tab{padding:14px 20px;background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:14px;font-family:inherit;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.main-tab:hover{color:var(--text)}
+.main-tab.active{border-bottom-color:var(--accent)}
+.main-tab[data-tab="overview"].active{color:var(--accent);border-bottom-color:var(--accent)}
+.main-tab[data-tab="media"].active{color:var(--accent-media);border-bottom-color:var(--accent-media)}
+.main-tab[data-tab="ops"].active{color:var(--accent-ops);border-bottom-color:var(--accent-ops)}
+.main-tab[data-tab="sales"].active{color:var(--accent-sales);border-bottom-color:var(--accent-sales)}
+.main-tab[data-tab="pm"].active{color:var(--accent-pm);border-bottom-color:var(--accent-pm)}
+
+/* Tab content */
+.tab-pane{display:none;padding:24px}
+.tab-pane.active{display:block}
+
+/* Sub-tabs (media-ops) */
+.sub-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border)}
+.sub-tab{padding:10px 16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:13px;font-family:inherit;border-bottom:2px solid transparent;transition:all .2s}
+.sub-tab.active{color:var(--accent-media);border-bottom-color:var(--accent-media)}
+.sub-pane{display:none}
+.sub-pane.active{display:block}
+
+/* Overview cards */
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.overview-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:0;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.overview-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.oc-bar{height:4px}
+.oc-body{padding:20px}
+.oc-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.oc-icon{font-size:24px}
+.oc-name{font-size:16px;font-weight:700}
+.oc-ver{font-size:11px;color:var(--text-secondary);background:var(--card-hover);padding:2px 8px;border-radius:4px;margin-left:auto}
+.oc-tools{font-size:13px;color:var(--text-secondary);margin-bottom:12px}
+.oc-tools strong{color:var(--accent)}
+.oc-features{list-style:none}
+.oc-features li{font-size:13px;padding:4px 0;color:var(--text);border-bottom:1px solid var(--border)}
+.oc-features li:last-child{border-bottom:none}
+.oc-features li::before{content:'+ ';color:var(--accent);font-weight:600}
+
+/* Table (media-ops) */
 .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse;min-width:800px}
 th{background:#162032;color:var(--text-secondary);font-weight:600;padding:12px 14px;text-align:left;font-size:13px;white-space:nowrap;border-bottom:1px solid var(--border)}
-td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;font-size:13px}
+td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(51,65,85,.4)}
 .platform-name{font-weight:600;display:flex;align-items:center;gap:6px}
-.overseas-row td:first-child .platform-name::after{content:'海外';font-size:10px;background:var(--overseas);color:#fff;padding:1px 5px;border-radius:3px;font-weight:500}
+.overseas-row td:first-child .platform-name::after{content:'OS';font-size:10px;background:var(--overseas);color:#fff;padding:1px 5px;border-radius:3px;font-weight:500}
 .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
 .badge-p0{background:#7f1d1d;color:#fca5a5}
 .badge-p1{background:#78350f;color:#fcd34d}
 .badge-p2{background:#1e3a5f;color:#93c5fd}
 .char-limit{font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent)}
-/* Preview tab */
-.preview-input{width:100%;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-size:14px;font-family:inherit;resize:vertical;min-height:100px;outline:none;transition:border-color .2s}
+
+/* Preview (media-ops) */
+.preview-input{width:100%;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-size:14px;font-family:inherit;resize:vertical;min-height:100px;outline:none}
 .preview-input:focus{border-color:var(--accent)}
 .preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:20px}
 .platform-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:14px;transition:background .2s}
@@ -50,389 +100,677 @@ tr:hover td{background:rgba(51,65,85,.4)}
 .card-pname{font-weight:600;font-size:13px}
 .card-count{font-size:12px;color:var(--text-secondary)}
 .card-count.over{color:var(--red);font-weight:600}
-.progress-bar{height:4px;background:#1e293b;border-radius:2px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border)}
+.progress-bar{height:4px;background:#162032;border-radius:2px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border)}
 .progress-fill{height:100%;border-radius:2px;transition:width .3s}
-.fill-green{background:var(--green)}
-.fill-yellow{background:var(--yellow)}
-.fill-red{background:var(--red)}
+.fill-green{background:var(--green)}.fill-yellow{background:var(--yellow)}.fill-red{background:var(--red)}
 .card-preview{font-size:12px;color:var(--text-secondary);line-height:1.6;min-height:48px;word-break:break-all}
 .card-tags{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
 .tag-chip{background:#1e3a5f;color:#93c5fd;font-size:11px;padding:1px 7px;border-radius:10px}
-/* Regional guide */
+
+/* Regional guide (media-ops) */
 .region-select{background:var(--card-bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:14px;font-family:inherit;outline:none;cursor:pointer;min-width:200px}
-.region-select:focus{border-color:var(--accent)}
 .region-panel{margin-top:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:24px}
-.region-header{font-size:20px;font-weight:700;margin-bottom:20px;color:var(--text)}
+.region-header{font-size:20px;font-weight:700;margin-bottom:20px}
 .region-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 .region-section{background:#162032;border-radius:8px;padding:16px}
 .section-title{font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
 .tip-list{list-style:none}
-.tip-list li{padding:5px 0;color:var(--text);font-size:13px;line-height:1.6;border-bottom:1px solid var(--border)}
+.tip-list li{padding:5px 0;font-size:13px;line-height:1.6;border-bottom:1px solid var(--border)}
 .tip-list li:last-child{border-bottom:none}
-.tip-list li::before{content:'• ';color:var(--accent)}
+.tip-list li::before{content:'> ';color:var(--accent)}
 .taboo-card{background:#2d1515;border:1px solid #7f1d1d;border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:13px;color:#fca5a5;line-height:1.5}
-.taboo-card:last-child{margin-bottom:0}
-.hashtag-row{display:flex;flex-wrap:wrap;gap:6px}
-.ht{background:#1e3a5f;color:#93c5fd;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:500}
-.time-row{font-size:13px;color:var(--text);line-height:1.8}
-.audience-text{font-size:13px;color:var(--text);line-height:1.7}
+.ht{background:#1e3a5f;color:#93c5fd;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:500;display:inline-block;margin:2px}
 .label{font-size:11px;color:var(--text-secondary);margin-bottom:4px}
+
+/* Ops-Flow */
+.cat-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.cat-pill{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text-secondary);cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s}
+.cat-pill.active{background:var(--accent-ops);color:#fff;border-color:var(--accent-ops)}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.tpl-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:16px;cursor:pointer;transition:all .2s}
+.tpl-card:hover{background:var(--card-hover)}
+.tpl-name{font-weight:600;font-size:14px;margin-bottom:4px}
+.tpl-desc{font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5}
+.tpl-meta{display:flex;gap:8px;flex-wrap:wrap}
+.tpl-badge{font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(249,115,22,.15);color:var(--accent-ops)}
+.tpl-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.tpl-card.expanded .tpl-detail{display:block}
+.step-flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.step-node{background:#162032;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px}
+.step-arrow{color:var(--accent-ops);font-size:14px}
+.var-list{margin-top:8px;font-size:12px;color:var(--text-secondary)}
+
+/* Sales-CRM */
+.funnel-section{margin-bottom:32px}
+.funnel-title{font-size:15px;font-weight:600;margin-bottom:16px}
+.deal-funnel{display:flex;flex-direction:column;gap:0;max-width:600px}
+.funnel-stage{display:flex;align-items:center;gap:12px;padding:12px 16px;position:relative}
+.funnel-bar{height:40px;border-radius:6px;display:flex;align-items:center;padding:0 14px;font-size:13px;font-weight:600;color:#fff;transition:width .3s}
+.funnel-label{min-width:80px;font-size:13px;color:var(--text-secondary);text-align:right}
+.funnel-count{font-size:12px;color:var(--text-secondary);margin-left:8px}
+.conv-arrow{text-align:center;font-size:11px;color:var(--text-dim);padding:2px 0 2px 92px}
+.lead-bars{max-width:600px}
+.lead-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.lead-label{min-width:60px;font-size:13px;color:var(--text-secondary);text-align:right}
+.lead-bar-wrap{flex:1;height:28px;background:#162032;border-radius:4px;overflow:hidden;position:relative}
+.lead-bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:600;color:#fff;transition:width .3s}
+.lead-stat{font-size:12px;color:var(--text-secondary);min-width:60px}
+
+/* PM-Toolkit */
+.pm-section{margin-bottom:32px}
+.pm-title{font-size:15px;font-weight:600;margin-bottom:16px}
+.roadmap-lanes{display:flex;flex-direction:column;gap:12px}
+.lane{display:flex;align-items:center;gap:12px}
+.lane-label{min-width:40px;font-size:13px;font-weight:700;color:var(--text-secondary)}
+.lane-items{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.ms-chip{padding:6px 12px;border-radius:6px;font-size:12px;border:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.ms-chip .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-completed{background:var(--green)}.dot-in_progress{background:var(--accent)}.dot-planned{background:var(--text-dim)}.dot-delayed{background:var(--yellow)}
+.sprint-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.sprint-col{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px}
+.sprint-col-title{font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between}
+.sprint-col-title .cnt{background:var(--card-hover);padding:1px 6px;border-radius:4px;font-size:11px}
+.task-chip{background:#162032;border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:12px;margin-bottom:6px;line-height:1.4}
+.fb-list{max-width:600px}
+.fb-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.fb-votes{background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:14px;font-weight:700;color:var(--accent-pm);text-align:center;min-width:44px}
+.fb-text{font-size:13px;flex:1}
+.fb-cat{font-size:11px;padding:2px 8px;border-radius:4px}
+.fb-feature{background:rgba(34,197,94,.15);color:var(--green)}
+.fb-bug{background:rgba(239,68,68,.15);color:var(--red)}
+.fb-improve{background:rgba(168,85,247,.15);color:var(--accent-sales)}
+
+/* Toast */
+#toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:12px 18px;border-radius:8px;font-size:13px;pointer-events:auto;animation:toastIn .3s ease;display:flex;align-items:center;gap:8px;max-width:360px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.toast-exit{animation:toastOut .3s ease forwards}
+.toast-success{background:var(--toast-success-bg);color:var(--toast-success-text)}
+.toast-warning{background:var(--toast-warning-bg);color:var(--toast-warning-text)}
+.toast-error{background:var(--toast-error-bg);color:var(--toast-error-text)}
+.toast-info{background:var(--toast-info-bg);color:var(--toast-info-text)}
+@keyframes toastIn{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(80px)}}
+
+/* Panels (settings + history) */
+.panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;display:none}
+.panel-overlay.open{display:block}
+.side-panel{position:fixed;top:0;right:-360px;width:340px;height:100%;background:var(--card-bg);border-left:1px solid var(--border);z-index:901;transition:right .3s ease;overflow-y:auto;padding:20px}
+.side-panel.open{right:0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.panel-title{font-size:16px;font-weight:700}
+.panel-close{background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:20px;padding:4px}
+.panel-btn{width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--card-hover);color:var(--text);cursor:pointer;font-size:14px;font-family:inherit;margin-bottom:10px;transition:background .2s}
+.panel-btn:hover{background:var(--accent);color:#fff}
+.panel-btn-danger{border-color:#7f1d1d}
+.panel-btn-danger:hover{background:var(--red)}
+.hist-entry{background:#162032;border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:10px}
+.hist-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary);margin-bottom:6px}
+.hist-preview{font-size:12px;color:var(--text);line-height:1.5;margin-bottom:8px}
+.hist-actions{display:flex;gap:8px}
+.hist-btn{background:none;border:1px solid var(--border);color:var(--text-secondary);padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer}
+.hist-btn:hover{color:var(--text);border-color:var(--text)}
+
+/* Responsive */
+@media(max-width:768px){
+  .main-tabs{padding:0 12px}
+  .main-tab{padding:12px 14px;font-size:13px}
+  .tab-pane{padding:16px}
+  .overview-grid,.tpl-grid,.preview-grid{grid-template-columns:1fr}
+  .sprint-board{grid-template-columns:repeat(2,1fr)}
+  .deal-funnel,.lead-bars,.fb-list{max-width:100%}
+  .stats-bar{gap:12px;padding:10px 16px}
+  .side-panel{width:100%;right:-100%}
+  .region-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .sprint-board{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="topbar">
-  <a class="back-link" href="index.html">← 返回首页</a>
-  <div class="topbar-title">海外内容平台运营仪表盘</div>
+  <a class="back-link" href="index.html">&larr; Home</a>
+  <div class="topbar-title">Career-Hub Dashboard</div>
+  <button class="gear-btn" onclick="togglePanel('settings')" title="Settings">&#9881;</button>
 </div>
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('compare',this)">平台对比</button>
-  <button class="tab-btn" onclick="switchTab('preview',this)">内容预览</button>
-  <button class="tab-btn" onclick="switchTab('regional',this)">地区指南</button>
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <span class="stat-item"><strong>4</strong> repos</span>
+  <span class="stat-item"><strong>73</strong> MCP tools</span>
+  <span class="stat-item"><strong>2,462</strong> tests passing</span>
+  <span class="stat-item">media-ops <strong>v0.8.0</strong></span>
+  <span class="stat-item">ops-flow <strong>v0.6.0</strong></span>
+  <span class="stat-item">sales-crm <strong>v0.6.0</strong></span>
+  <span class="stat-item">pm-toolkit <strong>v0.6.0</strong></span>
 </div>
 
-<!-- TAB 1: Platform Comparison -->
-<div id="tab-compare" class="tab-content active">
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>平台名称</th>
-          <th>字符上限</th>
-          <th>内容风格</th>
-          <th>话题标签</th>
-          <th>特殊功能</th>
-          <th>优先级</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Domestic -->
-        <tr>
-          <td><span class="platform-name">Twitter / X</span></td>
-          <td><span class="char-limit">280</span></td>
-          <td>简洁有力</td>
-          <td>2–3 个</td>
-          <td>话题广场、订阅</td>
-          <td><span class="badge badge-p0">P0</span></td>
-        </tr>
-        <tr>
-          <td><span class="platform-name">微博</span></td>
-          <td><span class="char-limit">2000</span></td>
-          <td>对话式</td>
-          <td>2 个超话</td>
-          <td>话题超话、直播</td>
-          <td><span class="badge badge-p1">P1</span></td>
-        </tr>
-        <tr>
-          <td><span class="platform-name">小红书</span></td>
-          <td><span class="char-limit">1000</span></td>
-          <td>生活方式</td>
-          <td>5–10 个</td>
-          <td>图文笔记、种草</td>
-          <td><span class="badge badge-p0">P0</span></td>
-        </tr>
-        <tr>
-          <td><span class="platform-name">抖音</span></td>
-          <td><span class="char-limit">300</span></td>
-          <td>钩子驱动</td>
-          <td>3–5 个</td>
-          <td>短视频、直播带货</td>
-          <td><span class="badge badge-p0">P0</span></td>
-        </tr>
-        <tr>
-          <td><span class="platform-name">哔哩哔哩</span></td>
-          <td><span class="char-limit">2000</span></td>
-          <td>教育类</td>
-          <td>3–8 个</td>
-          <td>长视频、专栏、弹幕</td>
-          <td><span class="badge badge-p1">P1</span></td>
-        </tr>
-        <tr>
-          <td><span class="platform-name">快手</span></td>
-          <td><span class="char-limit">300</span></td>
-          <td>接地气</td>
-          <td>3–5 个</td>
-          <td>下沉市场、老铁文化</td>
-          <td><span class="badge badge-p2">P2</span></td>
-        </tr>
-        <tr>
-          <td><span class="platform-name">Threads</span></td>
-          <td><span class="char-limit">500</span></td>
-          <td>对话式</td>
-          <td>1–3 个</td>
-          <td>Instagram 联动</td>
-          <td><span class="badge badge-p1">P1</span></td>
-        </tr>
-        <tr>
-          <td><span class="platform-name">LinkedIn</span></td>
-          <td><span class="char-limit">3000</span></td>
-          <td>专业洞察</td>
-          <td>3–5 个</td>
-          <td>职场人脉、B2B 获客</td>
-          <td><span class="badge badge-p1">P1</span></td>
-        </tr>
-        <!-- Overseas -->
-        <tr class="overseas-row">
-          <td><span class="platform-name">YouTube</span></td>
-          <td><span class="char-limit">5000</span></td>
-          <td>SEO 优化</td>
-          <td>5–15 个</td>
-          <td>长视频、会员、超级感谢</td>
-          <td><span class="badge badge-p0">P0</span></td>
-        </tr>
-        <tr class="overseas-row">
-          <td><span class="platform-name">YouTube Shorts</span></td>
-          <td><span class="char-limit">100</span></td>
-          <td>病毒式钩子</td>
-          <td>3–5 个</td>
-          <td>竖屏短视频、Shorts 流量池</td>
-          <td><span class="badge badge-p0">P0</span></td>
-        </tr>
-        <tr class="overseas-row">
-          <td><span class="platform-name">TikTok</span></td>
-          <td><span class="char-limit">2200</span></td>
-          <td>病毒式钩子</td>
-          <td>3–5 个</td>
-          <td>挑战赛、TikTok Shop</td>
-          <td><span class="badge badge-p0">P0</span></td>
-        </tr>
-        <tr class="overseas-row">
-          <td><span class="platform-name">Instagram Reels</span></td>
-          <td><span class="char-limit">2200</span></td>
-          <td>行动号召</td>
-          <td>5–10 个</td>
-          <td>Reels 推流、购物标签</td>
-          <td><span class="badge badge-p0">P0</span></td>
-        </tr>
-        <tr class="overseas-row">
-          <td><span class="platform-name">Instagram 帖子</span></td>
-          <td><span class="char-limit">2200</span></td>
-          <td>生活方式</td>
-          <td>10–30 个</td>
-          <td>图文轮播、合集高亮</td>
-          <td><span class="badge badge-p1">P1</span></td>
-        </tr>
-      </tbody>
-    </table>
+<!-- MAIN TABS -->
+<div class="main-tabs">
+  <button class="main-tab active" data-tab="overview" onclick="switchMain('overview',this)">Overview</button>
+  <button class="main-tab" data-tab="media" onclick="switchMain('media',this)">Media-Ops</button>
+  <button class="main-tab" data-tab="ops" onclick="switchMain('ops',this)">Ops-Flow</button>
+  <button class="main-tab" data-tab="sales" onclick="switchMain('sales',this)">Sales-CRM</button>
+  <button class="main-tab" data-tab="pm" onclick="switchMain('pm',this)">PM-Toolkit</button>
+</div>
+
+<!-- ==================== TAB 1: OVERVIEW ==================== -->
+<div id="pane-overview" class="tab-pane active">
+  <div class="overview-grid">
+    <div class="overview-card">
+      <div class="oc-bar" style="background:var(--accent-media)"></div>
+      <div class="oc-body">
+        <div class="oc-head"><span class="oc-icon">&#127909;</span><span class="oc-name">media-ops</span><span class="oc-ver">v0.8.0</span></div>
+        <div class="oc-tools"><strong>26</strong> MCP tools | 13 platforms | 9 regions</div>
+        <ul class="oc-features">
+          <li>Content repurposing (13 platforms)</li>
+          <li>Regional culture engine (9 regions)</li>
+          <li>AI humanizer + detection</li>
+          <li>Trending topics (Bilibili/Douyin/Weibo)</li>
+          <li>RAG knowledge base</li>
+          <li>Swipe file inspiration library</li>
+        </ul>
+      </div>
+    </div>
+    <div class="overview-card">
+      <div class="oc-bar" style="background:var(--accent-ops)"></div>
+      <div class="oc-body">
+        <div class="oc-head"><span class="oc-icon">&#9881;</span><span class="oc-name">ops-flow</span><span class="oc-ver">v0.6.0</span></div>
+        <div class="oc-tools"><strong>10</strong> MCP tools | 10 templates | 6 categories</div>
+        <ul class="oc-features">
+          <li>Workflow automation (10 templates)</li>
+          <li>ETL data pipeline</li>
+          <li>Email automation (SMTP)</li>
+          <li>Report generation (daily/weekly)</li>
+          <li>n8n workflow export</li>
+          <li>Alert monitoring</li>
+        </ul>
+      </div>
+    </div>
+    <div class="overview-card">
+      <div class="oc-bar" style="background:var(--accent-sales)"></div>
+      <div class="oc-body">
+        <div class="oc-head"><span class="oc-icon">&#128176;</span><span class="oc-name">sales-crm</span><span class="oc-ver">v0.6.0</span></div>
+        <div class="oc-tools"><strong>17</strong> MCP tools | 5 deal stages | lead tracking</div>
+        <ul class="oc-features">
+          <li>Customer + Deal lifecycle</li>
+          <li>Lead funnel tracking</li>
+          <li>Email outreach sequences</li>
+          <li>Follow-up task management</li>
+          <li>Auto sales reports</li>
+          <li>RAG knowledge base</li>
+        </ul>
+      </div>
+    </div>
+    <div class="overview-card">
+      <div class="oc-bar" style="background:var(--accent-pm)"></div>
+      <div class="oc-body">
+        <div class="oc-head"><span class="oc-icon">&#128203;</span><span class="oc-name">pm-toolkit</span><span class="oc-ver">v0.6.0</span></div>
+        <div class="oc-tools"><strong>20</strong> MCP tools | Roadmap + Sprint + Feedback</div>
+        <ul class="oc-features">
+          <li>Product roadmap management</li>
+          <li>Sprint + task tracking</li>
+          <li>User feedback with voting</li>
+          <li>Figma bridge integration</li>
+          <li>AI-assisted PRD generation</li>
+          <li>Survey system</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <p style="margin-top:12px;font-size:12px;color:var(--text-secondary)">
-    <span style="background:var(--overseas);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px">海外</span>
-    标记为重点拓展的海外平台
-  </p>
 </div>
 
-<!-- TAB 2: Content Preview -->
-<div id="tab-preview" class="tab-content">
-  <div class="label" style="margin-bottom:8px">输入内容</div>
-  <textarea class="preview-input" id="previewInput" placeholder="输入你的内容，实时预览各平台适配效果..." oninput="debounceUpdate()"></textarea>
-  <div class="preview-grid" id="previewGrid"></div>
+<!-- ==================== TAB 2: MEDIA-OPS ==================== -->
+<div id="pane-media" class="tab-pane">
+  <div class="sub-tabs">
+    <button class="sub-tab active" onclick="switchSub('m-compare',this)">Platform Comparison</button>
+    <button class="sub-tab" onclick="switchSub('m-preview',this)">Content Preview</button>
+    <button class="sub-tab" onclick="switchSub('m-regional',this)">Regional Guide</button>
+  </div>
+
+  <!-- Sub: Compare -->
+  <div id="sub-m-compare" class="sub-pane active">
+    <div class="table-wrap"><table><thead><tr>
+      <th>Platform</th><th>Char Limit</th><th>Style</th><th>Hashtags</th><th>Features</th><th>Priority</th>
+    </tr></thead><tbody>
+      <tr><td><span class="platform-name">Twitter / X</span></td><td><span class="char-limit">280</span></td><td>Punchy</td><td>2-3</td><td>Topic trends, Subscriptions</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr><td><span class="platform-name">Weibo</span></td><td><span class="char-limit">2000</span></td><td>Conversational</td><td>2</td><td>Super topics, Live streaming</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td><span class="platform-name">Xiaohongshu</span></td><td><span class="char-limit">1000</span></td><td>Lifestyle</td><td>5-10</td><td>Photo notes, Product seeding</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr><td><span class="platform-name">Douyin</span></td><td><span class="char-limit">300</span></td><td>Hook-driven</td><td>3-5</td><td>Short video, Live commerce</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr><td><span class="platform-name">Bilibili</span></td><td><span class="char-limit">2000</span></td><td>Educational</td><td>3-8</td><td>Long video, Articles, Danmaku</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td><span class="platform-name">Kuaishou</span></td><td><span class="char-limit">300</span></td><td>Relatable</td><td>3-5</td><td>Sinking market, Community</td><td><span class="badge badge-p2">P2</span></td></tr>
+      <tr><td><span class="platform-name">Threads</span></td><td><span class="char-limit">500</span></td><td>Conversational</td><td>1-3</td><td>Instagram integration</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td><span class="platform-name">LinkedIn</span></td><td><span class="char-limit">3000</span></td><td>Professional</td><td>3-5</td><td>B2B networking, Articles</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">YouTube</span></td><td><span class="char-limit">5000</span></td><td>SEO-optimized</td><td>5-15</td><td>Long video, Memberships, Super Thanks</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">YouTube Shorts</span></td><td><span class="char-limit">100</span></td><td>Viral-hook</td><td>3-5</td><td>Vertical short video, Shorts feed</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">TikTok</span></td><td><span class="char-limit">2200</span></td><td>Viral-hook</td><td>3-5</td><td>Challenges, TikTok Shop</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">Instagram Reels</span></td><td><span class="char-limit">2200</span></td><td>CTA-driven</td><td>5-10</td><td>Reels boost, Shopping tags</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">Instagram Post</span></td><td><span class="char-limit">2200</span></td><td>Lifestyle</td><td>10-30</td><td>Carousel, Highlights</td><td><span class="badge badge-p1">P1</span></td></tr>
+    </tbody></table></div>
+    <p style="margin-top:12px;font-size:12px;color:var(--text-secondary)"><span style="background:var(--overseas);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px">OS</span> = Overseas platform</p>
+  </div>
+
+  <!-- Sub: Preview -->
+  <div id="sub-m-preview" class="sub-pane">
+    <div class="label" style="margin-bottom:8px">Enter content to preview adaptation across platforms</div>
+    <textarea class="preview-input" id="previewInput" placeholder="Type your content here... Real-time preview for all 13 platforms." oninput="debouncePreview()"></textarea>
+    <div class="preview-grid" id="previewGrid"></div>
+  </div>
+
+  <!-- Sub: Regional -->
+  <div id="sub-m-regional" class="sub-pane">
+    <div class="label" style="margin-bottom:8px">Select target region</div>
+    <select class="region-select" id="regionSelect" onchange="renderRegion()">
+      <option value="us">US / North America</option>
+      <option value="uk">UK</option>
+      <option value="europe">Europe</option>
+      <option value="japan">Japan</option>
+      <option value="korea">Korea</option>
+      <option value="sea">Southeast Asia</option>
+      <option value="me">Middle East</option>
+      <option value="africa">Africa</option>
+      <option value="latam">Latin America</option>
+    </select>
+    <div id="regionPanel"></div>
+  </div>
 </div>
 
-<!-- TAB 3: Regional Guide -->
-<div id="tab-regional" class="tab-content">
-  <div style="margin-bottom:8px" class="label">选择目标地区</div>
-  <select class="region-select" id="regionSelect" onchange="renderRegion()">
-    <option value="us">🇺🇸 美国 / 北美</option>
-    <option value="uk">🇬🇧 英国</option>
-    <option value="europe">🇪🇺 欧洲</option>
-    <option value="japan">🇯🇵 日本</option>
-    <option value="korea">🇰🇷 韩国</option>
-    <option value="sea">🌏 东南亚</option>
-    <option value="me">🌙 中东</option>
-    <option value="africa">🌍 非洲</option>
-    <option value="latam">🌎 拉丁美洲</option>
-  </select>
-  <div id="regionPanel"></div>
+<!-- ==================== TAB 3: OPS-FLOW ==================== -->
+<div id="pane-ops" class="tab-pane">
+  <div class="cat-pills" id="catPills"></div>
+  <div class="tpl-grid" id="tplGrid"></div>
+</div>
+
+<!-- ==================== TAB 4: SALES-CRM ==================== -->
+<div id="pane-sales" class="tab-pane">
+  <div class="funnel-section">
+    <div class="funnel-title">Deal Pipeline</div>
+    <div class="deal-funnel" id="dealFunnel"></div>
+  </div>
+  <div class="funnel-section">
+    <div class="funnel-title">Lead Funnel</div>
+    <div class="lead-bars" id="leadBars"></div>
+  </div>
+</div>
+
+<!-- ==================== TAB 5: PM-TOOLKIT ==================== -->
+<div id="pane-pm" class="tab-pane">
+  <div class="pm-section">
+    <div class="pm-title">Product Roadmap</div>
+    <div class="roadmap-lanes" id="roadmapLanes"></div>
+  </div>
+  <div class="pm-section">
+    <div class="pm-title">Sprint Board (Current)</div>
+    <div class="sprint-board" id="sprintBoard"></div>
+  </div>
+  <div class="pm-section">
+    <div class="pm-title">Top Feedback</div>
+    <div class="fb-list" id="fbList"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- OVERLAY -->
+<div class="panel-overlay" id="panelOverlay" onclick="closeAllPanels()"></div>
+
+<!-- SETTINGS PANEL -->
+<div class="side-panel" id="settingsPanel">
+  <div class="panel-head">
+    <span class="panel-title">Settings</span>
+    <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
+  </div>
+  <button class="panel-btn" onclick="togglePanel('history')">View History</button>
+  <button class="panel-btn panel-btn-danger" onclick="clearAllCache()">Clear Cache</button>
+  <button class="panel-btn" id="pwaInstallBtn" style="display:none" onclick="pwaInstall()">Install App (PWA)</button>
+  <div style="margin-top:24px;font-size:12px;color:var(--text-dim)">
+    <p>Cache: Service Worker + localStorage</p>
+    <p style="margin-top:4px">PWA: Offline-capable</p>
+  </div>
+</div>
+
+<!-- HISTORY PANEL -->
+<div class="side-panel" id="historyPanel">
+  <div class="panel-head">
+    <span class="panel-title">History</span>
+    <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
+  </div>
+  <div id="historyList"><p style="font-size:13px;color:var(--text-secondary)">No history yet. Use Content Preview to generate entries.</p></div>
 </div>
 
 <script>
-// ─── TAB SWITCH ────────────────────────────────────────────────
-function switchTab(id,btn){
-  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
+// ─── STATE ──────────────────────────────────────────────
+let activeMain='overview';
+let activeSub='m-compare';
+let deferredPWAPrompt=null;
+
+// ─── TAB SWITCHING ──────────────────────────────────────
+function switchMain(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='preview')renderPreview();
-  if(id==='regional')renderRegion();
+  activeMain=id;
+  savePrefs();
+  if(id==='media'&&activeSub==='m-preview')renderPreview();
+  if(id==='media'&&activeSub==='m-regional')renderRegion();
+  if(id==='ops')renderOps();
+  if(id==='sales')renderSales();
+  if(id==='pm')renderPM();
+}
+function switchSub(id,btn){
+  document.querySelectorAll('.sub-pane').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.sub-tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById('sub-'+id).classList.add('active');
+  btn.classList.add('active');
+  activeSub=id;
+  if(id==='m-preview')renderPreview();
+  if(id==='m-regional')renderRegion();
 }
 
-// ─── PLATFORM DATA ─────────────────────────────────────────────
+// ─── TOAST ──────────────────────────────────────────────
+function showToast(msg,type='info',dur=3000){
+  const icons={success:'\u2713',warning:'\u26A0',error:'\u2717',info:'\u2139'};
+  const c=document.getElementById('toast-container');
+  const d=document.createElement('div');
+  d.className='toast toast-'+type;
+  d.innerHTML=(icons[type]||'')+' '+msg;
+  c.appendChild(d);
+  setTimeout(()=>{d.classList.add('toast-exit');setTimeout(()=>d.remove(),300)},dur);
+}
+
+// ─── MEDIA-OPS: PLATFORM DATA ───────────────────────────
 const PLATFORMS=[
-  {id:'twitter',  name:'Twitter / X',       limit:280,  style:'punchy',      tags:['#职场成长','#效率提升'],overseas:false},
-  {id:'weibo',    name:'微博',              limit:2000, style:'conversational',tags:['#职场故事','#打工人'],overseas:false},
-  {id:'xhs',      name:'小红书',            limit:1000, style:'lifestyle',   tags:['#生活方式','#好物分享','#成长记录'],overseas:false},
-  {id:'douyin',   name:'抖音',              limit:300,  style:'hook-driven', tags:['#职场干货','#涨知识'],overseas:false},
-  {id:'bili',     name:'哔哩哔哩',          limit:2000, style:'educational', tags:['#学习','#职场技能','#干货'],overseas:false},
-  {id:'kuai',     name:'快手',              limit:300,  style:'relatable',   tags:['#老铁','#真实生活'],overseas:false},
-  {id:'threads',  name:'Threads',           limit:500,  style:'conversational',tags:['#career','#growth'],overseas:false},
-  {id:'linkedin', name:'LinkedIn',          limit:3000, style:'professional',tags:['#Leadership','#Career','#Growth'],overseas:false},
-  {id:'youtube',  name:'YouTube',           limit:5000, style:'seo-optimized',tags:['#HowTo','#Tutorial','#Career'],overseas:true},
-  {id:'ytshorts', name:'YouTube Shorts',    limit:100,  style:'viral-hook',  tags:['#Shorts','#Tips'],overseas:true},
-  {id:'tiktok',   name:'TikTok',            limit:2200, style:'viral-hook',  tags:['#fyp','#LearnOnTikTok','#Career'],overseas:true},
-  {id:'reels',    name:'Instagram Reels',   limit:2200, style:'cta-driven',  tags:['#Reels','#CareerTips','#Motivation'],overseas:true},
-  {id:'igpost',   name:'Instagram 帖子',    limit:2200, style:'lifestyle',   tags:['#lifestyle','#success','#mindset'],overseas:true},
+  {id:'twitter',name:'Twitter/X',limit:280,style:'punchy',tags:['#Career','#Growth'],os:false},
+  {id:'weibo',name:'Weibo',limit:2000,style:'conversational',tags:['#Career','#Story'],os:false},
+  {id:'xhs',name:'Xiaohongshu',limit:1000,style:'lifestyle',tags:['#Lifestyle','#Tips'],os:false},
+  {id:'douyin',name:'Douyin',limit:300,style:'hook-driven',tags:['#Skills','#Learn'],os:false},
+  {id:'bili',name:'Bilibili',limit:2000,style:'educational',tags:['#Learning','#Skills'],os:false},
+  {id:'kuai',name:'Kuaishou',limit:300,style:'relatable',tags:['#RealLife','#Community'],os:false},
+  {id:'threads',name:'Threads',limit:500,style:'conversational',tags:['#career','#growth'],os:false},
+  {id:'linkedin',name:'LinkedIn',limit:3000,style:'professional',tags:['#Leadership','#Career'],os:false},
+  {id:'youtube',name:'YouTube',limit:5000,style:'seo-optimized',tags:['#HowTo','#Tutorial'],os:true},
+  {id:'ytshorts',name:'YT Shorts',limit:100,style:'viral-hook',tags:['#Shorts','#Tips'],os:true},
+  {id:'tiktok',name:'TikTok',limit:2200,style:'viral-hook',tags:['#fyp','#LearnOnTikTok'],os:true},
+  {id:'reels',name:'IG Reels',limit:2200,style:'cta-driven',tags:['#Reels','#CareerTips'],os:true},
+  {id:'igpost',name:'IG Post',limit:2200,style:'lifestyle',tags:['#lifestyle','#success'],os:true},
 ];
 
-function applyStyle(text,style){
-  if(!text)return'';
-  const sents=text.split(/(?<=[。！？.!?])\s*/);
-  switch(style){
-    case'punchy':return sents.slice(0,2).join(' ');
-    case'hook-driven':case'relatable':case'viral-hook':return sents[0]||text;
-    case'lifestyle':return sents.map((s,i)=>i%2===0?s:'\n'+s).join('');
-    case'seo-optimized':return(sents[0]||'')+'\n\n'+sents.slice(1).join(' ');
-    case'cta-driven':return sents.slice(0,3).join(' ');
-    default:return text;
+function applyStyle(t,s){
+  if(!t)return'';
+  const ss=t.split(/(?<=[。！？.!?])\s*/);
+  switch(s){
+    case'punchy':return ss.slice(0,2).join(' ');
+    case'hook-driven':case'relatable':case'viral-hook':return ss[0]||t;
+    case'lifestyle':return ss.map((x,i)=>i%2===0?x:'\n'+x).join('');
+    case'seo-optimized':return(ss[0]||'')+'\n\n'+ss.slice(1).join(' ');
+    case'cta-driven':return ss.slice(0,3).join(' ');
+    default:return t;
   }
 }
+function truncate(s,m){return s.length<=m?s:s.slice(0,m-1)+'\u2026';}
 
-function truncate(str,max){
-  if(str.length<=max)return str;
-  return str.slice(0,max-1)+'…';
-}
-
-// ─── PREVIEW RENDER ────────────────────────────────────────────
-let debounceTimer=null;
-function debounceUpdate(){
-  clearTimeout(debounceTimer);
-  debounceTimer=setTimeout(renderPreview,300);
-}
+let previewTimer=null;
+function debouncePreview(){clearTimeout(previewTimer);previewTimer=setTimeout(()=>{renderPreview();saveHistory()},300)}
 
 function renderPreview(){
   const raw=document.getElementById('previewInput').value||'';
-  const grid=document.getElementById('previewGrid');
-  grid.innerHTML=PLATFORMS.map(p=>{
+  const g=document.getElementById('previewGrid');
+  g.innerHTML=PLATFORMS.map(p=>{
     const adapted=applyStyle(raw,p.style);
     const preview=truncate(adapted,p.limit);
-    const len=raw.length;
-    const ratio=Math.min(len/p.limit,1);
-    const pct=Math.round(ratio*100);
-    const fillClass=ratio<0.7?'fill-green':ratio<0.9?'fill-yellow':'fill-red';
-    const countClass=len>p.limit?'card-count over':'card-count';
-    const tagHtml=p.tags.map(t=>`<span class="tag-chip">${t}</span>`).join('');
-    const overseaBadge=p.overseas?'<span style="font-size:10px;background:var(--overseas);color:#fff;padding:1px 5px;border-radius:3px;margin-left:4px">海外</span>':'';
+    const len=raw.length,ratio=Math.min(len/p.limit,1),pct=Math.round(ratio*100);
+    const fc=ratio<.7?'fill-green':ratio<.9?'fill-yellow':'fill-red';
+    const cc=len>p.limit?'card-count over':'card-count';
+    const osBadge=p.os?'<span style="font-size:10px;background:var(--overseas);color:#fff;padding:1px 5px;border-radius:3px;margin-left:4px">OS</span>':'';
     return`<div class="platform-card">
-      <div class="card-header">
-        <span class="card-pname">${p.name}${overseaBadge}</span>
-        <span class="${countClass}">${len}/${p.limit}</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${pct}%"></div></div>
-      <div class="card-preview">${preview||'<span style="color:var(--text-secondary);font-style:italic">暂无内容</span>'}</div>
-      <div class="card-tags">${tagHtml}</div>
+      <div class="card-header"><span class="card-pname">${p.name}${osBadge}</span><span class="${cc}">${len}/${p.limit}</span></div>
+      <div class="progress-bar"><div class="progress-fill ${fc}" style="width:${pct}%"></div></div>
+      <div class="card-preview">${preview||'<span style="color:var(--text-secondary);font-style:italic">No content</span>'}</div>
+      <div class="card-tags">${p.tags.map(t=>'<span class="tag-chip">'+t+'</span>').join('')}</div>
     </div>`;
   }).join('');
 }
 
-// init preview grid with empty state
-renderPreview();
-
-// ─── REGIONAL DATA ─────────────────────────────────────────────
+// ─── MEDIA-OPS: REGIONAL DATA ───────────────────────────
 const REGIONS={
-  us:{
-    label:'🇺🇸 美国 / 北美',
-    tips:['直接切入主题，美国受众不喜欢兜圈子，开头 5 秒必须说明价值','用数字量化成果，例如"3 步提升效率 40%"比模糊描述更有说服力','英文内容配合字幕，提升可访问性并帮助算法识别关键词','鼓励评论和分享，可在结尾用问题引导互动，例如"你有类似经历吗？"','早 8 点至 10 点（东部时间）发布职场类内容，午间或周末发布娱乐内容','保持真实态度，"接地气"的内容在美国有更高的信任度和转化率'],
-    taboos:['避免过度政治表态，两党话题极化严重，容易引起争议','不要夸大宣传，美国用户对"最好""第一"等绝对化表述反感','涉及种族、性别等敏感话题需谨慎，措辞不当容易引发社区举报'],
-    tags:['#ProductivityTips','#CareerGrowth','#WorkSmarter','#9to5','#SideHustle'],
-    times:'工作日早 7:00–9:00（EST），午休 12:00–13:00，周末上午 10:00–11:00 效果较好',
-    audience:'注重个人价值与效率，追求副业与财务自由，对 AI 工具类内容高度感兴趣，反应速度快、互动率高'
-  },
-  uk:{
-    label:'🇬🇧 英国',
-    tips:['语气正式而幽默并存，英国受众欣赏自嘲和讽刺，但过于直白则显得粗鲁','内容兼顾专业深度，英国用户更愿意阅读长文和深度分析','加入英式生活参考（如茶、天气、下班喝一杯），增加文化认同感','配合英式拼写（colour、organisation），提升本地化感知','发布时间以下班后晚 7 点至 9 点（GMT）为佳，尤其是工作日','关注可持续和社会责任话题，英国年轻用户对此高度敏感'],
-    taboos:['不要混淆英格兰、苏格兰、威尔士、北爱尔兰的文化差异，这是非常敏感的身份认同问题','脱欧话题仍具争议性，非必要不触碰','皇室相关内容要保持中立，支持或讽刺都可能引起争议'],
-    tags:['#UKCareer','#WorkLifeBalance','#BritishLife','#SelfImprovement','#LondonLife'],
-    times:'工作日晚 19:00–21:00（GMT），午间 12:00–13:00，周末早 9:00–11:00',
-    audience:'受教育程度高、注重礼仪与幽默，职场内容偏向管理与领导力，对科技创业和职场平衡话题感兴趣'
-  },
-  europe:{
-    label:'🇪🇺 欧洲（综合）',
-    tips:['内容需考虑多语言受众，英语为主但适当加入目标国语言词汇可提升好感','欧洲用户重视隐私，不要强调数据追踪或过度个性化推荐功能','可持续发展、环保主题在欧洲拥有极高热度，融入相关内容有助于获得共鸣','学术与理论内容在德国、北欧等地区深受欢迎，可适当增加深度','发布时间参考中欧时间（CET），工作日下午 5 点至晚 9 点较活跃','北欧受众对工作与生活平衡、心理健康话题尤为感兴趣'],
-    taboos:['不要用"欧洲"笼统概括，法国、德国、意大利文化差异显著','避免触碰二战历史和极右派议题，敏感度极高','不要忽视 GDPR 合规，如有落地页或表单需确保数据合规'],
-    tags:['#EuropeanLife','#Sustainability','#FutureOfWork','#WorkLifeBalance','#Innovation'],
-    times:'中欧时间（CET）工作日 17:00–21:00，周末 10:00–12:00 效果较好',
-    audience:'教育水平高、重视环保与平权，偏好有深度的内容，对职场文化改革和技术创新感兴趣'
-  },
-  japan:{
-    label:'🇯🇵 日本',
-    tips:['措辞要委婉礼貌，避免直接命令式或过于强势的语气','图文质量要求高，日本用户对视觉审美非常敏感，排版要精细','内容节奏不要太快，日本受众偏向细腻、深入的叙事方式','适当加入日本文化元素（动漫、匠人精神、四季主题），更易引起共鸣','TikTok 和 YouTube 上的教程类内容在日本很受欢迎，步骤要清晰','发布时间集中在工作日晚 8 点至 11 点（JST），以及周末下午 2 点至 5 点'],
-    taboos:['不要对日本历史事件轻率评论，包括战争、核武器等议题','直接销售推广在日本效果极差，要先建立信任再引导转化','避免在内容中出现低质量或粗糙的元素，会严重损伤品牌形象'],
-    tags:['#日本日常','#学習','#仕事術','#KawaiiLife','#Anime','#技術'],
-    times:'工作日晚 20:00–23:00（JST），午休 12:00–13:00，周末下午 14:00–17:00',
-    audience:'注重细节与品质，有强烈的社群归属感，热爱动漫、科技与美食，对工作效率和自我提升有持续兴趣'
-  },
-  korea:{
-    label:'🇰🇷 韩国',
-    tips:['封面图和缩略图要足够吸引人，韩国用户点击决策非常依赖视觉冲击力','融入 K-pop、美妆、韩剧等流行文化元素可以大幅提升曝光','内容语气温暖亲切，韩国社区文化很强，要有"一起"的感觉','使用热门韩国话题标签，与当地流行趋势绑定传播','发布频率要保持稳定，韩国粉丝期待创作者持续输出','晚上 9 点至 11 点（KST）是韩国平台最活跃的黄金时段'],
-    taboos:['中韩关系敏感，泡菜、汉字起源等文化归属问题绝对不要触碰','不要批评韩国饮食文化或外貌审美文化，容易引发强烈反弹','萨德、领土争议等政治议题会导致大规模抵制'],
-    tags:['#한국일상','#자기개발','#직장생활','#KoreanLife','#Kpop','#Beauty'],
-    times:'工作日晚 21:00–23:00（KST），周末下午 14:00–18:00，午休 12:00–13:00',
-    audience:'时尚敏感、追逐潮流，受 K-pop 和韩剧影响深远，对美妆、职场成长、海外生活内容接受度高，互动热情高'
-  },
-  sea:{
-    label:'🌏 东南亚',
-    tips:['内容要活泼、接地气，东南亚受众非常喜欢有趣和轻松的内容风格','多元宗教背景需要尊重，尤其是马来西亚、印尼等穆斯林较多的地区','电商内容受欢迎，可以在内容中嵌入购物导引和产品推荐','食物和旅游内容极具传播力，尤其在 TikTok 和 Instagram','善用当地网络流行语和梗，与本地用户建立情感联系','发布时间参考东南亚标准时间，晚上 7 点至 10 点最为活跃'],
-    taboos:['宗教话题非常敏感，在马来西亚和印尼避免调侃伊斯兰教','不要忽视各国之间的差异，泰国、越南、菲律宾用户习惯和偏好各不相同','历史殖民话题在某些国家仍有情绪，切勿轻率提及'],
-    tags:['#SEAlife','#AseanCreator','#TravelAsia','#FoodTour','#OnlineBusiness'],
-    times:'工作日晚 19:00–22:00（UTC+7/+8），午休 12:00–13:00，周末全天均活跃',
-    audience:'年轻、移动优先、电商活跃，对美食、旅游、副业收入、技能学习内容兴趣浓厚，TikTok 渗透率极高'
-  },
-  me:{
-    label:'🌙 中东',
-    tips:['重视家庭与社群价值，内容中体现对家庭和集体的尊重有助于建立信任','斋月期间发布时间需调整，斋月结束开斋时（日落后）和深夜是高峰活跃期','阿拉伯语字幕或简短阿拉伯语说明可大幅提升本地受众黏性','商业和创业内容在海湾地区（沙特、UAE）非常受欢迎','视觉内容要符合当地审美，保守、大气的风格比暴露或嬉皮风格更受认可','内容中融入对当地节日（开斋节、宰牲节）的祝福，增强文化认同感'],
-    taboos:['严禁涉及对伊斯兰教的批评或嘲弄，后果严重','酒精、赌博等话题在众多中东国家属于违禁内容，绝对回避','两性关系内容要保守，暴露穿着或亲密行为展示在部分国家违法'],
-    tags:['#MiddleEast','#Business','#Entrepreneurship','#Arabic','#Ramadan'],
-    times:'工作日晚 21:00–24:00（AST，UTC+3），斋月期间 22:00–凌晨 2:00 为高峰',
-    audience:'信仰驱动、家庭导向，对商业、房产投资、宗教内容高度关注，社交媒体覆盖率高，消费力强'
-  },
-  africa:{
-    label:'🌍 非洲',
-    tips:['内容要强调社群共建，非洲文化非常重视集体主义和互助精神','移动端优先，大多数非洲用户通过手机访问，视频要轻量化、加载快','融入本地音乐节奏和视觉风格，内容更具感染力','创业和副业收入话题非常受欢迎，尤其在尼日利亚、肯尼亚、加纳','英语和斯瓦希里语是东非主流，法语覆盖西非，内容语言策略需因地制宜','分享真实的成功故事和奋斗经历，能激励并留住用户'],
-    taboos:['不要用贫困或落后的刻板印象描述非洲，极具冒犯性且容易被举报','部落政治和宗族矛盾在部分地区十分敏感，不要站队','新冠疫情和部分国家的政治稳定性是高度敏感话题'],
-    tags:['#AfricanCreator','#Hustle','#Entrepreneurship','#AfricaRising','#Naija'],
-    times:'工作日晚 18:00–21:00（WAT/EAT），午休 12:00–13:00 也有较好互动',
-    audience:'年轻、充满活力、创业意识强，移动互联网用户增长最快的市场，对商业机会、教育、娱乐内容需求旺盛'
-  },
-  latam:{
-    label:'🌎 拉丁美洲',
-    tips:['语气热情、充满激情，拉丁受众喜欢情感浓郁的内容，冷静疏离风格效果差','西班牙语是主流，巴西使用葡萄牙语，内容语言要有区分','结合家庭、音乐、食物主题，这是拉丁文化的核心情感连接点','TikTok 和 Instagram 在拉美增长极快，短视频内容优先','强调情感共鸣而非纯理性说理，故事化叙述更能打动受众','发布时间集中在晚 8 点至 11 点（各国时区），周末下午也有较好表现'],
-    taboos:['不要将所有拉美国家混为一谈，墨西哥、巴西、阿根廷文化差异显著','政治话题极为复杂，尤其是委内瑞拉、古巴等国的议题，慎重处理','不要轻视或嘲弄拉丁裔的口音、饮食或传统，这在美国和当地都会引发强烈反应'],
-    tags:['#Latinx','#Emprendimiento','#FamiliaLatina','#TikTokLatino','#VibeLatino'],
-    times:'工作日晚 20:00–23:00（各本地时区），周末下午 15:00–18:00 互动活跃',
-    audience:'情感驱动、家庭优先，热爱音乐与美食，移动社交活跃，对娱乐、情感故事和副业内容接受度极高'
-  }
+  us:{label:'US / North America',tips:['Get to the point fast - US audiences value directness','Quantify results: "3 steps to boost efficiency 40%"','Add subtitles for accessibility and SEO','Encourage comments with closing questions','Post 7-10 AM EST for career content','Stay authentic - "real talk" builds trust'],taboos:['Avoid strong political stances','No exaggerated claims ("best ever", "#1")','Be careful with race/gender topics'],tags:['#ProductivityTips','#CareerGrowth','#SideHustle','#WorkSmarter'],times:'Weekdays 7-9 AM EST, Lunch 12-1 PM, Weekends 10-11 AM',audience:'Value efficiency + freedom, interested in AI tools, fast engagement, side hustle mindset'},
+  uk:{label:'UK',tips:['Balance professionalism with dry humor','Long-form analysis performs well','Use British spelling (colour, organisation)','Reference British culture (tea, weather, pub)','Post evenings 7-9 PM GMT','Sustainability topics resonate strongly'],taboos:['Never confuse England/Scotland/Wales/NI identities','Brexit remains divisive','Stay neutral on Royal Family topics'],tags:['#UKCareer','#WorkLifeBalance','#BritishLife','#SelfImprovement'],times:'Weekdays 7-9 PM GMT, Lunch 12-1 PM, Weekends 9-11 AM',audience:'Well-educated, value humor + manners, interested in leadership and work-life balance'},
+  europe:{label:'Europe',tips:['Consider multilingual audiences - English primary','Europeans value privacy - avoid data tracking themes','Sustainability/green topics have high engagement','Academic depth welcome in DACH + Nordics','Post 5-9 PM CET on weekdays','Nordic audiences love work-life balance content'],taboos:['Don\'t generalize "Europe" - cultures vary greatly','WWII/far-right topics extremely sensitive','Ensure GDPR compliance for any forms'],tags:['#EuropeanLife','#Sustainability','#FutureOfWork','#Innovation'],times:'CET weekdays 5-9 PM, weekends 10 AM - 12 PM',audience:'High education, value environment + equality, prefer depth over hype'},
+  japan:{label:'Japan',tips:['Use polite, indirect language - avoid commanding tone','High visual quality expected - clean layouts essential','Slower narrative pace, detailed storytelling','Add anime/craftsman/seasonal cultural references','Tutorials perform well on TikTok + YouTube','Post 8-11 PM JST weekdays, 2-5 PM weekends'],taboos:['No casual remarks about WWII history','Hard-sell tactics backfire badly','Low-quality visuals damage brand perception'],tags:['#Japan','#Learning','#WorkStyle','#Technology'],times:'Weekdays 8-11 PM JST, Lunch 12-1 PM, Weekends 2-5 PM',audience:'Detail-oriented, quality-focused, strong community belonging, love anime + tech + food'},
+  korea:{label:'Korea',tips:['Thumbnails must be eye-catching - clicks depend on visuals','Leverage K-pop, beauty, K-drama cultural hooks','Warm, community-oriented tone works best','Use trending Korean hashtags','Maintain consistent posting frequency','Peak hours: 9-11 PM KST'],taboos:['Never touch cultural origin disputes (kimchi, hanzi)','Don\'t criticize Korean beauty/food culture','Political issues (THAAD, territory) cause boycotts'],tags:['#KoreanLife','#SelfDevelopment','#Kpop','#Beauty'],times:'Weekdays 9-11 PM KST, Weekends 2-6 PM, Lunch 12-1 PM',audience:'Trend-conscious, K-culture influenced, high engagement, beauty + career + overseas life content'},
+  sea:{label:'Southeast Asia',tips:['Keep content fun, relatable, light-hearted','Respect religious diversity (Islam in MY/ID)','E-commerce content performs very well','Food + travel content goes viral easily','Use local slang and memes for connection','Peak: 7-10 PM local time'],taboos:['Religious topics very sensitive in MY/ID','Don\'t treat SEA countries as identical','Colonial history still emotional in some countries'],tags:['#SEAlife','#TravelAsia','#FoodTour','#OnlineBusiness'],times:'Weekdays 7-10 PM UTC+7/8, Lunch 12-1 PM, Weekends active all day',audience:'Young, mobile-first, e-commerce active, love food + travel + side income + TikTok'},
+  me:{label:'Middle East',tips:['Emphasize family + community values','Adjust posting times during Ramadan (after sunset)','Arabic subtitles greatly boost local engagement','Business/entrepreneurship content popular in Gulf','Conservative, dignified visual style preferred','Include holiday greetings (Eid al-Fitr, Eid al-Adha)'],taboos:['Never criticize or mock Islam','Alcohol/gambling content prohibited','Keep gender-related content conservative'],tags:['#MiddleEast','#Business','#Entrepreneurship','#Arabic'],times:'Weekdays 9 PM - 12 AM AST, Ramadan: 10 PM - 2 AM peak',audience:'Faith-driven, family-oriented, business + real estate + religion focus, high purchasing power'},
+  africa:{label:'Africa',tips:['Emphasize community building and mutual support','Mobile-first: keep videos lightweight, fast-loading','Incorporate local music and visual styles','Entrepreneurship + side income topics very popular','Tailor language: English (East), French (West)','Share real success stories for inspiration'],taboos:['Never use poverty/backwardness stereotypes','Tribal politics sensitive in some regions','COVID + political stability are sensitive topics'],tags:['#AfricanCreator','#Hustle','#AfricaRising','#Entrepreneurship'],times:'Weekdays 6-9 PM WAT/EAT, Lunch 12-1 PM also active',audience:'Young, energetic, entrepreneurial, fastest-growing mobile internet market, hungry for business + education + entertainment'},
+  latam:{label:'Latin America',tips:['Passionate, emotional tone - cold style fails','Spanish primary, Portuguese for Brazil','Family + music + food are core cultural connectors','TikTok + Instagram growing fast in LATAM','Story-driven narratives over dry logic','Post 8-11 PM local time, weekends afternoons'],taboos:['Don\'t lump all LATAM countries together','Politics extremely complex (VZ, Cuba, etc.)','Never mock Latino accents, food, or traditions'],tags:['#Latinx','#Emprendimiento','#FamiliaLatina','#TikTokLatino'],times:'Weekdays 8-11 PM local, Weekends 3-6 PM active',audience:'Emotion-driven, family-first, love music + food, mobile social active, entertainment + side hustle content'}
 };
 
 function renderRegion(){
-  const key=document.getElementById('regionSelect').value;
-  const d=REGIONS[key];
-  if(!d)return;
-  const panel=document.getElementById('regionPanel');
-  const tipsHtml=d.tips.map(t=>`<li>${t}</li>`).join('');
-  const taboosHtml=d.taboos.map(t=>`<div class="taboo-card">⚠ ${t}</div>`).join('');
-  const tagsHtml=d.tags.map(t=>`<span class="ht">${t}</span>`).join('');
-  panel.innerHTML=`<div class="region-panel">
+  const k=document.getElementById('regionSelect').value;
+  const d=REGIONS[k];if(!d)return;
+  document.getElementById('regionPanel').innerHTML=`<div class="region-panel">
     <div class="region-header">${d.label}</div>
     <div class="region-grid">
-      <div class="region-section">
-        <div class="section-title">发布建议</div>
-        <ul class="tip-list">${tipsHtml}</ul>
-      </div>
-      <div class="region-section">
-        <div class="section-title">禁忌话题</div>
-        ${taboosHtml}
-        <div style="margin-top:16px"><div class="section-title">推荐标签</div><div class="hashtag-row">${tagsHtml}</div></div>
-      </div>
-      <div class="region-section">
-        <div class="section-title">最佳发布时间</div>
-        <div class="time-row">${d.times}</div>
-        <div style="margin-top:16px"><div class="section-title">受众特征</div><div class="audience-text">${d.audience}</div></div>
-      </div>
-    </div>
-  </div>`;
+      <div class="region-section"><div class="section-title">Publishing Tips</div><ul class="tip-list">${d.tips.map(t=>'<li>'+t+'</li>').join('')}</ul></div>
+      <div class="region-section"><div class="section-title">Taboo Topics</div>${d.taboos.map(t=>'<div class="taboo-card">! '+t+'</div>').join('')}<div style="margin-top:16px"><div class="section-title">Recommended Tags</div><div>${d.tags.map(t=>'<span class="ht">'+t+'</span>').join('')}</div></div></div>
+      <div class="region-section"><div class="section-title">Best Posting Times</div><div style="font-size:13px;line-height:1.8">${d.times}</div><div style="margin-top:16px"><div class="section-title">Audience Profile</div><div style="font-size:13px;line-height:1.7">${d.audience}</div></div></div>
+    </div></div>`;
 }
 
-// init regional
+// ─── OPS-FLOW: TEMPLATES ────────────────────────────────
+const TEMPLATES=[
+  {id:'daily-report',name:'Daily Report',cat:'reporting',desc:'Auto-generate daily work summary and send via email',trigger:'Cron: 18:00 daily',steps:['Collect data','Generate report','Send email'],vars:['email (required)','timezone (default: Asia/Shanghai)']},
+  {id:'weekly-digest',name:'Weekly Digest',cat:'reporting',desc:'Compile weekly metrics and achievements into digest',trigger:'Cron: Mon 9:00',steps:['Aggregate weekly data','Generate digest','Send to team'],vars:['email (required)','includeCharts (default: true)']},
+  {id:'data-sync',name:'Data Sync',cat:'data',desc:'Cross-platform data synchronization with ETL pipeline',trigger:'Cron: every 30min + Webhook',steps:['Extract from sources','Transform data','Validate schema','Load to destination'],vars:['source (required)','destination (required)','mapping (optional)']},
+  {id:'alert-monitor',name:'Alert Monitor',cat:'monitoring',desc:'Monitor key metrics and trigger alerts on anomalies',trigger:'Cron: every 5min',steps:['Fetch metrics','Check thresholds','Send alert if triggered'],vars:['metrics (required)','thresholds (required)','alertChannel (default: email)']},
+  {id:'competitor-monitor',name:'Competitor Monitor',cat:'monitoring',desc:'Track competitor activities and generate change reports',trigger:'Cron: weekdays 8:00',steps:['Crawl competitor sites','Diff with previous','Generate change report','Notify'],vars:['urls (required)','selectors (required)']},
+  {id:'content-distribute',name:'Content Distribute',cat:'content',desc:'Distribute content across multiple platforms simultaneously',trigger:'Manual / Webhook',steps:['Prepare content variants','Adapt per platform','Publish to all','Collect results'],vars:['content (required)','platforms (default: all)']},
+  {id:'email-campaign',name:'Email Campaign',cat:'marketing',desc:'Automated email marketing sequence with A/B testing',trigger:'Event-triggered',steps:['Segment audience','Prepare variants','Send batch','Track opens/clicks','Optimize'],vars:['templateId (required)','audience (required)','abTest (default: false)']},
+  {id:'lead-nurture',name:'Lead Nurture',cat:'crm',desc:'Automated lead nurturing workflow with scoring',trigger:'Event-triggered',steps:['Score lead','Select nurture track','Send personalized content','Update CRM'],vars:['leadSource (required)','scoreThreshold (default: 50)']},
+  {id:'customer-onboard',name:'Customer Onboard',cat:'crm',desc:'New customer onboarding automation',trigger:'Event / Webhook',steps:['Create account','Send welcome email','Schedule onboard call','Assign CSM'],vars:['customerData (required)','plan (required)']},
+  {id:'feedback-collect',name:'Feedback Collect',cat:'crm',desc:'Collect and categorize user feedback automatically',trigger:'Cron: Fri 10:00 + Order event',steps:['Send survey','Collect responses','Categorize feedback','Generate insights'],vars:['surveyTemplate (required)','minResponses (default: 10)']},
+];
+const CAT_LABELS={all:'All',reporting:'Reporting',data:'Data',monitoring:'Monitoring',content:'Content',marketing:'Marketing',crm:'CRM'};
+let activeCat='all';
+
+function renderOps(){
+  const pills=document.getElementById('catPills');
+  pills.innerHTML=Object.entries(CAT_LABELS).map(([k,v])=>`<button class="cat-pill${k===activeCat?' active':''}" onclick="filterCat('${k}')">${v}</button>`).join('');
+  const filtered=activeCat==='all'?TEMPLATES:TEMPLATES.filter(t=>t.cat===activeCat);
+  document.getElementById('tplGrid').innerHTML=filtered.map(t=>`<div class="tpl-card" onclick="this.classList.toggle('expanded')">
+    <div class="tpl-name">${t.name}</div>
+    <div class="tpl-desc">${t.desc}</div>
+    <div class="tpl-meta"><span class="tpl-badge">${t.cat}</span><span class="tpl-badge">${t.trigger}</span><span class="tpl-badge">${t.steps.length} steps</span></div>
+    <div class="tpl-detail">
+      <div class="section-title">Workflow Steps</div>
+      <div class="step-flow">${t.steps.map((s,i)=>(i>0?'<span class="step-arrow">&rarr;</span>':'')+`<span class="step-node">${i+1}. ${s}</span>`).join('')}</div>
+      <div class="var-list"><strong>Variables:</strong> ${t.vars.join(' | ')}</div>
+    </div></div>`).join('');
+}
+function filterCat(c){activeCat=c;renderOps()}
+
+// ─── SALES-CRM: FUNNEL DATA ────────────────────────────
+const DEAL_STAGES=[
+  {id:'contact',label:'Contact',count:24,color:'#3b82f6'},
+  {id:'qualified',label:'Qualified',count:18,color:'#06b6d4'},
+  {id:'proposal',label:'Proposal',count:11,color:'#8b5cf6'},
+  {id:'negotiation',label:'Negotiation',count:6,color:'#f59e0b'},
+  {id:'closed_won',label:'Won',count:3,color:'#10b981'},
+];
+const LEAD_STATUSES=[
+  {id:'new',label:'New',count:45,color:'#3b82f6'},
+  {id:'contacted',label:'Contacted',count:32,color:'#06b6d4'},
+  {id:'qualified',label:'Qualified',count:20,color:'#8b5cf6'},
+  {id:'converted',label:'Converted',count:11,color:'#10b981'},
+  {id:'lost',label:'Lost',count:9,color:'#ef4444'},
+];
+
+function renderSales(){
+  const maxDeal=DEAL_STAGES[0].count;
+  let fhtml='';
+  DEAL_STAGES.forEach((s,i)=>{
+    const w=Math.max(Math.round(s.count/maxDeal*100),15);
+    fhtml+=`<div class="funnel-stage"><span class="funnel-label">${s.label}</span><div class="funnel-bar" style="width:${w}%;background:${s.color}">${s.count}</div></div>`;
+    if(i<DEAL_STAGES.length-1){
+      const conv=Math.round(DEAL_STAGES[i+1].count/s.count*100);
+      fhtml+=`<div class="conv-arrow">&darr; ${conv}% conversion</div>`;
+    }
+  });
+  document.getElementById('dealFunnel').innerHTML=fhtml;
+
+  const maxLead=LEAD_STATUSES[0].count;
+  document.getElementById('leadBars').innerHTML=LEAD_STATUSES.map(s=>{
+    const w=Math.max(Math.round(s.count/maxLead*100),8);
+    const pct=Math.round(s.count/maxLead*100);
+    return`<div class="lead-row"><span class="lead-label">${s.label}</span><div class="lead-bar-wrap"><div class="lead-bar-fill" style="width:${w}%;background:${s.color}">${s.count}</div></div><span class="lead-stat">${pct}%</span></div>`;
+  }).join('');
+}
+
+// ─── PM-TOOLKIT: ROADMAP + SPRINT + FEEDBACK ────────────
+const ROADMAP=[
+  {lane:'P0',title:'MCP Server v1.0',status:'completed',date:'2026-01'},
+  {lane:'P0',title:'RAG Knowledge Base',status:'completed',date:'2026-02'},
+  {lane:'P0',title:'Multi-platform Publish',status:'in_progress',date:'2026-03'},
+  {lane:'P1',title:'Email Automation',status:'completed',date:'2026-02'},
+  {lane:'P1',title:'n8n Export',status:'in_progress',date:'2026-03'},
+  {lane:'P1',title:'Figma Bridge',status:'planned',date:'2026-04'},
+  {lane:'P2',title:'AI Agent Goals',status:'planned',date:'2026-04'},
+  {lane:'P2',title:'Dashboard v2',status:'in_progress',date:'2026-03'},
+  {lane:'P3',title:'Chrome Extension',status:'planned',date:'2026-Q3'},
+];
+const SPRINT_TASKS={
+  todo:['Add OAuth login','Write API docs','Setup CI/CD'],
+  in_progress:['Unified Dashboard','Regional Culture tests'],
+  review:['Content Repurposer v2'],
+  done:['MCP registry update','Platform comparison table','Service Worker setup'],
+};
+const FEEDBACK=[
+  {text:'Add dark/light theme toggle',votes:28,cat:'feature'},
+  {text:'Mobile layout breaks on small screens',votes:22,cat:'bug'},
+  {text:'Export dashboard data as CSV',votes:19,cat:'feature'},
+  {text:'Improve search in swipe file',votes:15,cat:'improve'},
+  {text:'Add notification for scheduled posts',votes:12,cat:'feature'},
+];
+
+function renderPM(){
+  const lanes=['P0','P1','P2','P3'];
+  document.getElementById('roadmapLanes').innerHTML=lanes.map(l=>{
+    const items=ROADMAP.filter(r=>r.lane===l);
+    return`<div class="lane"><span class="lane-label">${l}</span><div class="lane-items">${items.map(r=>`<div class="ms-chip"><span class="dot dot-${r.status}"></span>${r.title}<span style="font-size:11px;color:var(--text-dim);margin-left:4px">${r.date}</span></div>`).join('')}</div></div>`;
+  }).join('');
+
+  const cols=[['todo','To Do'],['in_progress','In Progress'],['review','Review'],['done','Done']];
+  document.getElementById('sprintBoard').innerHTML=cols.map(([k,label])=>{
+    const tasks=SPRINT_TASKS[k]||[];
+    return`<div class="sprint-col"><div class="sprint-col-title">${label}<span class="cnt">${tasks.length}</span></div>${tasks.map(t=>`<div class="task-chip">${t}</div>`).join('')}</div>`;
+  }).join('');
+
+  const catCls={feature:'fb-feature',bug:'fb-bug',improve:'fb-improve'};
+  const catLabel={feature:'Feature',bug:'Bug',improve:'Improve'};
+  document.getElementById('fbList').innerHTML=FEEDBACK.map(f=>`<div class="fb-item"><div class="fb-votes">${f.votes}</div><div class="fb-text">${f.text}</div><span class="fb-cat ${catCls[f.cat]}">${catLabel[f.cat]}</span></div>`).join('');
+}
+
+// ─── PANELS ─────────────────────────────────────────────
+function togglePanel(name){
+  closeAllPanels();
+  const panel=document.getElementById(name+'Panel');
+  const overlay=document.getElementById('panelOverlay');
+  panel.classList.add('open');
+  overlay.classList.add('open');
+  if(name==='history')renderHistory();
+}
+function closeAllPanels(){
+  document.querySelectorAll('.side-panel').forEach(p=>p.classList.remove('open'));
+  document.getElementById('panelOverlay').classList.remove('open');
+}
+
+// ─── CACHE CLEAR ────────────────────────────────────────
+function clearAllCache(){
+  if(window.caches)caches.keys().then(ks=>ks.forEach(k=>caches.delete(k)));
+  localStorage.removeItem('chub_prefs');
+  localStorage.removeItem('chub_history');
+  showToast('Cache cleared | Refresh in 2s...','success');
+  setTimeout(()=>location.reload(),2000);
+}
+
+// ─── HISTORY ────────────────────────────────────────────
+let historyTimer=null;
+function saveHistory(){
+  clearTimeout(historyTimer);
+  historyTimer=setTimeout(()=>{
+    const text=(document.getElementById('previewInput').value||'').trim();
+    if(text.length<10)return;
+    let hist=JSON.parse(localStorage.getItem('chub_history')||'[]');
+    if(hist.length>0&&hist[0].text===text)return;
+    const now=new Date();
+    hist.unshift({id:Date.now(),ts:now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}),text,preview:text.slice(0,60),len:text.length});
+    if(hist.length>50)hist=hist.slice(0,50);
+    localStorage.setItem('chub_history',JSON.stringify(hist));
+    showToast('Saved to history','success',2000);
+  },2000);
+}
+
+function renderHistory(){
+  const hist=JSON.parse(localStorage.getItem('chub_history')||'[]');
+  const el=document.getElementById('historyList');
+  if(!hist.length){el.innerHTML='<p style="font-size:13px;color:var(--text-secondary)">No history yet.</p>';return}
+  el.innerHTML=hist.map(h=>`<div class="hist-entry">
+    <div class="hist-meta"><span>${h.ts}</span><span>${h.len} chars</span></div>
+    <div class="hist-preview">${h.preview}${h.len>60?'...':''}</div>
+    <div class="hist-actions"><button class="hist-btn" onclick="restoreHistory(${h.id})">Restore</button><button class="hist-btn" onclick="deleteHistory(${h.id})">Delete</button></div>
+  </div>`).join('');
+}
+
+function restoreHistory(id){
+  const hist=JSON.parse(localStorage.getItem('chub_history')||'[]');
+  const entry=hist.find(h=>h.id===id);
+  if(!entry)return;
+  document.getElementById('previewInput').value=entry.text;
+  closeAllPanels();
+  // Switch to media > preview
+  const mediaBtn=document.querySelector('[data-tab="media"]');
+  if(mediaBtn)switchMain('media',mediaBtn);
+  const previewBtn=document.querySelectorAll('.sub-tab')[1];
+  if(previewBtn)switchSub('m-preview',previewBtn);
+  renderPreview();
+  showToast('Content restored','success');
+}
+
+function deleteHistory(id){
+  let hist=JSON.parse(localStorage.getItem('chub_history')||'[]');
+  hist=hist.filter(h=>h.id!==id);
+  localStorage.setItem('chub_history',JSON.stringify(hist));
+  renderHistory();
+  showToast('Entry deleted','info');
+}
+
+// ─── PREFS PERSISTENCE ──────────────────────────────────
+function savePrefs(){
+  localStorage.setItem('chub_prefs',JSON.stringify({tab:activeMain,sub:activeSub,cat:activeCat,region:document.getElementById('regionSelect')?.value||'us'}));
+}
+function loadPrefs(){
+  try{
+    const p=JSON.parse(localStorage.getItem('chub_prefs'));
+    if(!p)return;
+    if(p.tab){const btn=document.querySelector(`[data-tab="${p.tab}"]`);if(btn)switchMain(p.tab,btn)}
+    if(p.cat)activeCat=p.cat;
+    if(p.region){const sel=document.getElementById('regionSelect');if(sel)sel.value=p.region}
+  }catch(e){}
+}
+
+// ─── PWA INSTALL ────────────────────────────────────────
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPWAPrompt=e;const btn=document.getElementById('pwaInstallBtn');if(btn)btn.style.display='block'});
+function pwaInstall(){if(deferredPWAPrompt){deferredPWAPrompt.prompt();deferredPWAPrompt=null}}
+
+// ─── SERVICE WORKER ─────────────────────────────────────
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>showToast('Offline cache unavailable','warning'))}
+
+// ─── INIT ───────────────────────────────────────────────
+loadPrefs();
+renderPreview();
 renderRegion();
 </script>
 </body>
