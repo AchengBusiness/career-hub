@@ -1,7 +1,7 @@
 {
   "registry": {
     "name": "Career-Hub MCP Registry",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "description": "四大职业工具的MCP Server统一注册表 | Unified MCP Server registry for four career toolkits",
     "updated": "2026-03-25",
     "totalTools": 73
