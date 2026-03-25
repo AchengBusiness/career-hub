@@ -4,13 +4,13 @@
     "version": "0.7.0",
     "description": "四大职业工具的MCP Server统一注册表 | Unified MCP Server registry for four career toolkits",
     "updated": "2026-03-25",
-    "totalTools": 70
+    "totalTools": 73
   },
   "servers": [
     {
       "name": "media-ops",
       "title": "自媒体工具集 | Media Ops",
-      "version": "0.7.0",
+      "version": "0.8.0",
       "repo": "https://github.com/AchengBusiness/media-ops",
       "command": "node",
       "args": ["src/mcp-server/index.js"],
@@ -37,7 +37,10 @@
         { "name": "adapt_for_platform", "description": "为指定平台适配内容 | Adapt content for a specific platform" },
         { "name": "add_inspiration", "description": "添加灵感到灵感库 | Add inspiration to swipe file" },
         { "name": "search_inspiration", "description": "搜索灵感库 | Search swipe file" },
-        { "name": "get_swipe_stats", "description": "获取灵感库统计 | Get swipe file statistics" }
+        { "name": "get_swipe_stats", "description": "获取灵感库统计 | Get swipe file statistics" },
+        { "name": "adapt_for_region", "description": "适配内容到指定地区文化风格 | Adapt content to a region's cultural style" },
+        { "name": "get_region_tips", "description": "获取地区内容创作建议 | Get region-specific content tips" },
+        { "name": "translate_content", "description": "AI翻译内容到目标语言 | Translate content to target language" }
       ]
     },
     {

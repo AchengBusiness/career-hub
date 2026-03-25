@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外内容平台运营仪表盘</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f172a;--card-bg:#1e293b;--card-hover:#334155;
+  --text:#f1f5f9;--text-secondary:#94a3b8;
+  --accent:#38bdf8;--accent2:#818cf8;
+  --green:#22c55e;--yellow:#eab308;--red:#ef4444;
+  --border:#334155;--overseas:#0ea5e9;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.topbar{background:var(--card-bg);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px}
+.topbar-title{font-size:16px;font-weight:600;color:var(--text)}
+.back-link{font-size:13px;color:var(--text-secondary)}
+.back-link:hover{color:var(--accent)}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--card-bg);padding:0 24px}
+.tab-btn{padding:14px 20px;background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:14px;font-family:inherit;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none;padding:24px}
+.tab-content.active{display:block}
+/* Table */
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;min-width:800px}
+th{background:#162032;color:var(--text-secondary);font-weight:600;padding:12px 14px;text-align:left;font-size:13px;white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(51,65,85,.4)}
+.platform-name{font-weight:600;display:flex;align-items:center;gap:6px}
+.overseas-row td:first-child .platform-name::after{content:'海外';font-size:10px;background:var(--overseas);color:#fff;padding:1px 5px;border-radius:3px;font-weight:500}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-p0{background:#7f1d1d;color:#fca5a5}
+.badge-p1{background:#78350f;color:#fcd34d}
+.badge-p2{background:#1e3a5f;color:#93c5fd}
+.char-limit{font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent)}
+/* Preview tab */
+.preview-input{width:100%;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-size:14px;font-family:inherit;resize:vertical;min-height:100px;outline:none;transition:border-color .2s}
+.preview-input:focus{border-color:var(--accent)}
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:20px}
+.platform-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:14px;transition:background .2s}
+.platform-card:hover{background:var(--card-hover)}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.card-pname{font-weight:600;font-size:13px}
+.card-count{font-size:12px;color:var(--text-secondary)}
+.card-count.over{color:var(--red);font-weight:600}
+.progress-bar{height:4px;background:#1e293b;border-radius:2px;margin-bottom:10px;overflow:hidden;border:1px solid var(--border)}
+.progress-fill{height:100%;border-radius:2px;transition:width .3s}
+.fill-green{background:var(--green)}
+.fill-yellow{background:var(--yellow)}
+.fill-red{background:var(--red)}
+.card-preview{font-size:12px;color:var(--text-secondary);line-height:1.6;min-height:48px;word-break:break-all}
+.card-tags{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.tag-chip{background:#1e3a5f;color:#93c5fd;font-size:11px;padding:1px 7px;border-radius:10px}
+/* Regional guide */
+.region-select{background:var(--card-bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:14px;font-family:inherit;outline:none;cursor:pointer;min-width:200px}
+.region-select:focus{border-color:var(--accent)}
+.region-panel{margin-top:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:24px}
+.region-header{font-size:20px;font-weight:700;margin-bottom:20px;color:var(--text)}
+.region-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.region-section{background:#162032;border-radius:8px;padding:16px}
+.section-title{font-size:13px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.tip-list{list-style:none}
+.tip-list li{padding:5px 0;color:var(--text);font-size:13px;line-height:1.6;border-bottom:1px solid var(--border)}
+.tip-list li:last-child{border-bottom:none}
+.tip-list li::before{content:'• ';color:var(--accent)}
+.taboo-card{background:#2d1515;border:1px solid #7f1d1d;border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:13px;color:#fca5a5;line-height:1.5}
+.taboo-card:last-child{margin-bottom:0}
+.hashtag-row{display:flex;flex-wrap:wrap;gap:6px}
+.ht{background:#1e3a5f;color:#93c5fd;font-size:12px;padding:3px 10px;border-radius:12px;font-weight:500}
+.time-row{font-size:13px;color:var(--text);line-height:1.8}
+.audience-text{font-size:13px;color:var(--text);line-height:1.7}
+.label{font-size:11px;color:var(--text-secondary);margin-bottom:4px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back-link" href="index.html">← 返回首页</a>
+  <div class="topbar-title">海外内容平台运营仪表盘</div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('compare',this)">平台对比</button>
+  <button class="tab-btn" onclick="switchTab('preview',this)">内容预览</button>
+  <button class="tab-btn" onclick="switchTab('regional',this)">地区指南</button>
+</div>
+
+<!-- TAB 1: Platform Comparison -->
+<div id="tab-compare" class="tab-content active">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>平台名称</th>
+          <th>字符上限</th>
+          <th>内容风格</th>
+          <th>话题标签</th>
+          <th>特殊功能</th>
+          <th>优先级</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Domestic -->
+        <tr>
+          <td><span class="platform-name">Twitter / X</span></td>
+          <td><span class="char-limit">280</span></td>
+          <td>简洁有力</td>
+          <td>2–3 个</td>
+          <td>话题广场、订阅订阅</td>
+          <td><span class="badge badge-p0">P0</span></td>
+        </tr>
+        <tr>
+          <td><span class="platform-name">微博</span></td>
+          <td><span class="char-limit">2000</span></td>
+          <td>对话式</td>
+          <td>2 个超话</td>
+          <td>话题超话、直播</td>
+          <td><span class="badge badge-p1">P1</span></td>
+        </tr>
+        <tr>
+          <td><span class="platform-name">小红书</span></td>
+          <td><span class="char-limit">1000</span></td>
+          <td>生活方式</td>
+          <td>5–10 个</td>
+          <td>图文笔记、种草</td>
+          <td><span class="badge badge-p0">P0</span></td>
+        </tr>
+        <tr>
+          <td><span class="platform-name">抖音</span></td>
+          <td><span class="char-limit">300</span></td>
+          <td>钩子驱动</td>
+          <td>3–5 个</td>
+          <td>短视频、直播带货</td>
+          <td><span class="badge badge-p0">P0</span></td>
+        </tr>
+        <tr>
+          <td><span class="platform-name">哔哩哔哩</span></td>
+          <td><span class="char-limit">2000</span></td>
+          <td>教育类</td>
+          <td>3–8 个</td>
+          <td>长视频、专栏、弹幕</td>
+          <td><span class="badge badge-p1">P1</span></td>
+        </tr>
+        <tr>
+          <td><span class="platform-name">快手</span></td>
+          <td><span class="char-limit">300</span></td>
+          <td>接地气</td>
+          <td>3–5 个</td>
+          <td>下沉市场、老铁文化</td>
+          <td><span class="badge badge-p2">P2</span></td>
+        </tr>
+        <tr>
+          <td><span class="platform-name">Threads</span></td>
+          <td><span class="char-limit">500</span></td>
+          <td>对话式</td>
+          <td>1–3 个</td>
+          <td>Instagram 联动</td>
+          <td><span class="badge badge-p1">P1</span></td>
+        </tr>
+        <tr>
+          <td><span class="platform-name">LinkedIn</span></td>
+          <td><span class="char-limit">3000</span></td>
+          <td>专业洞察</td>
+          <td>3–5 个</td>
+          <td>职场人脉、B2B 获客</td>
+          <td><span class="badge badge-p1">P1</span></td>
+        </tr>
+        <!-- Overseas -->
+        <tr class="overseas-row">
+          <td><span class="platform-name">YouTube</span></td>
+          <td><span class="char-limit">5000</span></td>
+          <td>SEO 优化</td>
+          <td>5–15 个</td>
+          <td>长视频、会员、超级感谢</td>
+          <td><span class="badge badge-p0">P0</span></td>
+        </tr>
+        <tr class="overseas-row">
+          <td><span class="platform-name">YouTube Shorts</span></td>
+          <td><span class="char-limit">100</span></td>
+          <td>病毒式钩子</td>
+          <td>3–5 个</td>
+          <td>竖屏短视频、Shorts 流量池</td>
+          <td><span class="badge badge-p0">P0</span></td>
+        </tr>
+        <tr class="overseas-row">
+          <td><span class="platform-name">TikTok</span></td>
+          <td><span class="char-limit">2200</span></td>
+          <td>病毒式钩子</td>
+          <td>3–5 个</td>
+          <td>挑战赛、TikTok Shop</td>
+          <td><span class="badge badge-p0">P0</span></td>
+        </tr>
+        <tr class="overseas-row">
+          <td><span class="platform-name">Instagram Reels</span></td>
+          <td><span class="char-limit">2200</span></td>
+          <td>行动号召</td>
+          <td>5–10 个</td>
+          <td>Reels 推流、购物标签</td>
+          <td><span class="badge badge-p0">P0</span></td>
+        </tr>
+        <tr class="overseas-row">
+          <td><span class="platform-name">Instagram 帖子</span></td>
+          <td><span class="char-limit">2200</span></td>
+          <td>生活方式</td>
+          <td>10–30 个</td>
+          <td>图文轮播、合集高亮</td>
+          <td><span class="badge badge-p1">P1</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:12px;font-size:12px;color:var(--text-secondary)">
+    <span style="background:var(--overseas);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px">海外</span>
+    标记为重点拓展的海外平台
+  </p>
+</div>
+
+<!-- TAB 2: Content Preview -->
+<div id="tab-preview" class="tab-content">
+  <div class="label" style="margin-bottom:8px">输入内容</div>
+  <textarea class="preview-input" id="previewInput" placeholder="输入你的内容，实时预览各平台适配效果..." oninput="debounceUpdate()"></textarea>
+  <div class="preview-grid" id="previewGrid"></div>
+</div>
+
+<!-- TAB 3: Regional Guide -->
+<div id="tab-regional" class="tab-content">
+  <div style="margin-bottom:8px" class="label">选择目标地区</div>
+  <select class="region-select" id="regionSelect" onchange="renderRegion()">
+    <option value="us">🇺🇸 美国 / 北美</option>
+    <option value="uk">🇬🇧 英国</option>
+    <option value="europe">🇪🇺 欧洲</option>
+    <option value="japan">🇯🇵 日本</option>
+    <option value="korea">🇰🇷 韩国</option>
+    <option value="sea">🌏 东南亚</option>
+    <option value="me">🌙 中东</option>
+    <option value="africa">🌍 非洲</option>
+    <option value="latam">🌎 拉丁美洲</option>
+  </select>
+  <div id="regionPanel"></div>
+</div>
+
+<script>
+// ─── TAB SWITCH ────────────────────────────────────────────────
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='preview')renderPreview();
+  if(id==='regional')renderRegion();
+}
+
+// ─── PLATFORM DATA ─────────────────────────────────────────────
+const PLATFORMS=[
+  {id:'twitter',  name:'Twitter / X',       limit:280,  style:'punchy',      tags:['#职场成长','#效率提升'],overseas:false},
+  {id:'weibo',    name:'微博',              limit:2000, style:'conversational',tags:['#职场故事','#打工人'],overseas:false},
+  {id:'xhs',      name:'小红书',            limit:1000, style:'lifestyle',   tags:['#生活方式','#好物分享','#成长记录'],overseas:false},
+  {id:'douyin',   name:'抖音',              limit:300,  style:'hook-driven', tags:['#职场干货','#涨知识'],overseas:false},
+  {id:'bili',     name:'哔哩哔哩',          limit:2000, style:'educational', tags:['#学习','#职场技能','#干货'],overseas:false},
+  {id:'kuai',     name:'快手',              limit:300,  style:'relatable',   tags:['#老铁','#真实生活'],overseas:false},
+  {id:'threads',  name:'Threads',           limit:500,  style:'conversational',tags:['#career','#growth'],overseas:false},
+  {id:'linkedin', name:'LinkedIn',          limit:3000, style:'professional',tags:['#Leadership','#Career','#Growth'],overseas:false},
+  {id:'youtube',  name:'YouTube',           limit:5000, style:'seo-optimized',tags:['#HowTo','#Tutorial','#Career'],overseas:true},
+  {id:'ytshorts', name:'YouTube Shorts',    limit:100,  style:'viral-hook',  tags:['#Shorts','#Tips'],overseas:true},
+  {id:'tiktok',   name:'TikTok',            limit:2200, style:'viral-hook',  tags:['#fyp','#LearnOnTikTok','#Career'],overseas:true},
+  {id:'reels',    name:'Instagram Reels',   limit:2200, style:'cta-driven',  tags:['#Reels','#CareerTips','#Motivation'],overseas:true},
+  {id:'igpost',   name:'Instagram 帖子',    limit:2200, style:'lifestyle',   tags:['#lifestyle','#success','#mindset'],overseas:true},
+];
+
+function applyStyle(text,style){
+  if(!text)return'';
+  const sents=text.split(/(?<=[。！？.!?])\s*/);
+  switch(style){
+    case'punchy':return sents.slice(0,2).join(' ');
+    case'hook-driven':case'relatable':case'viral-hook':return sents[0]||text;
+    case'lifestyle':return sents.map((s,i)=>i%2===0?s:'\n'+s).join('');
+    case'seo-optimized':return(sents[0]||'')+'\n\n'+sents.slice(1).join(' ');
+    case'cta-driven':return sents.slice(0,3).join(' ');
+    default:return text;
+  }
+}
+
+function truncate(str,max){
+  if(str.length<=max)return str;
+  return str.slice(0,max-1)+'…';
+}
+
+// ─── PREVIEW RENDER ────────────────────────────────────────────
+let debounceTimer=null;
+function debounceUpdate(){
+  clearTimeout(debounceTimer);
+  debounceTimer=setTimeout(renderPreview,300);
+}
+
+function renderPreview(){
+  const raw=document.getElementById('previewInput').value||'';
+  const grid=document.getElementById('previewGrid');
+  grid.innerHTML=PLATFORMS.map(p=>{
+    const adapted=applyStyle(raw,p.style);
+    const preview=truncate(adapted,p.limit);
+    const len=raw.length;
+    const ratio=Math.min(len/p.limit,1);
+    const pct=Math.round(ratio*100);
+    const fillClass=ratio<0.7?'fill-green':ratio<0.9?'fill-yellow':'fill-red';
+    const countClass=len>p.limit?'card-count over':'card-count';
+    const tagHtml=p.tags.map(t=>`<span class="tag-chip">${t}</span>`).join('');
+    const overseaBadge=p.overseas?'<span style="font-size:10px;background:var(--overseas);color:#fff;padding:1px 5px;border-radius:3px;margin-left:4px">海外</span>':'';
+    return`<div class="platform-card">
+      <div class="card-header">
+        <span class="card-pname">${p.name}${overseaBadge}</span>
+        <span class="${countClass}">${len}/${p.limit}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${pct}%"></div></div>
+      <div class="card-preview">${preview||'<span style="color:var(--text-secondary);font-style:italic">暂无内容</span>'}</div>
+      <div class="card-tags">${tagHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// init preview grid with empty state
+renderPreview();
+
+// ─── REGIONAL DATA ─────────────────────────────────────────────
+const REGIONS={
+  us:{
+    label:'🇺🇸 美国 / 北美',
+    tips:['直接切入主题，美国受众不喜欢兜圈子，开头 5 秒必须说明价值','用数字量化成果，例如"3 步提升效率 40%"比模糊描述更有说服力','英文内容配合字幕，提升可访问性并帮助算法识别关键词','鼓励评论和分享，可在结尾用问题引导互动，例如"你有类似经历吗？"','早 8 点至 10 点（东部时间）发布职场类内容，午间或周末发布娱乐内容','保持真实态度，"接地气"的内容在美国有更高的信任度和转化率'],
+    taboos:['避免过度政治表态，两党话题极化严重，容易引起争议','不要夸大宣传，美国用户对"最好""第一"等绝对化表述反感','涉及种族、性别等敏感话题需谨慎，措辞不当容易引发社区举报'],
+    tags:['#ProductivityTips','#CareerGrowth','#WorkSmarter','#9to5','#SideHustle'],
+    times:'工作日早 7:00–9:00（EST），午休 12:00–13:00，周末上午 10:00–11:00 效果较好',
+    audience:'注重个人价值与效率，追求副业与财务自由，对 AI 工具类内容高度感兴趣，反应速度快、互动率高'
+  },
+  uk:{
+    label:'🇬🇧 英国',
+    tips:['语气正式而幽默并存，英国受众欣赏自嘲和讽刺，但过于直白则显得粗鲁','内容兼顾专业深度，英国用户更愿意阅读长文和深度分析','加入英式生活参考（如茶、天气、下班喝一杯），增加文化认同感','配合英式拼写（colour、organisation），提升本地化感知','发布时间以下班后晚 7 点至 9 点（GMT）为佳，尤其是工作日','关注可持续和社会责任话题，英国年轻用户对此高度敏感'],
+    taboos:['不要混淆英格兰、苏格兰、威尔士、北爱尔兰的文化差异，这是非常敏感的身份认同问题','脱欧话题仍具争议性，非必要不触碰','皇室相关内容要保持中立，支持或讽刺都可能引起争议'],
+    tags:['#UKCareer','#WorkLifeBalance','#BritishLife','#SelfImprovement','#LondonLife'],
+    times:'工作日晚 19:00–21:00（GMT），午间 12:00–13:00，周末早 9:00–11:00',
+    audience:'受教育程度高、注重礼仪与幽默，职场内容偏向管理与领导力，对科技创业和职场平衡话题感兴趣'
+  },
+  europe:{
+    label:'🇪🇺 欧洲（综合）',
+    tips:['内容需考虑多语言受众，英语为主但适当加入目标国语言词汇可提升好感','欧洲用户重视隐私，不要强调数据追踪或过度个性化推荐功能','可持续发展、环保主题在欧洲拥有极高热度，融入相关内容有助于获得共鸣','学术与理论内容在德国、北欧等地区深受欢迎，可适当增加深度','发布时间参考中欧时间（CET），工作日下午 5 点至晚 9 点较活跃','北欧受众对工作与生活平衡、心理健康话题尤为感兴趣'],
+    taboos:['不要用"欧洲"笼统概括，法国、德国、意大利文化差异显著','避免触碰二战历史和极右派议题，敏感度极高','不要忽视 GDPR 合规，如有落地页或表单需确保数据合规'],
+    tags:['#EuropeanLife','#Sustainability','#FutureOfWork','#WorkLifeBalance','#Innovation'],
+    times:'中欧时间（CET）工作日 17:00–21:00，周末 10:00–12:00 效果较好',
+    audience:'教育水平高、重视环保与平权，偏好有深度的内容，对职场文化改革和技术创新感兴趣'
+  },
+  japan:{
+    label:'🇯🇵 日本',
+    tips:['措辞要委婉礼貌，避免直接命令式或过于强势的语气','图文质量要求高，日本用户对视觉审美非常敏感，排版要精细','内容节奏不要太快，日本受众偏向细腻、深入的叙事方式','适当加入日本文化元素（动漫、匠人精神、四季主题），更易引起共鸣','TikTok 和 YouTube 上的教程类内容在日本很受欢迎，步骤要清晰','发布时间集中在工作日晚 8 点至 11 点（JST），以及周末下午 2 点至 5 点'],
+    taboos:['不要对日本历史事件轻率评论，包括战争、核武器等议题','直接销售推广在日本效果极差，要先建立信任再引导转化','避免在内容中出现低质量或粗糙的元素，会严重损伤品牌形象'],
+    tags:['#日本日常','#学習','#仕事術','#KawaiiLife','#Anime','#技術'],
+    times:'工作日晚 20:00–23:00（JST），午休 12:00–13:00，周末下午 14:00–17:00',
+    audience:'注重细节与品质，有强烈的社群归属感，热爱动漫、科技与美食，对工作效率和自我提升有持续兴趣'
+  },
+  korea:{
+    label:'🇰🇷 韩国',
+    tips:['封面图和缩略图要足够吸引人，韩国用户点击决策非常依赖视觉冲击力','融入 K-pop、美妆、韩剧等流行文化元素可以大幅提升曝光','内容语气温暖亲切，韩国社区文化很强，要有"一起"的感觉','使用热门韩国话题标签，与当地流行趋势绑定传播','发布频率要保持稳定，韩国粉丝期待创作者持续输出','晚上 9 点至 11 点（KST）是韩国平台最活跃的黄金时段'],
+    taboos:['中韩关系敏感，泡菜、汉字起源等文化归属问题绝对不要触碰','不要批评韩国饮食文化或外貌审美文化，容易引发强烈反弹','萨德、领土争议等政治议题会导致大规模抵制'],
+    tags:['#한국일상','#자기개발','#직장생활','#KoreanLife','#Kpop','#Beauty'],
+    times:'工作日晚 21:00–23:00（KST），周末下午 14:00–18:00，午休 12:00–13:00',
+    audience:'时尚敏感、追逐潮流，受 K-pop 和韩剧影响深远，对美妆、职场成长、海外生活内容接受度高，互动热情高'
+  },
+  sea:{
+    label:'🌏 东南亚',
+    tips:['内容要活泼、接地气，东南亚受众非常喜欢有趣和轻松的内容风格','多元宗教背景需要尊重，尤其是马来西亚、印尼等穆斯林较多的地区','电商内容受欢迎，可以在内容中嵌入购物导引和产品推荐','食物和旅游内容极具传播力，尤其在 TikTok 和 Instagram','善用当地网络流行语和梗，与本地用户建立情感联系','发布时间参考东南亚标准时间，晚上 7 点至 10 点最为活跃'],
+    taboos:['宗教话题非常敏感，在马来西亚和印尼避免调侃伊斯兰教','不要忽视各国之间的差异，泰国、越南、菲律宾用户习惯和偏好各不相同','历史殖民话题在某些国家仍有情绪，切勿轻率提及'],
+    tags:['#SEAlife','#AseanCreator','#TravelAsia','#FoodTour','#OnlineBusiness'],
+    times:'工作日晚 19:00–22:00（UTC+7/+8），午休 12:00–13:00，周末全天均活跃',
+    audience:'年轻、移动优先、电商活跃，对美食、旅游、副业收入、技能学习内容兴趣浓厚，TikTok 渗透率极高'
+  },
+  me:{
+    label:'🌙 中东',
+    tips:['重视家庭与社群价值，内容中体现对家庭和集体的尊重有助于建立信任','斋月期间发布时间需调整，斋月结束开斋时（日落后）和深夜是高峰活跃期','阿拉伯语字幕或简短阿拉伯语说明可大幅提升本地受众黏性','商业和创业内容在海湾地区（沙特、UAE）非常受欢迎','视觉内容要符合当地审美，保守、大气的风格比暴露或嬉皮风格更受认可','内容中融入对当地节日（开斋节、宰牲节）的祝福，增强文化认同感'],
+    taboos:['严禁涉及对伊斯兰教的批评或嘲弄，后果严重','酒精、赌博等话题在众多中东国家属于违禁内容，绝对回避','两性关系内容要保守，暴露穿着或亲密行为展示在部分国家违法'],
+    tags:['#MiddleEast','#Business','#Entrepreneurship','#Arabic','#Ramadan'],
+    times:'工作日晚 21:00–24:00（AST，UTC+3），斋月期间 22:00–凌晨 2:00 为高峰',
+    audience:'信仰驱动、家庭导向，对商业、房产投资、宗教内容高度关注，社交媒体覆盖率高，消费力强'
+  },
+  africa:{
+    label:'🌍 非洲',
+    tips:['内容要强调社群共建，非洲文化非常重视集体主义和互助精神','移动端优先，大多数非洲用户通过手机访问，视频要轻量化、加载快','融入本地音乐节奏和视觉风格，内容更具感染力','创业和副业收入话题非常受欢迎，尤其在尼日利亚、肯尼亚、加纳','英语和斯瓦希里语是东非主流，法语覆盖西非，内容语言策略需因地制宜','分享真实的成功故事和奋斗经历，能激励并留住用户'],
+    taboos:['不要用贫困或落后的刻板印象描述非洲，极具冒犯性且容易被举报','部落政治和宗族矛盾在部分地区十分敏感，不要站队','新冠疫情和部分国家的政治稳定性是高度敏感话题'],
+    tags:['#AfricanCreator','#Hustle','#Entrepreneurship','#AfricaRising','#Naija'],
+    times:'工作日晚 18:00–21:00（WAT/EAT），午休 12:00–13:00 也有较好互动',
+    audience:'年轻、充满活力、创业意识强，移动互联网用户增长最快的市场，对商业机会、教育、娱乐内容需求旺盛'
+  },
+  latam:{
+    label:'🌎 拉丁美洲',
+    tips:['语气热情、充满激情，拉丁受众喜欢情感浓郁的内容，冷静疏离风格效果差','西班牙语是主流，巴西使用葡萄牙语，内容语言要有区分','结合家庭、音乐、食物主题，这是拉丁文化的核心情感连接点','TikTok 和 Instagram 在拉美增长极快，短视频内容优先','强调情感共鸣而非纯理性说理，故事化叙述更能打动受众','发布时间集中在晚 8 点至 11 点（各国时区），周末下午也有较好表现'],
+    taboos:['不要将所有拉美国家混为一谈，墨西哥、巴西、阿根廷文化差异显著','政治话题极为复杂，尤其是委内瑞拉、古巴等国的议题，慎重处理','不要轻视或嘲弄拉丁裔的口音、饮食或传统，这在美国和当地都会引发强烈反应'],
+    tags:['#Latinx','#Emprendimiento','#FamiliaLatina','#TikTokLatino','#VibeLatino'],
+    times:'工作日晚 20:00–23:00（各本地时区），周末下午 15:00–18:00 互动活跃',
+    audience:'情感驱动、家庭优先，热爱音乐与美食，移动社交活跃，对娱乐、情感故事和副业内容接受度极高'
+  }
+};
+
+function renderRegion(){
+  const key=document.getElementById('regionSelect').value;
+  const d=REGIONS[key];
+  if(!d)return;
+  const panel=document.getElementById('regionPanel');
+  const tipsHtml=d.tips.map(t=>`<li>${t}</li>`).join('');
+  const taboosHtml=d.taboos.map(t=>`<div class="taboo-card">⚠ ${t}</div>`).join('');
+  const tagsHtml=d.tags.map(t=>`<span class="ht">${t}</span>`).join('');
+  panel.innerHTML=`<div class="region-panel">
+    <div class="region-header">${d.label}</div>
+    <div class="region-grid">
+      <div class="region-section">
+        <div class="section-title">发布建议</div>
+        <ul class="tip-list">${tipsHtml}</ul>
+      </div>
+      <div class="region-section">
+        <div class="section-title">禁忌话题</div>
+        ${taboosHtml}
+        <div style="margin-top:16px"><div class="section-title">推荐标签</div><div class="hashtag-row">${tagsHtml}</div></div>
+      </div>
+      <div class="region-section">
+        <div class="section-title">最佳发布时间</div>
+        <div class="time-row">${d.times}</div>
+        <div style="margin-top:16px"><div class="section-title">受众特征</div><div class="audience-text">${d.audience}</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// init regional
+renderRegion();
+</script>
+</body>
+</html>
