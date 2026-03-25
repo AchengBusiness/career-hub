@@ -1,7 +1,7 @@
 {
   "registry": {
     "name": "Career-Hub MCP Registry",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "四大职业工具的MCP Server统一注册表 | Unified MCP Server registry for four career toolkits",
     "updated": "2026-03-25"
   },
@@ -9,7 +9,7 @@
     {
       "name": "media-ops",
       "title": "自媒体工具集 | Media Ops",
-      "version": "0.1.0",
+      "version": "0.3.0",
       "repo": "https://github.com/AchengBusiness/media-ops",
       "command": "node",
       "args": ["src/mcp-server/index.js"],
@@ -18,13 +18,14 @@
         { "name": "list_templates", "description": "列出模板 | List templates" },
         { "name": "publish_content", "description": "发布内容 | Publish content" },
         { "name": "get_analytics", "description": "获取分析 | Get analytics" },
-        { "name": "schedule_publish", "description": "定时发布 | Schedule publish" }
+        { "name": "schedule_publish", "description": "定时发布 | Schedule publish" },
+        { "name": "execute_goal", "description": "AI Agent执行高层目标 | Execute high-level goal via AI Agent" }
       ]
     },
     {
       "name": "ops-flow",
       "title": "运营自动化 | Ops Flow",
-      "version": "0.1.0",
+      "version": "0.3.0",
       "repo": "https://github.com/AchengBusiness/ops-flow",
       "command": "node",
       "args": ["src/mcp-server/index.js"],
@@ -34,13 +35,14 @@
         { "name": "send_email", "description": "发送邮件 | Send email" },
         { "name": "collect_data", "description": "采集数据 | Collect data" },
         { "name": "generate_report", "description": "生成报告 | Generate report" },
-        { "name": "list_workflows", "description": "列出工作流 | List workflows" }
+        { "name": "list_workflows", "description": "列出工作流 | List workflows" },
+        { "name": "execute_goal", "description": "AI Agent执行高层目标 | Execute high-level goal via AI Agent" }
       ]
     },
     {
       "name": "sales-crm",
       "title": "销售CRM | Sales CRM",
-      "version": "0.1.0",
+      "version": "0.3.0",
       "repo": "https://github.com/AchengBusiness/sales-crm",
       "command": "node",
       "args": ["src/mcp-server/index.js"],
@@ -54,13 +56,14 @@
         { "name": "get_funnel", "description": "获取漏斗 | Get funnel" },
         { "name": "create_follow_up", "description": "创建跟进 | Create follow-up" },
         { "name": "get_pending_follow_ups", "description": "获取待办跟进 | Get pending" },
-        { "name": "run_email_sequence", "description": "执行邮件序列 | Run sequence" }
+        { "name": "run_email_sequence", "description": "执行邮件序列 | Run sequence" },
+        { "name": "execute_goal", "description": "AI Agent执行高层目标 | Execute high-level goal via AI Agent" }
       ]
     },
     {
       "name": "pm-toolkit",
       "title": "产品经理工具箱 | PM Toolkit",
-      "version": "0.1.0",
+      "version": "0.3.0",
       "repo": "https://github.com/AchengBusiness/pm-toolkit",
       "command": "node",
       "args": ["src/mcp-server/index.js"],
@@ -74,7 +77,8 @@
         { "name": "create_sprint", "description": "创建冲刺 | Create sprint" },
         { "name": "add_task", "description": "添加任务 | Add task" },
         { "name": "update_task_status", "description": "更新状态 | Update status" },
-        { "name": "generate_prd", "description": "生成PRD | Generate PRD" }
+        { "name": "generate_prd", "description": "生成PRD | Generate PRD" },
+        { "name": "execute_goal", "description": "AI Agent执行高层目标 | Execute high-level goal via AI Agent" }
       ]
     }
   ],
