@@ -240,8 +240,8 @@ tr:hover td{background:rgba(51,65,85,.4)}
 .toolbar-btn.primary:hover{opacity:.85}
 .toolbar-btn.danger{color:var(--red);border-color:var(--red)}
 .toolbar-btn.danger:hover{background:#7f1d1d;color:#fff}
-td[contenteditable="true"]{outline:none;background:rgba(56,189,248,.08);border-radius:3px;cursor:text}
-td[contenteditable="true"]:focus{box-shadow:inset 0 0 0 1px var(--accent)}
+[contenteditable="true"]{outline:none;background:rgba(56,189,248,.08);border-radius:3px;cursor:text}
+[contenteditable="true"]:focus{box-shadow:inset 0 0 0 1px var(--accent)}
 .row-actions{display:flex;gap:4px}
 .row-btn{background:none;border:1px solid var(--border);color:var(--text-secondary);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px}
 .row-btn:hover{color:var(--text);border-color:var(--accent)}
@@ -279,7 +279,7 @@ td[contenteditable="true"]:focus{box-shadow:inset 0 0 0 1px var(--accent)}
   <span class="stat-item"><strong>4</strong> 仓库</span>
   <span class="stat-item"><strong>73</strong> MCP工具</span>
   <span class="stat-item"><strong>2,462</strong> 测试通过</span>
-  <span class="stat-item">media-ops <strong>v0.8.0</strong></span>
+  <span class="stat-item">media-ops <strong>v0.7.0</strong></span>
   <span class="stat-item">ops-flow <strong>v0.6.0</strong></span>
   <span class="stat-item">sales-crm <strong>v0.6.0</strong></span>
   <span class="stat-item">pm-toolkit <strong>v0.6.0</strong></span>
@@ -300,7 +300,7 @@ td[contenteditable="true"]:focus{box-shadow:inset 0 0 0 1px var(--accent)}
     <div class="overview-card">
       <div class="oc-bar" style="background:var(--accent-media)"></div>
       <div class="oc-body">
-        <div class="oc-head"><span class="oc-icon">&#127909;</span><span class="oc-name">media-ops</span><span class="oc-ver">v0.8.0</span></div>
+        <div class="oc-head"><span class="oc-icon">&#127909;</span><span class="oc-name">media-ops</span><span class="oc-ver">v0.7.0</span></div>
         <div class="oc-tools"><strong>26</strong> MCP工具 | 13平台 | 9地区</div>
         <ul class="oc-features">
           <li>内容多平台分发（13平台）</li>
@@ -576,7 +576,7 @@ function renderPlatformTable(){
       <button class="row-btn del" onclick="deletePlatform(${i})">删除</button>
     </div></td>`:'';
     return`<tr class="${rc}" data-idx="${i}">
-      <td><span class="platform-name">${p.name}${osBadge}</span></td>
+      <td><span class="platform-name">${platEditMode?`<span ${ce} data-field="name" data-idx="${i}" style="min-width:60px;display:inline-block">${p.name}</span>`:`${p.name}`}${osBadge}</span></td>
       <td ${ce} data-field="limit" data-idx="${i}"><span class="char-limit">${p.limit}</span></td>
       <td ${ce} data-field="styleLabel" data-idx="${i}">${p.styleLabel}</td>
       <td ${ce} data-field="hashtags" data-idx="${i}">${p.hashtags}</td>
@@ -591,8 +591,8 @@ function renderPlatformTable(){
   `;
   // Bind contenteditable blur events
   if(platEditMode){
-    document.querySelectorAll('#platformTableWrap td[contenteditable]').forEach(td=>{
-      td.addEventListener('blur',function(){
+    document.querySelectorAll('#platformTableWrap [contenteditable]').forEach(el=>{
+      el.addEventListener('blur',function(){
         const idx=+this.dataset.idx,field=this.dataset.field;
         let val=this.textContent.trim();
         if(field==='limit')val=parseInt(val)||0;
@@ -1058,6 +1058,7 @@ function loadPrefs(){
     const p=JSON.parse(localStorage.getItem('chub_prefs'));
     if(!p)return;
     if(p.tab){const btn=document.querySelector(`[data-tab="${p.tab}"]`);if(btn)switchMain(p.tab,btn)}
+    if(p.sub){const subBtns=document.querySelectorAll('.sub-tab');subBtns.forEach(b=>{if(b.textContent.trim()&&document.getElementById('sub-'+p.sub)){switchSub(p.sub,document.querySelector('.sub-tab.active')||subBtns[0])}});activeSub=p.sub}
     if(p.cat)activeCat=p.cat;
     if(p.region){const sel=document.getElementById('regionSelect');if(sel)sel.value=p.region}
   }catch(e){}
