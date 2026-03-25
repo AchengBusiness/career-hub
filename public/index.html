@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career-Hub | 职业工具导航</title>
+  <meta name="description" content="四大职业方向的一站式自动化工具导航 | One-stop career toolkit navigation">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-hover: #334155;
+      --text: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-media: #3b82f6;
+      --accent-ops: #10b981;
+      --accent-sales: #f59e0b;
+      --accent-pm: #8b5cf6;
+      --border: #334155;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* 头部 | Header */
+    header {
+      text-align: center;
+      padding: 80px 0 40px;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-media), var(--accent-ops), var(--accent-sales), var(--accent-pm));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+
+    header p {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    header .subtitle-en {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      opacity: 0.7;
+      margin-top: 8px;
+    }
+
+    /* 状态条 | Status bar */
+    .status-bar {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin: 40px 0;
+      flex-wrap: wrap;
+    }
+
+    .status-item {
+      text-align: center;
+    }
+
+    .status-item .number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .status-item .label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* 卡片网格 | Card grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      padding: 40px 0;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .card:nth-child(1)::before { background: var(--accent-media); }
+    .card:nth-child(2)::before { background: var(--accent-ops); }
+    .card:nth-child(3)::before { background: var(--accent-sales); }
+    .card:nth-child(4)::before { background: var(--accent-pm); }
+
+    .card:hover {
+      background: var(--card-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    .card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .card .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .card .features {
+      list-style: none;
+      padding: 0;
+    }
+
+    .card .features li {
+      padding: 6px 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .card .features li:last-child {
+      border-bottom: none;
+    }
+
+    .card .features li::before {
+      content: '>';
+      margin-right: 8px;
+      opacity: 0.5;
+    }
+
+    .card .version {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* 底部 | Footer */
+    footer {
+      text-align: center;
+      padding: 60px 0 40px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: var(--accent-media);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* 响应式 | Responsive */
+    @media (max-width: 768px) {
+      header h1 { font-size: 2rem; }
+      header p { font-size: 1rem; }
+      .grid { grid-template-columns: 1fr; }
+      .status-bar { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Career-Hub</h1>
+      <p>四大职业方向的一站式自动化工具导航<br>助力自媒体、运营、销售、产品经理提效</p>
+      <p class="subtitle-en">One-stop automation toolkit navigation for four career tracks</p>
+    </header>
+
+    <div class="status-bar">
+      <div class="status-item">
+        <div class="number">4</div>
+        <div class="label">工具仓库 Repos</div>
+      </div>
+      <div class="status-item">
+        <div class="number">31</div>
+        <div class="label">MCP Tools</div>
+      </div>
+      <div class="status-item">
+        <div class="number">447</div>
+        <div class="label">测试用例 Tests</div>
+      </div>
+      <div class="status-item">
+        <div class="number">MIT</div>
+        <div class="label">开源协议 License</div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <a class="card" href="https://github.com/AchengBusiness/media-ops" target="_blank">
+        <span class="icon">&#9998;</span>
+        <h2>自媒体工具集</h2>
+        <div class="subtitle">Media-Ops | Content Creator Automation</div>
+        <ul class="features">
+          <li>AI内容生成 | Content Generator</li>
+          <li>多平台发布 | Multi-Platform Publisher</li>
+          <li>定时调度 | Scheduler</li>
+          <li>数据分析 | Analytics</li>
+        </ul>
+        <span class="version">v0.1.0</span>
+      </a>
+
+      <a class="card" href="https://github.com/AchengBusiness/ops-flow" target="_blank">
+        <span class="icon">&#9881;</span>
+        <h2>运营自动化</h2>
+        <div class="subtitle">Ops-Flow | Operations Workflow Engine</div>
+        <ul class="features">
+          <li>工作流引擎 | Workflow Engine</li>
+          <li>邮件自动化 | Email Automation</li>
+          <li>数据采集 | Data Collector</li>
+          <li>报告生成 | Report Generator</li>
+        </ul>
+        <span class="version">v0.1.0</span>
+      </a>
+
+      <a class="card" href="https://github.com/AchengBusiness/sales-crm" target="_blank">
+        <span class="icon">&#128176;</span>
+        <h2>销售CRM</h2>
+        <div class="subtitle">Sales-CRM | Sales & Follow-up Automation</div>
+        <ul class="features">
+          <li>客户管理 | CRM Core</li>
+          <li>线索追踪 | Lead Tracker</li>
+          <li>智能跟进 | Follow-up Manager</li>
+          <li>邮件外联 | Email Outreach</li>
+        </ul>
+        <span class="version">v0.1.0</span>
+      </a>
+
+      <a class="card" href="https://github.com/AchengBusiness/pm-toolkit" target="_blank">
+        <span class="icon">&#128640;</span>
+        <h2>产品经理工具箱</h2>
+        <div class="subtitle">PM-Toolkit | Product Manager Toolkit</div>
+        <ul class="features">
+          <li>路线图管理 | Roadmap Manager</li>
+          <li>用户反馈 | Feedback Collector</li>
+          <li>冲刺管理 | Sprint Manager</li>
+          <li>PRD生成器 | PRD Generator</li>
+        </ul>
+        <span class="version">v0.1.0</span>
+      </a>
+
+    </div>
+
+    <!-- MCP集成说明 | MCP Integration Section -->
+    <div style="margin: 40px 0; padding: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;">
+      <h2 style="font-size: 1.8rem; margin-bottom: 8px;">MCP 协议集成 | MCP Protocol Integration</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 24px; line-height: 1.8;">
+        所有工具均支持 <strong style="color: var(--text);">Model Context Protocol (MCP)</strong>，可直接被 Claude Desktop / Cursor / VS Code 调用。<br>
+        All toolkits support MCP and can be called directly from Claude Desktop / Cursor / VS Code.
+      </p>
+      <div style="background: var(--bg); border-radius: 8px; padding: 20px; font-family: monospace; font-size: 0.85rem; overflow-x: auto; line-height: 1.6;">
+        <span style="color: #94a3b8;">// claude_desktop_config.json</span><br>
+        {<br>
+        &nbsp;&nbsp;<span style="color: #3b82f6;">"mcpServers"</span>: {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #10b981;">"media-ops"</span>: { "command": "node", "args": ["src/mcp-server/index.js"] },<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #10b981;">"ops-flow"</span>: { "command": "node", "args": ["src/mcp-server/index.js"] },<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #f59e0b;">"sales-crm"</span>: { "command": "node", "args": ["src/mcp-server/index.js"] },<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #8b5cf6;">"pm-toolkit"</span>: { "command": "node", "args": ["src/mcp-server/index.js"] }<br>
+        &nbsp;&nbsp;}<br>
+        }
+      </div>
+      <p style="color: var(--text-secondary); margin-top: 16px; font-size: 0.85rem;">
+        完整配置见 <a href="mcp-registry.json" style="color: var(--accent-media);">mcp-registry.json</a> | 共 31 个 MCP Tools 可用
+      </p>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 <a href="https://github.com/AchengBusiness">AchengBusiness</a> | 开源于 GitHub, MIT 许可证</p>
+      <p style="margin-top: 8px;">Built with purpose. Powered by automation.</p>
+    </footer>
+  </div>
+
+</body>
+</html>
