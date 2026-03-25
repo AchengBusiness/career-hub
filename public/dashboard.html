@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1e293b">
 <link rel="manifest" href="manifest.json">
-<title>Career-Hub Dashboard</title>
+<title>Career-Hub 仪表盘</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -232,15 +232,15 @@ tr:hover td{background:rgba(51,65,85,.4)}
 <!-- TOPBAR -->
 <div class="topbar">
   <a class="back-link" href="index.html">&larr; Home</a>
-  <div class="topbar-title">Career-Hub Dashboard</div>
-  <button class="gear-btn" onclick="togglePanel('settings')" title="Settings">&#9881;</button>
+  <div class="topbar-title">Career-Hub 仪表盘</div>
+  <button class="gear-btn" onclick="togglePanel('settings')" title="设置">&#9881;</button>
 </div>
 
 <!-- STATS BAR -->
 <div class="stats-bar">
-  <span class="stat-item"><strong>4</strong> repos</span>
-  <span class="stat-item"><strong>73</strong> MCP tools</span>
-  <span class="stat-item"><strong>2,462</strong> tests passing</span>
+  <span class="stat-item"><strong>4</strong> 仓库</span>
+  <span class="stat-item"><strong>73</strong> MCP工具</span>
+  <span class="stat-item"><strong>2,462</strong> 测试通过</span>
   <span class="stat-item">media-ops <strong>v0.8.0</strong></span>
   <span class="stat-item">ops-flow <strong>v0.6.0</strong></span>
   <span class="stat-item">sales-crm <strong>v0.6.0</strong></span>
@@ -249,11 +249,11 @@ tr:hover td{background:rgba(51,65,85,.4)}
 
 <!-- MAIN TABS -->
 <div class="main-tabs">
-  <button class="main-tab active" data-tab="overview" onclick="switchMain('overview',this)">Overview</button>
-  <button class="main-tab" data-tab="media" onclick="switchMain('media',this)">Media-Ops</button>
-  <button class="main-tab" data-tab="ops" onclick="switchMain('ops',this)">Ops-Flow</button>
-  <button class="main-tab" data-tab="sales" onclick="switchMain('sales',this)">Sales-CRM</button>
-  <button class="main-tab" data-tab="pm" onclick="switchMain('pm',this)">PM-Toolkit</button>
+  <button class="main-tab active" data-tab="overview" onclick="switchMain('overview',this)">总览</button>
+  <button class="main-tab" data-tab="media" onclick="switchMain('media',this)">媒体运营</button>
+  <button class="main-tab" data-tab="ops" onclick="switchMain('ops',this)">工作流</button>
+  <button class="main-tab" data-tab="sales" onclick="switchMain('sales',this)">销售CRM</button>
+  <button class="main-tab" data-tab="pm" onclick="switchMain('pm',this)">项目管理</button>
 </div>
 
 <!-- ==================== TAB 1: OVERVIEW ==================== -->
@@ -263,14 +263,14 @@ tr:hover td{background:rgba(51,65,85,.4)}
       <div class="oc-bar" style="background:var(--accent-media)"></div>
       <div class="oc-body">
         <div class="oc-head"><span class="oc-icon">&#127909;</span><span class="oc-name">media-ops</span><span class="oc-ver">v0.8.0</span></div>
-        <div class="oc-tools"><strong>26</strong> MCP tools | 13 platforms | 9 regions</div>
+        <div class="oc-tools"><strong>26</strong> MCP工具 | 13平台 | 9地区</div>
         <ul class="oc-features">
-          <li>Content repurposing (13 platforms)</li>
-          <li>Regional culture engine (9 regions)</li>
-          <li>AI humanizer + detection</li>
-          <li>Trending topics (Bilibili/Douyin/Weibo)</li>
-          <li>RAG knowledge base</li>
-          <li>Swipe file inspiration library</li>
+          <li>内容多平台分发（13平台）</li>
+          <li>地区文化引擎（9地区）</li>
+          <li>AI人化+AI检测</li>
+          <li>热点追踪（B站/抖音/微博）</li>
+          <li>RAG知识库</li>
+          <li>灵感素材库</li>
         </ul>
       </div>
     </div>
@@ -278,14 +278,14 @@ tr:hover td{background:rgba(51,65,85,.4)}
       <div class="oc-bar" style="background:var(--accent-ops)"></div>
       <div class="oc-body">
         <div class="oc-head"><span class="oc-icon">&#9881;</span><span class="oc-name">ops-flow</span><span class="oc-ver">v0.6.0</span></div>
-        <div class="oc-tools"><strong>10</strong> MCP tools | 10 templates | 6 categories</div>
+        <div class="oc-tools"><strong>10</strong> MCP工具 | 10模板 | 6分类</div>
         <ul class="oc-features">
-          <li>Workflow automation (10 templates)</li>
-          <li>ETL data pipeline</li>
-          <li>Email automation (SMTP)</li>
-          <li>Report generation (daily/weekly)</li>
-          <li>n8n workflow export</li>
-          <li>Alert monitoring</li>
+          <li>工作流自动化（10模板）</li>
+          <li>ETL数据管道</li>
+          <li>邮件自动化（SMTP）</li>
+          <li>报告生成（日报/周报）</li>
+          <li>n8n工作流导出</li>
+          <li>告警监控</li>
         </ul>
       </div>
     </div>
@@ -293,14 +293,14 @@ tr:hover td{background:rgba(51,65,85,.4)}
       <div class="oc-bar" style="background:var(--accent-sales)"></div>
       <div class="oc-body">
         <div class="oc-head"><span class="oc-icon">&#128176;</span><span class="oc-name">sales-crm</span><span class="oc-ver">v0.6.0</span></div>
-        <div class="oc-tools"><strong>17</strong> MCP tools | 5 deal stages | lead tracking</div>
+        <div class="oc-tools"><strong>17</strong> MCP工具 | 5商机阶段 | 线索追踪</div>
         <ul class="oc-features">
-          <li>Customer + Deal lifecycle</li>
-          <li>Lead funnel tracking</li>
-          <li>Email outreach sequences</li>
-          <li>Follow-up task management</li>
-          <li>Auto sales reports</li>
-          <li>RAG knowledge base</li>
+          <li>客户+商机全周期管理</li>
+          <li>线索漏斗追踪</li>
+          <li>邮件触达序列</li>
+          <li>跟进任务管理</li>
+          <li>自动销售报告</li>
+          <li>RAG知识库</li>
         </ul>
       </div>
     </div>
@@ -308,14 +308,14 @@ tr:hover td{background:rgba(51,65,85,.4)}
       <div class="oc-bar" style="background:var(--accent-pm)"></div>
       <div class="oc-body">
         <div class="oc-head"><span class="oc-icon">&#128203;</span><span class="oc-name">pm-toolkit</span><span class="oc-ver">v0.6.0</span></div>
-        <div class="oc-tools"><strong>20</strong> MCP tools | Roadmap + Sprint + Feedback</div>
+        <div class="oc-tools"><strong>20</strong> MCP工具 | 路线图 + 冲刺 + 反馈</div>
         <ul class="oc-features">
-          <li>Product roadmap management</li>
-          <li>Sprint + task tracking</li>
-          <li>User feedback with voting</li>
-          <li>Figma bridge integration</li>
-          <li>AI-assisted PRD generation</li>
-          <li>Survey system</li>
+          <li>产品路线图管理</li>
+          <li>冲刺+任务追踪</li>
+          <li>用户反馈投票</li>
+          <li>Figma桥接集成</li>
+          <li>AI辅助PRD生成</li>
+          <li>调研系统</li>
         </ul>
       </div>
     </div>
@@ -325,53 +325,53 @@ tr:hover td{background:rgba(51,65,85,.4)}
 <!-- ==================== TAB 2: MEDIA-OPS ==================== -->
 <div id="pane-media" class="tab-pane">
   <div class="sub-tabs">
-    <button class="sub-tab active" onclick="switchSub('m-compare',this)">Platform Comparison</button>
-    <button class="sub-tab" onclick="switchSub('m-preview',this)">Content Preview</button>
-    <button class="sub-tab" onclick="switchSub('m-regional',this)">Regional Guide</button>
+    <button class="sub-tab active" onclick="switchSub('m-compare',this)">平台对比</button>
+    <button class="sub-tab" onclick="switchSub('m-preview',this)">内容预览</button>
+    <button class="sub-tab" onclick="switchSub('m-regional',this)">地区指南</button>
   </div>
 
   <!-- Sub: Compare -->
   <div id="sub-m-compare" class="sub-pane active">
     <div class="table-wrap"><table><thead><tr>
-      <th>Platform</th><th>Char Limit</th><th>Style</th><th>Hashtags</th><th>Features</th><th>Priority</th>
+      <th>平台</th><th>字数限制</th><th>内容风格</th><th>话题标签</th><th>功能特色</th><th>优先级</th>
     </tr></thead><tbody>
-      <tr><td><span class="platform-name">Twitter / X</span></td><td><span class="char-limit">280</span></td><td>Punchy</td><td>2-3</td><td>Topic trends, Subscriptions</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr><td><span class="platform-name">Weibo</span></td><td><span class="char-limit">2000</span></td><td>Conversational</td><td>2</td><td>Super topics, Live streaming</td><td><span class="badge badge-p1">P1</span></td></tr>
-      <tr><td><span class="platform-name">Xiaohongshu</span></td><td><span class="char-limit">1000</span></td><td>Lifestyle</td><td>5-10</td><td>Photo notes, Product seeding</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr><td><span class="platform-name">Douyin</span></td><td><span class="char-limit">300</span></td><td>Hook-driven</td><td>3-5</td><td>Short video, Live commerce</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr><td><span class="platform-name">Bilibili</span></td><td><span class="char-limit">2000</span></td><td>Educational</td><td>3-8</td><td>Long video, Articles, Danmaku</td><td><span class="badge badge-p1">P1</span></td></tr>
-      <tr><td><span class="platform-name">Kuaishou</span></td><td><span class="char-limit">300</span></td><td>Relatable</td><td>3-5</td><td>Sinking market, Community</td><td><span class="badge badge-p2">P2</span></td></tr>
-      <tr><td><span class="platform-name">Threads</span></td><td><span class="char-limit">500</span></td><td>Conversational</td><td>1-3</td><td>Instagram integration</td><td><span class="badge badge-p1">P1</span></td></tr>
-      <tr><td><span class="platform-name">LinkedIn</span></td><td><span class="char-limit">3000</span></td><td>Professional</td><td>3-5</td><td>B2B networking, Articles</td><td><span class="badge badge-p1">P1</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">YouTube</span></td><td><span class="char-limit">5000</span></td><td>SEO-optimized</td><td>5-15</td><td>Long video, Memberships, Super Thanks</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">YouTube Shorts</span></td><td><span class="char-limit">100</span></td><td>Viral-hook</td><td>3-5</td><td>Vertical short video, Shorts feed</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">TikTok</span></td><td><span class="char-limit">2200</span></td><td>Viral-hook</td><td>3-5</td><td>Challenges, TikTok Shop</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">Instagram Reels</span></td><td><span class="char-limit">2200</span></td><td>CTA-driven</td><td>5-10</td><td>Reels boost, Shopping tags</td><td><span class="badge badge-p0">P0</span></td></tr>
-      <tr class="overseas-row"><td><span class="platform-name">Instagram Post</span></td><td><span class="char-limit">2200</span></td><td>Lifestyle</td><td>10-30</td><td>Carousel, Highlights</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td><span class="platform-name">Twitter / X</span></td><td><span class="char-limit">280</span></td><td>简洁有力</td><td>2-3</td><td>话题趋势, 订阅</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr><td><span class="platform-name">微博</span></td><td><span class="char-limit">2000</span></td><td>对话感</td><td>2</td><td>超话, 直播</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td><span class="platform-name">小红书</span></td><td><span class="char-limit">1000</span></td><td>生活方式</td><td>5-10</td><td>图文笔记, 种草</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr><td><span class="platform-name">抖音</span></td><td><span class="char-limit">300</span></td><td>钩子驱动</td><td>3-5</td><td>短视频, 直播带货</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr><td><span class="platform-name">哔哩哔哩</span></td><td><span class="char-limit">2000</span></td><td>知识性</td><td>3-8</td><td>长视频, 专栏, 弹幕</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td><span class="platform-name">快手</span></td><td><span class="char-limit">300</span></td><td>接地气</td><td>3-5</td><td>下沉市场, 社区</td><td><span class="badge badge-p2">P2</span></td></tr>
+      <tr><td><span class="platform-name">Threads</span></td><td><span class="char-limit">500</span></td><td>对话感</td><td>1-3</td><td>Instagram整合</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr><td><span class="platform-name">LinkedIn</span></td><td><span class="char-limit">3000</span></td><td>专业</td><td>3-5</td><td>B2B社交, 文章</td><td><span class="badge badge-p1">P1</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">YouTube</span></td><td><span class="char-limit">5000</span></td><td>SEO优化</td><td>5-15</td><td>长视频, 会员, 超级感谢</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">YouTube Shorts</span></td><td><span class="char-limit">100</span></td><td>病毒钩子</td><td>3-5</td><td>竖版短视频, Shorts推流</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">TikTok</span></td><td><span class="char-limit">2200</span></td><td>病毒钩子</td><td>3-5</td><td>挑战赛, TikTok商城</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">Instagram Reels</span></td><td><span class="char-limit">2200</span></td><td>CTA驱动</td><td>5-10</td><td>Reels加速, 购物标签</td><td><span class="badge badge-p0">P0</span></td></tr>
+      <tr class="overseas-row"><td><span class="platform-name">Instagram Post</span></td><td><span class="char-limit">2200</span></td><td>生活方式</td><td>10-30</td><td>轮播, 精选集</td><td><span class="badge badge-p1">P1</span></td></tr>
     </tbody></table></div>
-    <p style="margin-top:12px;font-size:12px;color:var(--text-secondary)"><span style="background:var(--overseas);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px">OS</span> = Overseas platform</p>
+    <p style="margin-top:12px;font-size:12px;color:var(--text-secondary)"><span style="background:var(--overseas);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px">OS</span> = 海外平台</p>
   </div>
 
   <!-- Sub: Preview -->
   <div id="sub-m-preview" class="sub-pane">
-    <div class="label" style="margin-bottom:8px">Enter content to preview adaptation across platforms</div>
-    <textarea class="preview-input" id="previewInput" placeholder="Type your content here... Real-time preview for all 13 platforms." oninput="debouncePreview()"></textarea>
+    <div class="label" style="margin-bottom:8px">输入内容，预览各平台适配效果</div>
+    <textarea class="preview-input" id="previewInput" placeholder="在此输入内容…实时预览13个平台的适配效果。" oninput="debouncePreview()"></textarea>
     <div class="preview-grid" id="previewGrid"></div>
   </div>
 
   <!-- Sub: Regional -->
   <div id="sub-m-regional" class="sub-pane">
-    <div class="label" style="margin-bottom:8px">Select target region</div>
+    <div class="label" style="margin-bottom:8px">选择目标地区</div>
     <select class="region-select" id="regionSelect" onchange="renderRegion()">
-      <option value="us">US / North America</option>
-      <option value="uk">UK</option>
-      <option value="europe">Europe</option>
-      <option value="japan">Japan</option>
-      <option value="korea">Korea</option>
-      <option value="sea">Southeast Asia</option>
-      <option value="me">Middle East</option>
-      <option value="africa">Africa</option>
-      <option value="latam">Latin America</option>
+      <option value="us">美国/北美</option>
+      <option value="uk">英国</option>
+      <option value="europe">欧洲</option>
+      <option value="japan">日本</option>
+      <option value="korea">韩国</option>
+      <option value="sea">东南亚</option>
+      <option value="me">中东</option>
+      <option value="africa">非洲</option>
+      <option value="latam">拉丁美洲</option>
     </select>
     <div id="regionPanel"></div>
   </div>
@@ -386,11 +386,11 @@ tr:hover td{background:rgba(51,65,85,.4)}
 <!-- ==================== TAB 4: SALES-CRM ==================== -->
 <div id="pane-sales" class="tab-pane">
   <div class="funnel-section">
-    <div class="funnel-title">Deal Pipeline</div>
+    <div class="funnel-title">商机漏斗</div>
     <div class="deal-funnel" id="dealFunnel"></div>
   </div>
   <div class="funnel-section">
-    <div class="funnel-title">Lead Funnel</div>
+    <div class="funnel-title">线索漏斗</div>
     <div class="lead-bars" id="leadBars"></div>
   </div>
 </div>
@@ -398,15 +398,15 @@ tr:hover td{background:rgba(51,65,85,.4)}
 <!-- ==================== TAB 5: PM-TOOLKIT ==================== -->
 <div id="pane-pm" class="tab-pane">
   <div class="pm-section">
-    <div class="pm-title">Product Roadmap</div>
+    <div class="pm-title">产品路线图</div>
     <div class="roadmap-lanes" id="roadmapLanes"></div>
   </div>
   <div class="pm-section">
-    <div class="pm-title">Sprint Board (Current)</div>
+    <div class="pm-title">当前冲刺看板</div>
     <div class="sprint-board" id="sprintBoard"></div>
   </div>
   <div class="pm-section">
-    <div class="pm-title">Top Feedback</div>
+    <div class="pm-title">热门反馈</div>
     <div class="fb-list" id="fbList"></div>
   </div>
 </div>
@@ -420,25 +420,25 @@ tr:hover td{background:rgba(51,65,85,.4)}
 <!-- SETTINGS PANEL -->
 <div class="side-panel" id="settingsPanel">
   <div class="panel-head">
-    <span class="panel-title">Settings</span>
+    <span class="panel-title">设置</span>
     <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
   </div>
-  <button class="panel-btn" onclick="togglePanel('history')">View History</button>
-  <button class="panel-btn panel-btn-danger" onclick="clearAllCache()">Clear Cache</button>
-  <button class="panel-btn" id="pwaInstallBtn" style="display:none" onclick="pwaInstall()">Install App (PWA)</button>
+  <button class="panel-btn" onclick="togglePanel('history')">查看历史</button>
+  <button class="panel-btn panel-btn-danger" onclick="clearAllCache()">清除缓存</button>
+  <button class="panel-btn" id="pwaInstallBtn" style="display:none" onclick="pwaInstall()">安装应用 (PWA)</button>
   <div style="margin-top:24px;font-size:12px;color:var(--text-dim)">
-    <p>Cache: Service Worker + localStorage</p>
-    <p style="margin-top:4px">PWA: Offline-capable</p>
+    <p>缓存：Service Worker + localStorage</p>
+    <p style="margin-top:4px">PWA：支持离线使用</p>
   </div>
 </div>
 
 <!-- HISTORY PANEL -->
 <div class="side-panel" id="historyPanel">
   <div class="panel-head">
-    <span class="panel-title">History</span>
+    <span class="panel-title">历史记录</span>
     <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
   </div>
-  <div id="historyList"><p style="font-size:13px;color:var(--text-secondary)">No history yet. Use Content Preview to generate entries.</p></div>
+  <div id="historyList"><p style="font-size:13px;color:var(--text-secondary)">暂无历史记录，请先使用内容预览功能。</p></div>
 </div>
 
 <script>
@@ -529,7 +529,7 @@ function renderPreview(){
     return`<div class="platform-card">
       <div class="card-header"><span class="card-pname">${p.name}${osBadge}</span><span class="${cc}">${len}/${p.limit}</span></div>
       <div class="progress-bar"><div class="progress-fill ${fc}" style="width:${pct}%"></div></div>
-      <div class="card-preview">${preview||'<span style="color:var(--text-secondary);font-style:italic">No content</span>'}</div>
+      <div class="card-preview">${preview||'<span style="color:var(--text-secondary);font-style:italic">暂无内容</span>'}</div>
       <div class="card-tags">${p.tags.map(t=>'<span class="tag-chip">'+t+'</span>').join('')}</div>
     </div>`;
   }).join('');
@@ -537,15 +537,15 @@ function renderPreview(){
 
 // ─── MEDIA-OPS: REGIONAL DATA ───────────────────────────
 const REGIONS={
-  us:{label:'US / North America',tips:['Get to the point fast - US audiences value directness','Quantify results: "3 steps to boost efficiency 40%"','Add subtitles for accessibility and SEO','Encourage comments with closing questions','Post 7-10 AM EST for career content','Stay authentic - "real talk" builds trust'],taboos:['Avoid strong political stances','No exaggerated claims ("best ever", "#1")','Be careful with race/gender topics'],tags:['#ProductivityTips','#CareerGrowth','#SideHustle','#WorkSmarter'],times:'Weekdays 7-9 AM EST, Lunch 12-1 PM, Weekends 10-11 AM',audience:'Value efficiency + freedom, interested in AI tools, fast engagement, side hustle mindset'},
-  uk:{label:'UK',tips:['Balance professionalism with dry humor','Long-form analysis performs well','Use British spelling (colour, organisation)','Reference British culture (tea, weather, pub)','Post evenings 7-9 PM GMT','Sustainability topics resonate strongly'],taboos:['Never confuse England/Scotland/Wales/NI identities','Brexit remains divisive','Stay neutral on Royal Family topics'],tags:['#UKCareer','#WorkLifeBalance','#BritishLife','#SelfImprovement'],times:'Weekdays 7-9 PM GMT, Lunch 12-1 PM, Weekends 9-11 AM',audience:'Well-educated, value humor + manners, interested in leadership and work-life balance'},
-  europe:{label:'Europe',tips:['Consider multilingual audiences - English primary','Europeans value privacy - avoid data tracking themes','Sustainability/green topics have high engagement','Academic depth welcome in DACH + Nordics','Post 5-9 PM CET on weekdays','Nordic audiences love work-life balance content'],taboos:['Don\'t generalize "Europe" - cultures vary greatly','WWII/far-right topics extremely sensitive','Ensure GDPR compliance for any forms'],tags:['#EuropeanLife','#Sustainability','#FutureOfWork','#Innovation'],times:'CET weekdays 5-9 PM, weekends 10 AM - 12 PM',audience:'High education, value environment + equality, prefer depth over hype'},
-  japan:{label:'Japan',tips:['Use polite, indirect language - avoid commanding tone','High visual quality expected - clean layouts essential','Slower narrative pace, detailed storytelling','Add anime/craftsman/seasonal cultural references','Tutorials perform well on TikTok + YouTube','Post 8-11 PM JST weekdays, 2-5 PM weekends'],taboos:['No casual remarks about WWII history','Hard-sell tactics backfire badly','Low-quality visuals damage brand perception'],tags:['#Japan','#Learning','#WorkStyle','#Technology'],times:'Weekdays 8-11 PM JST, Lunch 12-1 PM, Weekends 2-5 PM',audience:'Detail-oriented, quality-focused, strong community belonging, love anime + tech + food'},
-  korea:{label:'Korea',tips:['Thumbnails must be eye-catching - clicks depend on visuals','Leverage K-pop, beauty, K-drama cultural hooks','Warm, community-oriented tone works best','Use trending Korean hashtags','Maintain consistent posting frequency','Peak hours: 9-11 PM KST'],taboos:['Never touch cultural origin disputes (kimchi, hanzi)','Don\'t criticize Korean beauty/food culture','Political issues (THAAD, territory) cause boycotts'],tags:['#KoreanLife','#SelfDevelopment','#Kpop','#Beauty'],times:'Weekdays 9-11 PM KST, Weekends 2-6 PM, Lunch 12-1 PM',audience:'Trend-conscious, K-culture influenced, high engagement, beauty + career + overseas life content'},
-  sea:{label:'Southeast Asia',tips:['Keep content fun, relatable, light-hearted','Respect religious diversity (Islam in MY/ID)','E-commerce content performs very well','Food + travel content goes viral easily','Use local slang and memes for connection','Peak: 7-10 PM local time'],taboos:['Religious topics very sensitive in MY/ID','Don\'t treat SEA countries as identical','Colonial history still emotional in some countries'],tags:['#SEAlife','#TravelAsia','#FoodTour','#OnlineBusiness'],times:'Weekdays 7-10 PM UTC+7/8, Lunch 12-1 PM, Weekends active all day',audience:'Young, mobile-first, e-commerce active, love food + travel + side income + TikTok'},
-  me:{label:'Middle East',tips:['Emphasize family + community values','Adjust posting times during Ramadan (after sunset)','Arabic subtitles greatly boost local engagement','Business/entrepreneurship content popular in Gulf','Conservative, dignified visual style preferred','Include holiday greetings (Eid al-Fitr, Eid al-Adha)'],taboos:['Never criticize or mock Islam','Alcohol/gambling content prohibited','Keep gender-related content conservative'],tags:['#MiddleEast','#Business','#Entrepreneurship','#Arabic'],times:'Weekdays 9 PM - 12 AM AST, Ramadan: 10 PM - 2 AM peak',audience:'Faith-driven, family-oriented, business + real estate + religion focus, high purchasing power'},
-  africa:{label:'Africa',tips:['Emphasize community building and mutual support','Mobile-first: keep videos lightweight, fast-loading','Incorporate local music and visual styles','Entrepreneurship + side income topics very popular','Tailor language: English (East), French (West)','Share real success stories for inspiration'],taboos:['Never use poverty/backwardness stereotypes','Tribal politics sensitive in some regions','COVID + political stability are sensitive topics'],tags:['#AfricanCreator','#Hustle','#AfricaRising','#Entrepreneurship'],times:'Weekdays 6-9 PM WAT/EAT, Lunch 12-1 PM also active',audience:'Young, energetic, entrepreneurial, fastest-growing mobile internet market, hungry for business + education + entertainment'},
-  latam:{label:'Latin America',tips:['Passionate, emotional tone - cold style fails','Spanish primary, Portuguese for Brazil','Family + music + food are core cultural connectors','TikTok + Instagram growing fast in LATAM','Story-driven narratives over dry logic','Post 8-11 PM local time, weekends afternoons'],taboos:['Don\'t lump all LATAM countries together','Politics extremely complex (VZ, Cuba, etc.)','Never mock Latino accents, food, or traditions'],tags:['#Latinx','#Emprendimiento','#FamiliaLatina','#TikTokLatino'],times:'Weekdays 8-11 PM local, Weekends 3-6 PM active',audience:'Emotion-driven, family-first, love music + food, mobile social active, entertainment + side hustle content'}
+  us:{label:'美国/北美',tips:['Get to the point fast - US audiences value directness','Quantify results: "3 steps to boost efficiency 40%"','Add subtitles for accessibility and SEO','Encourage comments with closing questions','Post 7-10 AM EST for career content','Stay authentic - "real talk" builds trust'],taboos:['Avoid strong political stances','No exaggerated claims ("best ever", "#1")','Be careful with race/gender topics'],tags:['#ProductivityTips','#CareerGrowth','#SideHustle','#WorkSmarter'],times:'Weekdays 7-9 AM EST, Lunch 12-1 PM, Weekends 10-11 AM',audience:'Value efficiency + freedom, interested in AI tools, fast engagement, side hustle mindset'},
+  uk:{label:'英国',tips:['Balance professionalism with dry humor','Long-form analysis performs well','Use British spelling (colour, organisation)','Reference British culture (tea, weather, pub)','Post evenings 7-9 PM GMT','Sustainability topics resonate strongly'],taboos:['Never confuse England/Scotland/Wales/NI identities','Brexit remains divisive','Stay neutral on Royal Family topics'],tags:['#UKCareer','#WorkLifeBalance','#BritishLife','#SelfImprovement'],times:'Weekdays 7-9 PM GMT, Lunch 12-1 PM, Weekends 9-11 AM',audience:'Well-educated, value humor + manners, interested in leadership and work-life balance'},
+  europe:{label:'欧洲',tips:['Consider multilingual audiences - English primary','Europeans value privacy - avoid data tracking themes','Sustainability/green topics have high engagement','Academic depth welcome in DACH + Nordics','Post 5-9 PM CET on weekdays','Nordic audiences love work-life balance content'],taboos:['Don\'t generalize "Europe" - cultures vary greatly','WWII/far-right topics extremely sensitive','Ensure GDPR compliance for any forms'],tags:['#EuropeanLife','#Sustainability','#FutureOfWork','#Innovation'],times:'CET weekdays 5-9 PM, weekends 10 AM - 12 PM',audience:'High education, value environment + equality, prefer depth over hype'},
+  japan:{label:'日本',tips:['Use polite, indirect language - avoid commanding tone','High visual quality expected - clean layouts essential','Slower narrative pace, detailed storytelling','Add anime/craftsman/seasonal cultural references','Tutorials perform well on TikTok + YouTube','Post 8-11 PM JST weekdays, 2-5 PM weekends'],taboos:['No casual remarks about WWII history','Hard-sell tactics backfire badly','Low-quality visuals damage brand perception'],tags:['#Japan','#Learning','#WorkStyle','#Technology'],times:'Weekdays 8-11 PM JST, Lunch 12-1 PM, Weekends 2-5 PM',audience:'Detail-oriented, quality-focused, strong community belonging, love anime + tech + food'},
+  korea:{label:'韩国',tips:['Thumbnails must be eye-catching - clicks depend on visuals','Leverage K-pop, beauty, K-drama cultural hooks','Warm, community-oriented tone works best','Use trending Korean hashtags','Maintain consistent posting frequency','Peak hours: 9-11 PM KST'],taboos:['Never touch cultural origin disputes (kimchi, hanzi)','Don\'t criticize Korean beauty/food culture','Political issues (THAAD, territory) cause boycotts'],tags:['#KoreanLife','#SelfDevelopment','#Kpop','#Beauty'],times:'Weekdays 9-11 PM KST, Weekends 2-6 PM, Lunch 12-1 PM',audience:'Trend-conscious, K-culture influenced, high engagement, beauty + career + overseas life content'},
+  sea:{label:'东南亚',tips:['Keep content fun, relatable, light-hearted','Respect religious diversity (Islam in MY/ID)','E-commerce content performs very well','Food + travel content goes viral easily','Use local slang and memes for connection','Peak: 7-10 PM local time'],taboos:['Religious topics very sensitive in MY/ID','Don\'t treat SEA countries as identical','Colonial history still emotional in some countries'],tags:['#SEAlife','#TravelAsia','#FoodTour','#OnlineBusiness'],times:'Weekdays 7-10 PM UTC+7/8, Lunch 12-1 PM, Weekends active all day',audience:'Young, mobile-first, e-commerce active, love food + travel + side income + TikTok'},
+  me:{label:'中东',tips:['Emphasize family + community values','Adjust posting times during Ramadan (after sunset)','Arabic subtitles greatly boost local engagement','Business/entrepreneurship content popular in Gulf','Conservative, dignified visual style preferred','Include holiday greetings (Eid al-Fitr, Eid al-Adha)'],taboos:['Never criticize or mock Islam','Alcohol/gambling content prohibited','Keep gender-related content conservative'],tags:['#MiddleEast','#Business','#Entrepreneurship','#Arabic'],times:'Weekdays 9 PM - 12 AM AST, Ramadan: 10 PM - 2 AM peak',audience:'Faith-driven, family-oriented, business + real estate + religion focus, high purchasing power'},
+  africa:{label:'非洲',tips:['Emphasize community building and mutual support','Mobile-first: keep videos lightweight, fast-loading','Incorporate local music and visual styles','Entrepreneurship + side income topics very popular','Tailor language: English (East), French (West)','Share real success stories for inspiration'],taboos:['Never use poverty/backwardness stereotypes','Tribal politics sensitive in some regions','COVID + political stability are sensitive topics'],tags:['#AfricanCreator','#Hustle','#AfricaRising','#Entrepreneurship'],times:'Weekdays 6-9 PM WAT/EAT, Lunch 12-1 PM also active',audience:'Young, energetic, entrepreneurial, fastest-growing mobile internet market, hungry for business + education + entertainment'},
+  latam:{label:'拉丁美洲',tips:['Passionate, emotional tone - cold style fails','Spanish primary, Portuguese for Brazil','Family + music + food are core cultural connectors','TikTok + Instagram growing fast in LATAM','Story-driven narratives over dry logic','Post 8-11 PM local time, weekends afternoons'],taboos:['Don\'t lump all LATAM countries together','Politics extremely complex (VZ, Cuba, etc.)','Never mock Latino accents, food, or traditions'],tags:['#Latinx','#Emprendimiento','#FamiliaLatina','#TikTokLatino'],times:'Weekdays 8-11 PM local, Weekends 3-6 PM active',audience:'Emotion-driven, family-first, love music + food, mobile social active, entertainment + side hustle content'}
 };
 
 function renderRegion(){
@@ -554,26 +554,26 @@ function renderRegion(){
   document.getElementById('regionPanel').innerHTML=`<div class="region-panel">
     <div class="region-header">${d.label}</div>
     <div class="region-grid">
-      <div class="region-section"><div class="section-title">Publishing Tips</div><ul class="tip-list">${d.tips.map(t=>'<li>'+t+'</li>').join('')}</ul></div>
-      <div class="region-section"><div class="section-title">Taboo Topics</div>${d.taboos.map(t=>'<div class="taboo-card">! '+t+'</div>').join('')}<div style="margin-top:16px"><div class="section-title">Recommended Tags</div><div>${d.tags.map(t=>'<span class="ht">'+t+'</span>').join('')}</div></div></div>
-      <div class="region-section"><div class="section-title">Best Posting Times</div><div style="font-size:13px;line-height:1.8">${d.times}</div><div style="margin-top:16px"><div class="section-title">Audience Profile</div><div style="font-size:13px;line-height:1.7">${d.audience}</div></div></div>
+      <div class="region-section"><div class="section-title">发布技巧</div><ul class="tip-list">${d.tips.map(t=>'<li>'+t+'</li>').join('')}</ul></div>
+      <div class="region-section"><div class="section-title">禁忌话题</div>${d.taboos.map(t=>'<div class="taboo-card">! '+t+'</div>').join('')}<div style="margin-top:16px"><div class="section-title">推荐标签</div><div>${d.tags.map(t=>'<span class="ht">'+t+'</span>').join('')}</div></div></div>
+      <div class="region-section"><div class="section-title">最佳发布时间</div><div style="font-size:13px;line-height:1.8">${d.times}</div><div style="margin-top:16px"><div class="section-title">受众画像</div><div style="font-size:13px;line-height:1.7">${d.audience}</div></div></div>
     </div></div>`;
 }
 
 // ─── OPS-FLOW: TEMPLATES ────────────────────────────────
 const TEMPLATES=[
-  {id:'daily-report',name:'Daily Report',cat:'reporting',desc:'Auto-generate daily work summary and send via email',trigger:'Cron: 18:00 daily',steps:['Collect data','Generate report','Send email'],vars:['email (required)','timezone (default: Asia/Shanghai)']},
-  {id:'weekly-digest',name:'Weekly Digest',cat:'reporting',desc:'Compile weekly metrics and achievements into digest',trigger:'Cron: Mon 9:00',steps:['Aggregate weekly data','Generate digest','Send to team'],vars:['email (required)','includeCharts (default: true)']},
-  {id:'data-sync',name:'Data Sync',cat:'data',desc:'Cross-platform data synchronization with ETL pipeline',trigger:'Cron: every 30min + Webhook',steps:['Extract from sources','Transform data','Validate schema','Load to destination'],vars:['source (required)','destination (required)','mapping (optional)']},
-  {id:'alert-monitor',name:'Alert Monitor',cat:'monitoring',desc:'Monitor key metrics and trigger alerts on anomalies',trigger:'Cron: every 5min',steps:['Fetch metrics','Check thresholds','Send alert if triggered'],vars:['metrics (required)','thresholds (required)','alertChannel (default: email)']},
-  {id:'competitor-monitor',name:'Competitor Monitor',cat:'monitoring',desc:'Track competitor activities and generate change reports',trigger:'Cron: weekdays 8:00',steps:['Crawl competitor sites','Diff with previous','Generate change report','Notify'],vars:['urls (required)','selectors (required)']},
-  {id:'content-distribute',name:'Content Distribute',cat:'content',desc:'Distribute content across multiple platforms simultaneously',trigger:'Manual / Webhook',steps:['Prepare content variants','Adapt per platform','Publish to all','Collect results'],vars:['content (required)','platforms (default: all)']},
-  {id:'email-campaign',name:'Email Campaign',cat:'marketing',desc:'Automated email marketing sequence with A/B testing',trigger:'Event-triggered',steps:['Segment audience','Prepare variants','Send batch','Track opens/clicks','Optimize'],vars:['templateId (required)','audience (required)','abTest (default: false)']},
-  {id:'lead-nurture',name:'Lead Nurture',cat:'crm',desc:'Automated lead nurturing workflow with scoring',trigger:'Event-triggered',steps:['Score lead','Select nurture track','Send personalized content','Update CRM'],vars:['leadSource (required)','scoreThreshold (default: 50)']},
-  {id:'customer-onboard',name:'Customer Onboard',cat:'crm',desc:'New customer onboarding automation',trigger:'Event / Webhook',steps:['Create account','Send welcome email','Schedule onboard call','Assign CSM'],vars:['customerData (required)','plan (required)']},
-  {id:'feedback-collect',name:'Feedback Collect',cat:'crm',desc:'Collect and categorize user feedback automatically',trigger:'Cron: Fri 10:00 + Order event',steps:['Send survey','Collect responses','Categorize feedback','Generate insights'],vars:['surveyTemplate (required)','minResponses (default: 10)']},
+  {id:'daily-report',name:'日报生成',cat:'reporting',desc:'自动生成每日工作摘要并通过邮件发送',trigger:'定时：每天18:00',steps:['收集数据','生成报告','发送邮件'],vars:['email（必填）','timezone（默认：Asia/Shanghai）']},
+  {id:'weekly-digest',name:'周报汇总',cat:'reporting',desc:'将每周指标和成果汇编为周报摘要',trigger:'定时：周一9:00',steps:['汇总周数据','生成摘要','发送给团队'],vars:['email（必填）','includeCharts（默认：true）']},
+  {id:'data-sync',name:'数据同步',cat:'data',desc:'跨平台数据同步与ETL管道',trigger:'定时：每30分钟 + Webhook',steps:['从来源提取','数据转换','验证结构','加载到目标'],vars:['source（必填）','destination（必填）','mapping（可选）']},
+  {id:'alert-monitor',name:'告警监控',cat:'monitoring',desc:'监控关键指标，异常时触发告警',trigger:'定时：每5分钟',steps:['获取指标','检查阈值','触发时发送告警'],vars:['metrics（必填）','thresholds（必填）','alertChannel（默认：email）']},
+  {id:'competitor-monitor',name:'竞品监控',cat:'monitoring',desc:'追踪竞品动态并生成变化报告',trigger:'定时：工作日8:00',steps:['爬取竞品页面','与上次对比','生成变化报告','通知'],vars:['urls（必填）','selectors（必填）']},
+  {id:'content-distribute',name:'内容分发',cat:'content',desc:'将内容同时分发到多个平台',trigger:'手动 / Webhook',steps:['准备内容变体','按平台适配','全平台发布','收集结果'],vars:['content（必填）','platforms（默认：全部）']},
+  {id:'email-campaign',name:'邮件营销',cat:'marketing',desc:'带A/B测试的自动化邮件营销序列',trigger:'事件触发',steps:['细分受众','准备变体','批量发送','追踪打开/点击','优化'],vars:['templateId（必填）','audience（必填）','abTest（默认：false）']},
+  {id:'lead-nurture',name:'线索培育',cat:'crm',desc:'带评分的自动化线索培育工作流',trigger:'事件触发',steps:['线索评分','选择培育路径','发送个性化内容','更新CRM'],vars:['leadSource（必填）','scoreThreshold（默认：50）']},
+  {id:'customer-onboard',name:'客户入驻',cat:'crm',desc:'新客户入驻自动化流程',trigger:'事件 / Webhook',steps:['创建账户','发送欢迎邮件','预约入驻通话','分配客户成功经理'],vars:['customerData（必填）','plan（必填）']},
+  {id:'feedback-collect',name:'反馈收集',cat:'crm',desc:'自动收集并分类用户反馈',trigger:'定时：周五10:00 + 订单事件',steps:['发送问卷','收集回复','分类反馈','生成洞察'],vars:['surveyTemplate（必填）','minResponses（默认：10）']},
 ];
-const CAT_LABELS={all:'All',reporting:'Reporting',data:'Data',monitoring:'Monitoring',content:'Content',marketing:'Marketing',crm:'CRM'};
+const CAT_LABELS={all:'全部',reporting:'报告',data:'数据',monitoring:'监控',content:'内容',marketing:'营销',crm:'CRM'};
 let activeCat='all';
 
 function renderOps(){
@@ -583,29 +583,29 @@ function renderOps(){
   document.getElementById('tplGrid').innerHTML=filtered.map(t=>`<div class="tpl-card" onclick="this.classList.toggle('expanded')">
     <div class="tpl-name">${t.name}</div>
     <div class="tpl-desc">${t.desc}</div>
-    <div class="tpl-meta"><span class="tpl-badge">${t.cat}</span><span class="tpl-badge">${t.trigger}</span><span class="tpl-badge">${t.steps.length} steps</span></div>
+    <div class="tpl-meta"><span class="tpl-badge">${t.cat}</span><span class="tpl-badge">${t.trigger}</span><span class="tpl-badge">${t.steps.length} 步骤</span></div>
     <div class="tpl-detail">
-      <div class="section-title">Workflow Steps</div>
+      <div class="section-title">工作流步骤</div>
       <div class="step-flow">${t.steps.map((s,i)=>(i>0?'<span class="step-arrow">&rarr;</span>':'')+`<span class="step-node">${i+1}. ${s}</span>`).join('')}</div>
-      <div class="var-list"><strong>Variables:</strong> ${t.vars.join(' | ')}</div>
+      <div class="var-list"><strong>变量：</strong> ${t.vars.join(' | ')}</div>
     </div></div>`).join('');
 }
 function filterCat(c){activeCat=c;renderOps()}
 
 // ─── SALES-CRM: FUNNEL DATA ────────────────────────────
 const DEAL_STAGES=[
-  {id:'contact',label:'Contact',count:24,color:'#3b82f6'},
-  {id:'qualified',label:'Qualified',count:18,color:'#06b6d4'},
-  {id:'proposal',label:'Proposal',count:11,color:'#8b5cf6'},
-  {id:'negotiation',label:'Negotiation',count:6,color:'#f59e0b'},
-  {id:'closed_won',label:'Won',count:3,color:'#10b981'},
+  {id:'contact',label:'初次接触',count:24,color:'#3b82f6'},
+  {id:'qualified',label:'意向确认',count:18,color:'#06b6d4'},
+  {id:'proposal',label:'方案报价',count:11,color:'#8b5cf6'},
+  {id:'negotiation',label:'谈判中',count:6,color:'#f59e0b'},
+  {id:'closed_won',label:'已成交',count:3,color:'#10b981'},
 ];
 const LEAD_STATUSES=[
-  {id:'new',label:'New',count:45,color:'#3b82f6'},
-  {id:'contacted',label:'Contacted',count:32,color:'#06b6d4'},
-  {id:'qualified',label:'Qualified',count:20,color:'#8b5cf6'},
-  {id:'converted',label:'Converted',count:11,color:'#10b981'},
-  {id:'lost',label:'Lost',count:9,color:'#ef4444'},
+  {id:'new',label:'新线索',count:45,color:'#3b82f6'},
+  {id:'contacted',label:'已接触',count:32,color:'#06b6d4'},
+  {id:'qualified',label:'已意向',count:20,color:'#8b5cf6'},
+  {id:'converted',label:'已转化',count:11,color:'#10b981'},
+  {id:'lost',label:'已流失',count:9,color:'#ef4444'},
 ];
 
 function renderSales(){
@@ -616,7 +616,7 @@ function renderSales(){
     fhtml+=`<div class="funnel-stage"><span class="funnel-label">${s.label}</span><div class="funnel-bar" style="width:${w}%;background:${s.color}">${s.count}</div></div>`;
     if(i<DEAL_STAGES.length-1){
       const conv=Math.round(DEAL_STAGES[i+1].count/s.count*100);
-      fhtml+=`<div class="conv-arrow">&darr; ${conv}% conversion</div>`;
+      fhtml+=`<div class="conv-arrow">&darr; ${conv}% 转化率</div>`;
     }
   });
   document.getElementById('dealFunnel').innerHTML=fhtml;
@@ -632,27 +632,27 @@ function renderSales(){
 // ─── PM-TOOLKIT: ROADMAP + SPRINT + FEEDBACK ────────────
 const ROADMAP=[
   {lane:'P0',title:'MCP Server v1.0',status:'completed',date:'2026-01'},
-  {lane:'P0',title:'RAG Knowledge Base',status:'completed',date:'2026-02'},
-  {lane:'P0',title:'Multi-platform Publish',status:'in_progress',date:'2026-03'},
-  {lane:'P1',title:'Email Automation',status:'completed',date:'2026-02'},
-  {lane:'P1',title:'n8n Export',status:'in_progress',date:'2026-03'},
-  {lane:'P1',title:'Figma Bridge',status:'planned',date:'2026-04'},
-  {lane:'P2',title:'AI Agent Goals',status:'planned',date:'2026-04'},
-  {lane:'P2',title:'Dashboard v2',status:'in_progress',date:'2026-03'},
-  {lane:'P3',title:'Chrome Extension',status:'planned',date:'2026-Q3'},
+  {lane:'P0',title:'RAG知识库',status:'completed',date:'2026-02'},
+  {lane:'P0',title:'多平台发布',status:'in_progress',date:'2026-03'},
+  {lane:'P1',title:'邮件自动化',status:'completed',date:'2026-02'},
+  {lane:'P1',title:'n8n导出',status:'in_progress',date:'2026-03'},
+  {lane:'P1',title:'Figma桥接',status:'planned',date:'2026-04'},
+  {lane:'P2',title:'AI智能目标',status:'planned',date:'2026-04'},
+  {lane:'P2',title:'仪表盘v2',status:'in_progress',date:'2026-03'},
+  {lane:'P3',title:'Chrome插件',status:'planned',date:'2026-Q3'},
 ];
 const SPRINT_TASKS={
-  todo:['Add OAuth login','Write API docs','Setup CI/CD'],
-  in_progress:['Unified Dashboard','Regional Culture tests'],
-  review:['Content Repurposer v2'],
-  done:['MCP registry update','Platform comparison table','Service Worker setup'],
+  todo:['添加OAuth登录','编写API文档','配置CI/CD'],
+  in_progress:['统一仪表盘','地区文化测试'],
+  review:['内容分发器v2'],
+  done:['MCP注册更新','平台对比表','Service Worker配置'],
 };
 const FEEDBACK=[
-  {text:'Add dark/light theme toggle',votes:28,cat:'feature'},
-  {text:'Mobile layout breaks on small screens',votes:22,cat:'bug'},
-  {text:'Export dashboard data as CSV',votes:19,cat:'feature'},
-  {text:'Improve search in swipe file',votes:15,cat:'improve'},
-  {text:'Add notification for scheduled posts',votes:12,cat:'feature'},
+  {text:'添加深色/浅色主题切换',votes:28,cat:'feature'},
+  {text:'小屏手机布局错乱',votes:22,cat:'bug'},
+  {text:'导出仪表盘数据为CSV',votes:19,cat:'feature'},
+  {text:'优化素材库搜索功能',votes:15,cat:'improve'},
+  {text:'添加定时发布提醒通知',votes:12,cat:'feature'},
 ];
 
 function renderPM(){
@@ -662,14 +662,14 @@ function renderPM(){
     return`<div class="lane"><span class="lane-label">${l}</span><div class="lane-items">${items.map(r=>`<div class="ms-chip"><span class="dot dot-${r.status}"></span>${r.title}<span style="font-size:11px;color:var(--text-dim);margin-left:4px">${r.date}</span></div>`).join('')}</div></div>`;
   }).join('');
 
-  const cols=[['todo','To Do'],['in_progress','In Progress'],['review','Review'],['done','Done']];
+  const cols=[['todo','待处理'],['in_progress','进行中'],['review','待审核'],['done','已完成']];
   document.getElementById('sprintBoard').innerHTML=cols.map(([k,label])=>{
     const tasks=SPRINT_TASKS[k]||[];
     return`<div class="sprint-col"><div class="sprint-col-title">${label}<span class="cnt">${tasks.length}</span></div>${tasks.map(t=>`<div class="task-chip">${t}</div>`).join('')}</div>`;
   }).join('');
 
   const catCls={feature:'fb-feature',bug:'fb-bug',improve:'fb-improve'};
-  const catLabel={feature:'Feature',bug:'Bug',improve:'Improve'};
+  const catLabel={feature:'新功能',bug:'Bug',improve:'优化'};
   document.getElementById('fbList').innerHTML=FEEDBACK.map(f=>`<div class="fb-item"><div class="fb-votes">${f.votes}</div><div class="fb-text">${f.text}</div><span class="fb-cat ${catCls[f.cat]}">${catLabel[f.cat]}</span></div>`).join('');
 }
 
@@ -692,7 +692,7 @@ function clearAllCache(){
   if(window.caches)caches.keys().then(ks=>ks.forEach(k=>caches.delete(k)));
   localStorage.removeItem('chub_prefs');
   localStorage.removeItem('chub_history');
-  showToast('Cache cleared | Refresh in 2s...','success');
+  showToast('缓存已清除 | 2秒后刷新...','success');
   setTimeout(()=>location.reload(),2000);
 }
 
@@ -709,18 +709,18 @@ function saveHistory(){
     hist.unshift({id:Date.now(),ts:now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}),text,preview:text.slice(0,60),len:text.length});
     if(hist.length>50)hist=hist.slice(0,50);
     localStorage.setItem('chub_history',JSON.stringify(hist));
-    showToast('Saved to history','success',2000);
+    showToast('已保存到历史','success',2000);
   },2000);
 }
 
 function renderHistory(){
   const hist=JSON.parse(localStorage.getItem('chub_history')||'[]');
   const el=document.getElementById('historyList');
-  if(!hist.length){el.innerHTML='<p style="font-size:13px;color:var(--text-secondary)">No history yet.</p>';return}
+  if(!hist.length){el.innerHTML='<p style="font-size:13px;color:var(--text-secondary)">暂无历史记录。</p>';return}
   el.innerHTML=hist.map(h=>`<div class="hist-entry">
-    <div class="hist-meta"><span>${h.ts}</span><span>${h.len} chars</span></div>
+    <div class="hist-meta"><span>${h.ts}</span><span>${h.len} 字</span></div>
     <div class="hist-preview">${h.preview}${h.len>60?'...':''}</div>
-    <div class="hist-actions"><button class="hist-btn" onclick="restoreHistory(${h.id})">Restore</button><button class="hist-btn" onclick="deleteHistory(${h.id})">Delete</button></div>
+    <div class="hist-actions"><button class="hist-btn" onclick="restoreHistory(${h.id})">恢复</button><button class="hist-btn" onclick="deleteHistory(${h.id})">删除</button></div>
   </div>`).join('');
 }
 
@@ -736,7 +736,7 @@ function restoreHistory(id){
   const previewBtn=document.querySelectorAll('.sub-tab')[1];
   if(previewBtn)switchSub('m-preview',previewBtn);
   renderPreview();
-  showToast('Content restored','success');
+  showToast('内容已恢复','success');
 }
 
 function deleteHistory(id){
@@ -744,7 +744,7 @@ function deleteHistory(id){
   hist=hist.filter(h=>h.id!==id);
   localStorage.setItem('chub_history',JSON.stringify(hist));
   renderHistory();
-  showToast('Entry deleted','info');
+  showToast('记录已删除','info');
 }
 
 // ─── PREFS PERSISTENCE ──────────────────────────────────
@@ -766,7 +766,7 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPWA
 function pwaInstall(){if(deferredPWAPrompt){deferredPWAPrompt.prompt();deferredPWAPrompt=null}}
 
 // ─── SERVICE WORKER ─────────────────────────────────────
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>showToast('Offline cache unavailable','warning'))}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>showToast('离线缓存不可用','warning'))}
 
 // ─── INIT ───────────────────────────────────────────────
 loadPrefs();
