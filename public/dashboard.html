@@ -262,17 +262,6 @@ tr:hover td{background:rgba(51,65,85,.4)}
 .row-btn.del:hover{color:var(--red);border-color:var(--red)}
 .edit-indicator{font-size:11px;color:var(--text-dim);margin-left:auto}
 
-/* Modal */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:500px;max-height:80vh;overflow-y:auto}
-.modal-title{font-size:16px;font-weight:700;margin-bottom:16px}
-.modal-field{margin-bottom:12px}
-.modal-field label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:4px}
-.modal-field input,.modal-field select,.modal-field textarea{width:100%;background:#0f172a;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;font-family:inherit}
-.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{outline:none;border-color:var(--accent)}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
-
 /* Editable funnel/sprint */
 .editable-count{cursor:pointer;border-bottom:1px dashed var(--text-dim)}
 .editable-count:hover{color:var(--accent);border-color:var(--accent)}
@@ -833,7 +822,7 @@ function showToast(msg,type='info',dur=3000){
   const c=document.getElementById('toast-container');
   const d=document.createElement('div');
   d.className='toast toast-'+type;
-  d.innerHTML=(icons[type]||'')+' '+msg;
+  d.textContent=(icons[type]||'')+' '+msg;
   c.appendChild(d);
   setTimeout(()=>{d.classList.add('toast-exit');setTimeout(()=>d.remove(),300)},dur);
 }
@@ -951,7 +940,9 @@ function cyclePriority(i){
   savePlatforms();renderPlatformTable();showToast('优先级已切换','success',1500);
 }
 function deletePlatform(i){
-  PLATFORMS.splice(i,1);savePlatforms();renderPlatformTable();showToast('已删除','info',1500);
+  confirmDialog('确定删除平台 "'+PLATFORMS[i].name+'" ？',()=>{
+    PLATFORMS.splice(i,1);savePlatforms();renderPlatformTable();showToast('已删除','info',1500);
+  },'删除',true);
 }
 function resetPlatforms(){
   PLATFORMS=JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
@@ -971,16 +962,16 @@ function addPlatform(){
   });
 }
 
-function applyStyle(t,s){
-  if(!t)return'';
-  const ss=t.split(/([。！？.!?])\s*/).reduce((a,v,i,arr)=>i%2===0?[...a,v+(arr[i+1]||'')]:a,[]).filter(Boolean);
+function applyStyle(txt,s){
+  if(!txt)return'';
+  const ss=txt.split(/([。！？.!?])\s*/).reduce((a,v,i,arr)=>i%2===0?[...a,v+(arr[i+1]||'')]:a,[]).filter(Boolean);
   switch(s){
     case'punchy':return ss.slice(0,2).join(' ');
-    case'hook-driven':case'relatable':case'viral-hook':return ss[0]||t;
+    case'hook-driven':case'relatable':case'viral-hook':return ss[0]||txt;
     case'lifestyle':return ss.map((x,i)=>i%2===0?x:'\n'+x).join('');
     case'seo-optimized':return(ss[0]||'')+'\n\n'+ss.slice(1).join(' ');
     case'cta-driven':return ss.slice(0,3).join(' ');
-    default:return t;
+    default:return txt;
   }
 }
 function truncate(s,m){return s.length<=m?s:s.slice(0,m-1)+'\u2026';}
@@ -1088,13 +1079,14 @@ const DEFAULT_TEMPLATES=[
 ];
 let TEMPLATES=safeJSON('chub_templates')||JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
 function saveTemplates(){localStorage.setItem('chub_templates',JSON.stringify(TEMPLATES))}
-const CAT_LABELS={all:'全部 ('+DEFAULT_TEMPLATES.length+')',reporting:'报告',data:'数据',monitoring:'监控',content:'内容',marketing:'营销',crm:'CRM'};
+function getCatLabels(){return{all:'全部 ('+TEMPLATES.length+')',reporting:'报告',data:'数据',monitoring:'监控',content:'内容',marketing:'营销',crm:'CRM'}}
 let activeCat='all';
 let opsEditMode=false;
 
 function renderOps(){
   const pills=document.getElementById('catPills');
-  pills.innerHTML=Object.entries(CAT_LABELS).map(([k,v])=>`<button class="cat-pill${k===activeCat?' active':''}" onclick="filterCat('${k}')">${v}</button>`).join('');
+  const catLabels=getCatLabels();
+  pills.innerHTML=Object.entries(catLabels).map(([k,v])=>`<button class="cat-pill${k===activeCat?' active':''}" onclick="filterCat('${k}')">${v}</button>`).join('');
   const filtered=activeCat==='all'?TEMPLATES:TEMPLATES.filter(tp=>tp.cat===activeCat);
   // Toolbar in dedicated area
   document.getElementById('opsToolbar').innerHTML=`
@@ -1269,7 +1261,7 @@ function runWorkflow(i){
       // Try MCP call
       const mcpRepo=tpl.cat==='crm'?'sales-crm':tpl.cat==='content'?'media-ops':'ops-flow';
       callMCP(mcpRepo,'run_workflow',{id:tpl.id}).then(res=>{
-        tpl._runStatus=res?'done':'done';
+        tpl._runStatus=res?'done':'error';
         renderOps();showToast('工作流 "'+tpl.name+'" 执行完成','success',3000);
       });
     }
@@ -1485,7 +1477,7 @@ function editRoadmapItem(i){
       {v:'P0',l:'P0 (最高)'},{v:'P1',l:'P1'},{v:'P2',l:'P2'},{v:'P3',l:'P3 (最低)'}]}
   ],vals=>{r.title=vals.title;r.date=vals.date;r.status=vals.status;r.lane=vals.lane;saveRoadmap();renderPM();showToast('已更新','success')});
 }
-function deleteRoadmapItem(i){ROADMAP.splice(i,1);saveRoadmap();renderPM();showToast('已删除','info',1500)}
+function deleteRoadmapItem(i){confirmDialog('确定删除 "'+ROADMAP[i].title+'" ？',()=>{ROADMAP.splice(i,1);saveRoadmap();renderPM();showToast('已删除','info',1500)},'删除',true)}
 function addRoadmapItem(lane){
   formDialog('添加路线图项目',[
     {key:'title',label:'标题',type:'text',placeholder:'例：新功能名称'},
@@ -1508,7 +1500,7 @@ function editSprintTask(col,ti){
     saveSprint();renderPM();showToast('已更新','success');
   });
 }
-function deleteSprintTask(col,ti){SPRINT_TASKS[col].splice(ti,1);saveSprint();renderPM();showToast('已删除','info',1500)}
+function deleteSprintTask(col,ti){confirmDialog('确定删除此任务？',()=>{SPRINT_TASKS[col].splice(ti,1);saveSprint();renderPM();showToast('已删除','info',1500)},'删除',true)}
 function addSprintTask(col){
   formDialog('添加任务到 '+{todo:'待处理',in_progress:'进行中',review:'待审核',done:'已完成'}[col],[
     {key:'val',label:'任务名称',type:'text',placeholder:'输入任务名称'}
@@ -1599,7 +1591,7 @@ function restoreHistory(id){
   // Switch to media > preview
   const mediaBtn=document.querySelector('[data-tab="media"]');
   if(mediaBtn)switchMain('media',mediaBtn);
-  const previewBtn=document.querySelectorAll('.sub-tab')[1];
+  const previewBtn=[...document.querySelectorAll('.sub-tab')].find(b=>b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'m-preview'"));
   if(previewBtn)switchSub('m-preview',previewBtn);
   renderPreview();
   showToast('内容已恢复','success');
