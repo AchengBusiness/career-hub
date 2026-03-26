@@ -277,6 +277,44 @@ tr:hover td{background:rgba(51,65,85,.4)}
 .editable-count{cursor:pointer;border-bottom:1px dashed var(--text-dim)}
 .editable-count:hover{color:var(--accent);border-color:var(--accent)}
 .inline-input{background:#0f172a;border:1px solid var(--accent);color:var(--text);padding:2px 6px;border-radius:4px;font-size:13px;width:60px;text-align:center;font-family:inherit}
+
+/* Custom Dialog */
+.dlg-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:5000;align-items:center;justify-content:center}
+.dlg-overlay.open{display:flex}
+.dlg-box{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:24px;width:92%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.5);animation:dlgIn .2s ease}
+@keyframes dlgIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.dlg-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.dlg-msg{font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px}
+.dlg-field{margin-bottom:14px}
+.dlg-field label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:4px;font-weight:600}
+.dlg-field input,.dlg-field select,.dlg-field textarea{width:100%;background:#0f172a;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:6px;font-size:13px;font-family:inherit}
+.dlg-field textarea{min-height:80px;resize:vertical}
+.dlg-field input:focus,.dlg-field select:focus,.dlg-field textarea:focus{outline:none;border-color:var(--accent)}
+.dlg-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.dlg-btn{padding:8px 18px;border-radius:6px;border:1px solid var(--border);background:var(--card-hover);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s}
+.dlg-btn:hover{border-color:var(--accent);color:var(--accent)}
+.dlg-btn-ok{background:var(--accent);color:#0f172a;border-color:var(--accent);font-weight:600}
+.dlg-btn-ok:hover{opacity:.85}
+.dlg-btn-danger{background:var(--red);color:#fff;border-color:var(--red)}
+.dlg-btn-danger:hover{opacity:.85}
+.dlg-btn-run{background:var(--green);color:#fff;border-color:var(--green)}
+.dlg-btn-run:hover{opacity:.85}
+
+/* Guide box */
+.guide-box{background:#162032;border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px;font-size:13px;line-height:1.7;color:var(--text-secondary)}
+.guide-box strong{color:var(--accent)}
+.guide-box ul{margin:8px 0 0 16px;list-style:disc}
+.guide-box li{margin-bottom:4px}
+.guide-toggle{font-size:12px;color:var(--accent);cursor:pointer;border:none;background:none;font-family:inherit;padding:0}
+.guide-toggle:hover{text-decoration:underline}
+
+/* Run status */
+.run-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:3px 8px;border-radius:4px}
+.run-idle{background:rgba(100,116,139,.2);color:var(--text-dim)}
+.run-running{background:rgba(56,189,248,.15);color:var(--accent);animation:pulse 1.5s infinite}
+.run-done{background:rgba(34,197,94,.15);color:var(--green)}
+.run-error{background:rgba(239,68,68,.15);color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 </style>
 </head>
 <body>
@@ -398,8 +436,20 @@ tr:hover td{background:rgba(51,65,85,.4)}
 
   <!-- Sub: Preview -->
   <div id="sub-m-preview" class="sub-pane">
+    <div id="previewGuide" class="guide-box">
+      <strong>内容预览使用指南</strong>
+      <ul>
+        <li>在下方文本框输入你要发布的内容（文章、帖子、视频文案等）</li>
+        <li>系统会<strong>实时预览</strong>内容在 13 个平台上的适配效果（字数限制、风格适配）</li>
+        <li>绿色进度条=字数安全，黄色=接近上限，红色=超出限制</li>
+        <li>每个卡片展示该平台的推荐话题标签和内容风格调整后的预览</li>
+        <li>内容超过10字后自动保存到"历史记录"中</li>
+      </ul>
+      <button class="guide-toggle" onclick="this.parentElement.style.display='none'">收起指南</button>
+    </div>
     <div class="label" style="margin-bottom:8px">输入内容，预览各平台适配效果</div>
-    <textarea class="preview-input" id="previewInput" placeholder="在此输入内容…实时预览13个平台的适配效果。" oninput="debouncePreview()"></textarea>
+    <textarea class="preview-input" id="previewInput" placeholder="试试输入：今天分享一个提高工作效率的方法，使用AI工具自动化你的日常工作流程，节省80%的重复劳动时间..." oninput="debouncePreview()"></textarea>
+    <div style="margin-top:8px;margin-bottom:4px"><button class="toolbar-btn" onclick="loadSampleContent()">加载示例内容</button> <button class="toolbar-btn" onclick="document.getElementById('previewInput').value='';renderPreview()">清空</button></div>
     <div class="preview-grid" id="previewGrid"></div>
   </div>
 
@@ -423,12 +473,35 @@ tr:hover td{background:rgba(51,65,85,.4)}
 
 <!-- ==================== TAB 3: OPS-FLOW ==================== -->
 <div id="pane-ops" class="tab-pane">
+  <div id="opsGuide" class="guide-box">
+    <strong>工作流使用指南</strong>
+    <ul>
+      <li>点击任意工作流卡片<strong>展开详情</strong>，查看执行步骤和所需参数</li>
+      <li>展开后点击<strong>"运行"</strong>按钮可模拟执行工作流（需配置MCP连接后可实际运行）</li>
+      <li>点击<strong>"编辑模式"</strong>可修改工作流名称、描述、步骤等（点击卡片进入编辑弹窗）</li>
+      <li>使用分类标签筛选不同类型的工作流</li>
+      <li>工作流与 ops-flow MCP Server 联动，连接后支持真实执行</li>
+    </ul>
+    <button class="guide-toggle" onclick="this.parentElement.style.display='none'">收起指南</button>
+  </div>
+  <div class="toolbar" id="opsToolbar"></div>
   <div class="cat-pills" id="catPills"></div>
   <div class="tpl-grid" id="tplGrid"></div>
 </div>
 
 <!-- ==================== TAB 4: SALES-CRM ==================== -->
 <div id="pane-sales" class="tab-pane">
+  <div id="salesGuide" class="guide-box">
+    <strong>Sales CRM 使用指南</strong>
+    <ul>
+      <li><strong>商机漏斗</strong>：展示客户从初次接触到最终成交的全过程。点击数字可修改各阶段数量。箭头显示各阶段的转化率。</li>
+      <li><strong>线索漏斗</strong>：追踪潜在客户（线索）的来源和状态分布。点击数字可编辑。</li>
+      <li><strong>编辑模式</strong>：点击下方"编辑模式"按钮，可添加/删除阶段、修改名称和颜色。</li>
+      <li><strong>MCP同步</strong>：连接 sales-crm MCP Server 后，数据可实时同步。</li>
+    </ul>
+    <button class="guide-toggle" onclick="this.parentElement.style.display='none'">收起指南</button>
+  </div>
+  <div class="toolbar" id="salesToolbar"></div>
   <div class="funnel-section">
     <div class="funnel-title">商机漏斗</div>
     <div class="deal-funnel" id="dealFunnel"></div>
@@ -441,6 +514,16 @@ tr:hover td{background:rgba(51,65,85,.4)}
 
 <!-- ==================== TAB 5: PM-TOOLKIT ==================== -->
 <div id="pane-pm" class="tab-pane">
+  <div id="pmGuide" class="guide-box">
+    <strong>项目管理使用指南</strong>
+    <ul>
+      <li><strong>产品路线图</strong>：按优先级 P0(最高)-P3(最低) 排列。绿色=已完成，蓝色=进行中，灰色=计划中，黄色=延期。</li>
+      <li><strong>冲刺看板</strong>：4列看板（待处理/进行中/待审核/已完成），拖拽式任务管理。点击"编辑模式"可增删改任务。</li>
+      <li><strong>热门反馈</strong>：用户投票系统。点击数字投票，按票数排序。点击"编辑模式"可管理反馈条目。</li>
+      <li><strong>编辑方式</strong>：点击"编辑模式"按钮后，点击任何条目可编辑，点击 x 删除，点击 + 添加新条目。</li>
+    </ul>
+    <button class="guide-toggle" onclick="this.parentElement.style.display='none'">收起指南</button>
+  </div>
   <div class="pm-section">
     <div class="roadmap-lanes" id="roadmapLanes"></div>
   </div>
@@ -457,6 +540,11 @@ tr:hover td{background:rgba(51,65,85,.4)}
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
 
+<!-- CUSTOM DIALOG -->
+<div class="dlg-overlay" id="dlgOverlay">
+  <div class="dlg-box" id="dlgBox"></div>
+</div>
+
 <!-- OVERLAY -->
 <div class="panel-overlay" id="panelOverlay" onclick="closeAllPanels()"></div>
 
@@ -467,9 +555,9 @@ tr:hover td{background:rgba(51,65,85,.4)}
     <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
   </div>
   <button class="panel-btn" onclick="togglePanel('history')">查看历史</button>
-  <button class="panel-btn" onclick="Object.keys(MCP_ENDPOINTS).forEach(r=>promptMCPConfig(r))">配置MCP连接</button>
-  <button class="panel-btn" onclick="Promise.all([syncPlatforms(),syncDeals(),syncRoadmap()]).then(()=>showToast('同步完成','success'))">同步MCP数据</button>
-  <button class="panel-btn panel-btn-danger" onclick="clearAllCache()">清除缓存</button>
+  <button class="panel-btn" onclick="openMCPConfigDialog()">配置MCP连接</button>
+  <button class="panel-btn" onclick="syncAllMCP()">同步MCP数据</button>
+  <button class="panel-btn panel-btn-danger" onclick="confirmDialog('确定清除所有缓存并刷新？',clearAllCache)">清除缓存</button>
   <button class="panel-btn" id="pwaInstallBtn" style="display:none" onclick="pwaInstall()">安装应用 (PWA)</button>
   <div style="margin-top:24px;font-size:12px;color:var(--text-dim)">
     <p>缓存：Service Worker + localStorage</p>
@@ -513,6 +601,13 @@ const LANG={
     toOverseas:'改海外',toDomestic:'改国内',cyclePri:'切换优先级',delBtn:'删除',
     editClickHint:'编辑中 - 点击单元格修改',readOnlyHint:'只读模式',
     editClickCard:'编辑中 - 点击卡片可编辑',readOnlyCard:'只读模式 - 点击卡片展开详情',
+    regTips:'发布技巧',regTaboos:'禁忌话题',regTags:'推荐标签',regTimes:'最佳发布时间',regAudience:'受众画像',
+    editTips:'编辑技巧',editTaboos:'编辑禁忌',editTags:'编辑标签',editTimes:'编辑时间',editAudience:'编辑画像',
+    confirmResetRegion:'确定重置所有地区数据？',regionUpdated:'地区数据已更新',
+    loadSample:'加载示例',clearData:'清除数据',sampleLoaded:'示例数据已加载',dataCleared:'数据已清除',
+    confirmClearOps:'确定清除所有工作流数据？',confirmClearSales:'确定清除所有销售数据？',confirmClearPM:'确定清除所有项目管理数据？',
+    addWf:'添加工作流',addDeal:'添加商机阶段',addLead:'添加线索状态',
+    salesEditHint:'编辑中 - 点击数字修改，点击标签编辑',salesReadHint:'点击数字可修改数量',
   },
   en:{
     title:'Career-Hub Dashboard',langBtn:'中文',
@@ -532,12 +627,92 @@ const LANG={
     toOverseas:'Set Overseas',toDomestic:'Set Domestic',cyclePri:'Cycle Priority',delBtn:'Delete',
     editClickHint:'Editing - click cells to modify',readOnlyHint:'Read-only mode',
     editClickCard:'Editing - click cards to edit',readOnlyCard:'Read-only - click cards to expand',
+    regTips:'Publishing Tips',regTaboos:'Taboo Topics',regTags:'Recommended Tags',regTimes:'Best Posting Times',regAudience:'Audience Profile',
+    editTips:'Edit Tips',editTaboos:'Edit Taboos',editTags:'Edit Tags',editTimes:'Edit Times',editAudience:'Edit Audience',
+    confirmResetRegion:'Reset all regional data?',regionUpdated:'Regional data updated',
+    loadSample:'Load Sample',clearData:'Clear Data',sampleLoaded:'Sample data loaded',dataCleared:'Data cleared',
+    confirmClearOps:'Clear all workflow data?',confirmClearSales:'Clear all sales data?',confirmClearPM:'Clear all PM data?',
+    addWf:'Add Workflow',addDeal:'Add Deal Stage',addLead:'Add Lead Status',
+    salesEditHint:'Editing - click numbers to modify, click labels to edit',salesReadHint:'Click numbers to modify',
   }
 };
 function t(key){return(LANG[currentLang]&&LANG[currentLang][key])||LANG.zh[key]||key}
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function safeJSON(key,fallback){try{const v=localStorage.getItem(key);return v?JSON.parse(v):null}catch(e){localStorage.removeItem(key);return null}}
+
+// ─── CUSTOM DIALOG SYSTEM ─────────────────────────────
+function openDialog(html){
+  const o=document.getElementById('dlgOverlay'),b=document.getElementById('dlgBox');
+  b.innerHTML=html;o.classList.add('open');
+  const firstInput=b.querySelector('input,textarea,select');if(firstInput)setTimeout(()=>firstInput.focus(),50);
+}
+function closeDialog(){document.getElementById('dlgOverlay').classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('dlgOverlay').classList.contains('open'))closeDialog()});
+
+function confirmDialog(msg,onOk,okText,dangerMode){
+  openDialog(`<div class="dlg-title">${dangerMode?'&#9888;&#65039;':'&#10067;'} 确认操作</div>
+  <div class="dlg-msg">${msg}</div>
+  <div class="dlg-btns"><button class="dlg-btn" onclick="closeDialog()">取消</button>
+  <button class="dlg-btn ${dangerMode?'dlg-btn-danger':'dlg-btn-ok'}" id="dlgOkBtn">${okText||'确定'}</button></div>`);
+  document.getElementById('dlgOkBtn').onclick=()=>{closeDialog();onOk()};
+}
+
+function formDialog(title,fields,onOk,extraBtns){
+  // fields: [{key,label,type:'text'|'textarea'|'select'|'number',value,options:[{v,l}],placeholder}]
+  let html=`<div class="dlg-title">${esc(title)}</div>`;
+  fields.forEach(f=>{
+    html+=`<div class="dlg-field"><label>${esc(f.label)}</label>`;
+    if(f.type==='textarea') html+=`<textarea id="dlg_${f.key}" placeholder="${esc(f.placeholder||'')}">${esc(f.value||'')}</textarea>`;
+    else if(f.type==='select') html+=`<select id="dlg_${f.key}">${(f.options||[]).map(o=>`<option value="${esc(o.v)}"${o.v===f.value?' selected':''}>${esc(o.l)}</option>`).join('')}</select>`;
+    else html+=`<input type="${f.type||'text'}" id="dlg_${f.key}" value="${esc(f.value||'')}" placeholder="${esc(f.placeholder||'')}">`;
+    html+=`</div>`;
+  });
+  html+=`<div class="dlg-btns">${extraBtns||''}<button class="dlg-btn" onclick="closeDialog()">取消</button><button class="dlg-btn dlg-btn-ok" id="dlgOkBtn">保存</button></div>`;
+  openDialog(html);
+  document.getElementById('dlgOkBtn').onclick=()=>{
+    const vals={};fields.forEach(f=>{const el=document.getElementById('dlg_'+f.key);vals[f.key]=el?el.value:''});
+    closeDialog();onOk(vals);
+  };
+}
+
+// ─── MCP CONFIG DIALOG (single form, not 4 prompts) ───
+function openMCPConfigDialog(){
+  const fields=Object.keys(MCP_ENDPOINTS).map(repo=>({
+    key:repo,label:repo+' MCP URL',type:'text',value:MCP_ENDPOINTS[repo].url||'',placeholder:'http://localhost:3000'
+  }));
+  formDialog('配置 MCP 连接',fields,vals=>{
+    let connected=0;
+    Object.keys(vals).forEach(repo=>{
+      if(vals[repo]&&vals[repo].trim()){configureMCP(repo,vals[repo].trim());connected++}
+    });
+    if(connected)showToast(`正在连接 ${connected} 个MCP服务...`,'info',2000);
+    else showToast('未输入任何MCP地址','warning',2000);
+  });
+}
+
+function syncAllMCP(){
+  showToast('正在同步MCP数据...','info',2000);
+  Promise.all([syncPlatforms(),syncDeals(),syncRoadmap()]).then(results=>{
+    const ok=results.filter(Boolean).length;
+    if(ok)showToast(`同步完成（${ok}项成功）`,'success');
+    else showToast('无可用MCP连接，请先配置MCP','warning');
+  });
+}
+
+// ─── SAMPLE CONTENT LOADER ─────────────────────────────
+function loadSampleContent(){
+  const samples=[
+    '今天分享一个提高工作效率的方法：使用AI工具自动化你的日常工作流程。我测试了5款主流AI工具，发现平均能节省80%的重复劳动时间。具体方法如下：\n\n1. 邮件自动分类和回复 - 用AI识别邮件优先级\n2. 会议纪要自动生成 - 录音转文字+摘要\n3. 数据报表自动化 - 定时抓取+可视化\n4. 社交媒体排期 - 批量生成+定时发布\n5. 客户跟进提醒 - CRM自动化工作流\n\n每一个都不需要编程基础，新手也能上手。你最想自动化哪项工作？评论区告诉我！',
+    'Breaking: New study reveals that remote workers are 23% more productive than their in-office counterparts. Key findings from the 2026 Global Work Report:\n\n- Flexible schedules boost creativity by 31%\n- Commute elimination saves avg 47min/day\n- Hybrid models show highest satisfaction rates\n\nWhat\'s your experience? #RemoteWork #Productivity #FutureOfWork',
+    '刚从东京回来，分享5个小众但超值的地方：\n1. 谷中银座商店街 - 昭和年代的氛围感\n2. 清澄白河 - 咖啡圣地，蓝瓶咖啡发源地\n3. 下北泽 - 古着天堂，潮人聚集地\n4. 神乐坂 - 法式+日式的奇妙融合\n5. 月岛 - 文字烧一条街\n\n每个地方都不需要排队，比涩谷银座好逛100倍！收藏这条，去东京用得上。'
+  ];
+  document.getElementById('previewInput').value=samples[Math.floor(Math.random()*samples.length)];
+  renderPreview();showToast('已加载示例内容','success',1500);
+}
 function toggleLang(){
   currentLang=currentLang==='zh'?'en':'zh';
   localStorage.setItem('chub_lang',currentLang);
+  document.documentElement.lang=currentLang==='zh'?'zh-CN':'en';
   applyLang();
 }
 function applyLang(){
@@ -624,7 +799,7 @@ function renderIndustryGrid(){
     <span class="ind-icon">${ind.icon}</span>
     <div class="ind-name">${ind.name}</div>
     <div class="ind-desc">${ind.desc}</div>
-    <div class="ind-tools">${ind.tools.map(t=>`<span class="ind-tag" style="color:${repoColors[t]||'var(--accent)'};border-color:${repoColors[t]||'var(--accent)'}">${t}</span>`).join('')}${ind.tags.map(tg=>`<span class="ind-tag">${tg}</span>`).join('')}</div>
+    <div class="ind-tools">${ind.tools.map(tl=>`<span class="ind-tag" style="color:${repoColors[tl]||'var(--accent)'};border-color:${repoColors[tl]||'var(--accent)'}">${tl}</span>`).join('')}${ind.tags.map(tg=>`<span class="ind-tag">${tg}</span>`).join('')}</div>
   </div>`).join('');
 }
 
@@ -679,7 +854,7 @@ const DEFAULT_PLATFORMS=[
   {id:'reels',name:'IG Reels',limit:2200,style:'cta-driven',tags:['#Reels','#CareerTips'],os:true,styleLabel:'竖屏短视频, 高传播率',hashtags:'3-5',features:'Reels推流, 跨发Facebook, 购物',priority:'P0'},
   {id:'igpost',name:'IG Post',limit:2200,style:'lifestyle',tags:['#lifestyle','#success'],os:true,styleLabel:'图文精致, 品牌展示',hashtags:'3-10',features:'购物标签, 轮播, 探索页发现',priority:'P1'},
 ];
-let PLATFORMS=JSON.parse(localStorage.getItem('chub_platforms'))||JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
+let PLATFORMS=safeJSON('chub_platforms')||JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
 function savePlatforms(){localStorage.setItem('chub_platforms',JSON.stringify(PLATFORMS))}
 
 // ─── PLATFORM TABLE: SORT + EDIT + RENDER ─────────────
@@ -821,8 +996,8 @@ function renderPreview(){
     return`<div class="platform-card">
       <div class="card-header"><span class="card-pname">${p.name}${osBadge}</span><span class="${cc}">${len}/${p.limit}</span></div>
       <div class="progress-bar"><div class="progress-fill ${fc}" style="width:${pct}%"></div></div>
-      <div class="card-preview">${preview||'<span style="color:var(--text-secondary);font-style:italic">暂无内容</span>'}</div>
-      <div class="card-tags">${p.tags.map(t=>'<span class="tag-chip">'+t+'</span>').join('')}</div>
+      <div class="card-preview">${preview?esc(preview):'<span style="color:var(--text-secondary);font-style:italic">暂无内容</span>'}</div>
+      <div class="card-tags">${p.tags.map(tg=>'<span class="tag-chip">'+esc(tg)+'</span>').join('')}</div>
     </div>`;
   }).join('');
 }
@@ -839,7 +1014,7 @@ const DEFAULT_REGIONS={
   africa:{label:'非洲',tips:['WhatsApp是加纳/肯尼亚/尼日利亚/南非的主导平台，必须建立WhatsApp频道或广播列表策略','Facebook在撒哈拉以南非洲仍是最高覆盖率平台，不能当作衰退平台对待','傍晚6-8 PM WAT/EAT是西非和东非市场的高峰互动窗口（IQFluence 2026尼日利亚数据）','移动数据成本是真实限制：避免自动播放视频消耗流量，使用缩略图优先策略，优化视频文件大小','非洲本土喜剧/Afrobeats/美食内容正在全球爆发，优先使用本土格式而非模仿西方','斯瓦希里/豪萨/约鲁巴/阿姆哈拉语内容面临的算法竞争远低于英语（UNDP报告）'],taboos:['绝对禁止贫穷/援助依赖/异国化的刻板印象：非洲受众自身会强烈反弹，全球非洲侨民会迅速扩大批评（来源：UNDP 2024）','避免煽动特定民族/部落对立：社媒民族仇恨已在肯尼亚/尼日利亚/埃塞俄比亚导致暴力冲突（ScienceDirect 2024）','不要把非洲笼统概括为一个国家：54个国家有截然不同的法律/文化/语言，笼统化既不准确又令受众疏离'],tags:['#Africa','#AfricaRising','#Naija','#AfricanContent'],times:'工作日 6-8 PM WAT（西非）/EAT（东非）；周末12-3 PM当地时间',audience:'中位年龄低于25岁的年轻市场，移动端优先，数据成本敏感，WhatsApp社群是核心信息入口，喜剧/音乐/美食内容渗透率高'},
   latam:{label:'拉丁美洲',tips:['巴西人日均社交媒体3h49m全球最高（Statista），Instagram Reels（日均700万+帖子）和WhatsApp是巴西必备双平台','按国家细分：Instagram主导阿根廷/巴西/智利，Facebook主导哥伦比亚/墨西哥/秘鲁，TikTok在哥伦比亚增长最快（LatAm Intersect PR 2025）','WhatsApp和Telegram群组是重要内容发现渠道，群组种草效果往往超越付费广告','Meme是政治话语和文化评论载体（尤其巴西和墨西哥），创造可分享Meme格式的自然流量远超普通内容','西班牙语不能通用：墨西哥/阿根廷/哥伦比亚的词汇/俚语/正式程度差异巨大；巴西需全葡萄牙语','TikTok在拉美13-24岁用户中日均使用87分钟，竖屏视频是年轻受众的主要格式（Awisee 2025）'],taboos:['避免在国家政治冲突中选边：哥伦比亚/墨西哥/智利有记录的"水军"协同虚假宣传，涉政内容会被默认为付费虚假信息（Americas Market Intelligence 2025）','禁止嘲讽天主教会或民间宗教表达（亡灵节、圣周、守护圣人节），宗教与文化身份在拉美深度绑定','禁止用大男子主义或圣母主义刻板印象来定义性别角色，即使以批判角度使用也会两面不讨好'],tags:['#LatinAmerica','#Latinx','#Brasil','#Mexico'],times:'工作日12-2 PM和7-9 PM当地时间（午餐和晚间双高峰）；巴西周末参与度全球最高',audience:'全球社交媒体使用时长最高受众，WhatsApp/Telegram私群是核心发现渠道，年轻用户以TikTok为主，文化自豪感强，对去地域化内容抵触，足球是最大流量触发点'}
 };
-let REGIONS=JSON.parse(localStorage.getItem('chub_regions'))||JSON.parse(JSON.stringify(DEFAULT_REGIONS));
+let REGIONS=safeJSON('chub_regions')||JSON.parse(JSON.stringify(DEFAULT_REGIONS));
 function saveRegions(){localStorage.setItem('chub_regions',JSON.stringify(REGIONS))}
 
 let regionEditMode=false;
@@ -847,42 +1022,42 @@ function renderRegion(){
   const k=document.getElementById('regionSelect').value;
   const d=REGIONS[k];if(!d)return;
   const editToolbar=`<div class="toolbar" style="margin-top:12px;margin-bottom:0">
-    <button class="toolbar-btn${regionEditMode?' active':''}" onclick="toggleRegionEdit()">${regionEditMode?'退出编辑':'编辑模式'}</button>
-    ${regionEditMode?'<button class="toolbar-btn" onclick="resetRegions()">重置默认</button>':''}
-    <span class="edit-indicator">${regionEditMode?'编辑中':'只读模式'}</span>
+    <button class="toolbar-btn${regionEditMode?' active':''}" onclick="toggleRegionEdit()">${regionEditMode?t('exitEdit'):t('editMode')}</button>
+    ${regionEditMode?`<button class="toolbar-btn" onclick="resetRegions()">${t('resetDef')}</button>`:''}
+    <span class="edit-indicator">${regionEditMode?t('editing'):t('readOnly')}</span>
   </div>`;
   const editBtns=regionEditMode?`<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
-    <button class="toolbar-btn" onclick="editRegionField('${k}','tips')">编辑技巧</button>
-    <button class="toolbar-btn" onclick="editRegionField('${k}','taboos')">编辑禁忌</button>
-    <button class="toolbar-btn" onclick="editRegionField('${k}','tags')">编辑标签</button>
-    <button class="toolbar-btn" onclick="editRegionField('${k}','times')">编辑时间</button>
-    <button class="toolbar-btn" onclick="editRegionField('${k}','audience')">编辑画像</button>
+    <button class="toolbar-btn" onclick="editRegionField('${k}','tips')">${t('editTips')}</button>
+    <button class="toolbar-btn" onclick="editRegionField('${k}','taboos')">${t('editTaboos')}</button>
+    <button class="toolbar-btn" onclick="editRegionField('${k}','tags')">${t('editTags')}</button>
+    <button class="toolbar-btn" onclick="editRegionField('${k}','times')">${t('editTimes')}</button>
+    <button class="toolbar-btn" onclick="editRegionField('${k}','audience')">${t('editAudience')}</button>
   </div>`:'';
   document.getElementById('regionPanel').innerHTML=editToolbar+`<div class="region-panel">
     <div class="region-header">${d.label}</div>
     <div class="region-grid">
-      <div class="region-section"><div class="section-title">发布技巧</div><ul class="tip-list">${d.tips.map(t=>'<li>'+t+'</li>').join('')}</ul></div>
-      <div class="region-section"><div class="section-title">禁忌话题</div>${d.taboos.map(t=>'<div class="taboo-card">! '+t+'</div>').join('')}<div style="margin-top:16px"><div class="section-title">推荐标签</div><div>${d.tags.map(t=>'<span class="ht">'+t+'</span>').join('')}</div></div></div>
-      <div class="region-section"><div class="section-title">最佳发布时间</div><div style="font-size:13px;line-height:1.8">${d.times}</div><div style="margin-top:16px"><div class="section-title">受众画像</div><div style="font-size:13px;line-height:1.7">${d.audience}</div></div></div>
+      <div class="region-section"><div class="section-title">${t('regTips')}</div><ul class="tip-list">${d.tips.map(tp=>'<li>'+tp+'</li>').join('')}</ul></div>
+      <div class="region-section"><div class="section-title">${t('regTaboos')}</div>${d.taboos.map(tb=>'<div class="taboo-card">! '+tb+'</div>').join('')}<div style="margin-top:16px"><div class="section-title">${t('regTags')}</div><div>${d.tags.map(tg=>'<span class="ht">'+tg+'</span>').join('')}</div></div></div>
+      <div class="region-section"><div class="section-title">${t('regTimes')}</div><div style="font-size:13px;line-height:1.8">${d.times}</div><div style="margin-top:16px"><div class="section-title">${t('regAudience')}</div><div style="font-size:13px;line-height:1.7">${d.audience}</div></div></div>
     </div>${editBtns}</div>`;
 }
 function toggleRegionEdit(){regionEditMode=!regionEditMode;renderRegion()}
 function editRegionField(rk,field){
   const d=REGIONS[rk];if(!d)return;
-  if(Array.isArray(d[field])){
-    const val=prompt('编辑（每行一条，用换行分隔）：',d[field].join('\n'));
-    if(val===null)return;
-    d[field]=val.split('\n').map(s=>s.trim()).filter(Boolean);
-  }else{
-    const val=prompt('编辑：',d[field]);
-    if(val===null)return;
-    d[field]=val;
-  }
-  saveRegions();renderRegion();showToast('地区数据已更新','success',1500);
+  const isArr=Array.isArray(d[field]);
+  const fieldLabels={tips:t('regTips'),taboos:t('regTaboos'),tags:t('regTags'),times:t('regTimes'),audience:t('regAudience')};
+  formDialog('编辑 '+d.label+' - '+(fieldLabels[field]||field),[
+    {key:'val',label:isArr?'每行一条':'内容',type:'textarea',value:isArr?d[field].join('\n'):d[field]}
+  ],vals=>{
+    if(isArr) d[field]=vals.val.split('\n').map(s=>s.trim()).filter(Boolean);
+    else d[field]=vals.val;
+    saveRegions();renderRegion();showToast(t('regionUpdated'),'success',1500);
+  });
 }
 function resetRegions(){
-  if(!confirm('确定重置所有地区数据？'))return;
-  REGIONS=JSON.parse(JSON.stringify(DEFAULT_REGIONS));saveRegions();renderRegion();showToast('已重置为默认数据','success');
+  confirmDialog(t('confirmResetRegion'),()=>{
+    REGIONS=JSON.parse(JSON.stringify(DEFAULT_REGIONS));saveRegions();renderRegion();showToast(t('reset'),'success');
+  },'重置',true);
 }
 
 // ─── OPS-FLOW: TEMPLATES ────────────────────────────────
@@ -897,86 +1072,229 @@ const DEFAULT_TEMPLATES=[
   {id:'lead-nurture',name:'线索培育',cat:'crm',desc:'带评分的自动化线索培育工作流',trigger:'事件触发',steps:['线索评分','选择培育路径','发送个性化内容','更新CRM'],vars:['leadSource（必填）','scoreThreshold（默认：50）']},
   {id:'customer-onboard',name:'客户入驻',cat:'crm',desc:'新客户入驻自动化流程',trigger:'事件 / Webhook',steps:['创建账户','发送欢迎邮件','预约入驻通话','分配客户成功经理'],vars:['customerData（必填）','plan（必填）']},
   {id:'feedback-collect',name:'反馈收集',cat:'crm',desc:'自动收集并分类用户反馈',trigger:'定时：周五10:00 + 订单事件',steps:['发送问卷','收集回复','分类反馈','生成洞察'],vars:['surveyTemplate（必填）','minResponses（默认：10）']},
+  {id:'email-send',name:'邮件发送',cat:'marketing',desc:'通过SMTP或API发送单封或批量邮件，支持模板和附件',trigger:'手动 / API调用',steps:['加载邮件模板','填充变量','验证收件人','发送邮件','记录日志'],vars:['to（必填）','subject（必填）','template（可选）','attachments（可选）']},
+  {id:'email-template',name:'邮件模板管理',cat:'marketing',desc:'创建、编辑和管理邮件模板库，支持HTML和纯文本',trigger:'手动',steps:['选择/创建模板','编辑内容','设置变量占位符','预览效果','保存模板'],vars:['templateName（必填）','format（默认：html）']},
+  {id:'octopus-scraper',name:'八爪鱼数据采集',cat:'data',desc:'使用八爪鱼平台进行可视化网页数据采集，支持翻页和动态加载',trigger:'定时 / 手动',steps:['配置采集规则','设置翻页策略','启动采集任务','数据清洗','导出为CSV/Excel'],vars:['targetUrl（必填）','selectors（必填）','pagination（可选）','outputFormat（默认：csv）']},
+  {id:'yingdao-rpa',name:'影刀RPA自动化',cat:'data',desc:'使用影刀RPA进行桌面自动化操作，支持网页填表、数据录入等',trigger:'定时 / 手动',steps:['录制操作流程','设置数据源','配置异常处理','执行自动化','生成执行报告'],vars:['flowName（必填）','dataSource（可选）','retryCount（默认：3）']},
+  {id:'figma-export',name:'Figma设计导出',cat:'content',desc:'从Figma自动导出设计稿，转换为开发所需的格式和素材',trigger:'Webhook / 手动',steps:['连接Figma项目','选择导出画板','设置导出格式','批量导出','整理文件命名'],vars:['figmaFileId（必填）','exportFormat（默认：png）','scale（默认：2x）']},
+  {id:'canvas-design',name:'Canvas画图生成',cat:'content',desc:'使用AI辅助在Canvas平台生成营销图片、社交媒体配图',trigger:'手动 / API',steps:['选择模板/尺寸','输入文案内容','AI生成设计','人工微调','批量导出'],vars:['templateId（可选）','text（必填）','dimensions（默认：1080x1080）']},
+  {id:'social-schedule',name:'社交媒体排期',cat:'content',desc:'批量创建和管理社交媒体发布排期',trigger:'定时：按排期执行',steps:['导入内容列表','设置发布时间','按平台适配','定时发布','收集互动数据'],vars:['contentList（必填）','platforms（必填）','timezone（默认：Asia/Shanghai）']},
+  {id:'invoice-generate',name:'发票/报价单生成',cat:'reporting',desc:'自动生成PDF格式的发票或报价单',trigger:'手动 / CRM事件',steps:['加载客户信息','填充报价明细','计算税费','生成PDF','发送给客户'],vars:['clientId（必填）','items（必填）','taxRate（默认：6%）']},
 ];
-let TEMPLATES=JSON.parse(localStorage.getItem('chub_templates'))||JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
+let TEMPLATES=safeJSON('chub_templates')||JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
 function saveTemplates(){localStorage.setItem('chub_templates',JSON.stringify(TEMPLATES))}
-const CAT_LABELS={all:'全部',reporting:'报告',data:'数据',monitoring:'监控',content:'内容',marketing:'营销',crm:'CRM'};
+const CAT_LABELS={all:'全部 ('+DEFAULT_TEMPLATES.length+')',reporting:'报告',data:'数据',monitoring:'监控',content:'内容',marketing:'营销',crm:'CRM'};
 let activeCat='all';
 let opsEditMode=false;
 
 function renderOps(){
   const pills=document.getElementById('catPills');
   pills.innerHTML=Object.entries(CAT_LABELS).map(([k,v])=>`<button class="cat-pill${k===activeCat?' active':''}" onclick="filterCat('${k}')">${v}</button>`).join('');
-  const filtered=activeCat==='all'?TEMPLATES:TEMPLATES.filter(t=>t.cat===activeCat);
-  // Toolbar
-  const toolbarHtml=`<div class="toolbar" style="margin-bottom:16px">
+  const filtered=activeCat==='all'?TEMPLATES:TEMPLATES.filter(tp=>tp.cat===activeCat);
+  // Toolbar in dedicated area
+  document.getElementById('opsToolbar').innerHTML=`
     <button class="toolbar-btn${opsEditMode?' active':''}" onclick="toggleOpsEdit()">${opsEditMode?t('exitEdit'):t('editMode')}</button>
-    ${opsEditMode?`<button class="toolbar-btn primary" onclick="addTemplate()">${t('addPlat').replace('平台','模板').replace('Platform','Template')}</button><button class="toolbar-btn" onclick="resetTemplates()">${t('resetDef')}</button>`:''}
-    <span class="edit-indicator">${opsEditMode?t('editClickCard'):t('readOnlyCard')}</span>
-  </div>`;
-  const cardsHtml=filtered.map((t,fi)=>{
-    const ri=TEMPLATES.indexOf(t);
-    const editBtns=opsEditMode?`<div style="display:flex;gap:6px;margin-top:10px">
+    ${opsEditMode?`<button class="toolbar-btn primary" onclick="addTemplate()">+ ${t('addWf')}</button><button class="toolbar-btn danger" onclick="resetTemplates()">${t('resetDef')}</button>`
+    :`<button class="toolbar-btn" onclick="loadSampleOps()">${t('loadSample')}</button><button class="toolbar-btn danger" onclick="clearModuleData('ops')">${t('clearData')}</button>`}
+    <span class="edit-indicator">${opsEditMode?t('editClickCard'):t('readOnlyCard')}</span>`;
+  const cardsHtml=filtered.map((tpl,fi)=>{
+    const ri=TEMPLATES.indexOf(tpl);
+    const runStatus=tpl._runStatus||'idle';
+    const statusHtml={idle:'<span class="run-status run-idle">待运行</span>',running:'<span class="run-status run-running">运行中...</span>',done:'<span class="run-status run-done">已完成</span>',error:'<span class="run-status run-error">失败</span>'}[runStatus];
+    const actionBtns=opsEditMode?`<div style="display:flex;gap:6px;margin-top:10px">
       <button class="toolbar-btn" onclick="event.stopPropagation();editTemplate(${ri})">编辑</button>
       <button class="toolbar-btn danger" onclick="event.stopPropagation();deleteTemplate(${ri})">删除</button>
     </div>`:'';
-    return`<div class="tpl-card" onclick="${opsEditMode?'':'this.classList.toggle(\'expanded\')'}">
-    <div class="tpl-name">${t.name}</div>
-    <div class="tpl-desc">${t.desc}</div>
-    <div class="tpl-meta"><span class="tpl-badge">${t.cat}</span><span class="tpl-badge">${t.trigger}</span><span class="tpl-badge">${t.steps.length} 步骤</span></div>
-    ${editBtns}
+    return`<div class="tpl-card" onclick="${opsEditMode?`event.stopPropagation();editTemplate(${ri})`:'this.classList.toggle(\'expanded\')'}">
+    <div style="display:flex;align-items:center;gap:8px"><div class="tpl-name" style="flex:1">${esc(tpl.name)}</div>${statusHtml}</div>
+    <div class="tpl-desc">${esc(tpl.desc)}</div>
+    <div class="tpl-meta"><span class="tpl-badge">${tpl.cat}</span><span class="tpl-badge">${tpl.trigger}</span><span class="tpl-badge">${tpl.steps.length} 步骤</span></div>
+    ${actionBtns}
     <div class="tpl-detail">
       <div class="section-title">工作流步骤</div>
-      <div class="step-flow">${t.steps.map((s,i)=>(i>0?'<span class="step-arrow">&rarr;</span>':'')+`<span class="step-node">${i+1}. ${s}</span>`).join('')}</div>
-      <div class="var-list"><strong>变量：</strong> ${t.vars.join(' | ')}</div>
+      <div class="step-flow">${tpl.steps.map((s,si)=>(si>0?'<span class="step-arrow">&rarr;</span>':'')+`<span class="step-node" id="step_${ri}_${si}">${si+1}. ${esc(s)}</span>`).join('')}</div>
+      <div class="var-list"><strong>变量：</strong> ${tpl.vars.map(v=>esc(v)).join(' | ')}</div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="toolbar-btn dlg-btn-run" style="color:#fff;border-color:var(--green)" onclick="event.stopPropagation();runWorkflow(${ri})">&#9654; 运行</button>
+        <button class="toolbar-btn" onclick="event.stopPropagation();editTemplate(${ri})">编辑</button>
+      </div>
     </div></div>`;
   }).join('');
-  document.getElementById('tplGrid').innerHTML=toolbarHtml+cardsHtml;
+  document.getElementById('tplGrid').innerHTML=cardsHtml;
 }
 function filterCat(c){activeCat=c;renderOps()}
 function toggleOpsEdit(){opsEditMode=!opsEditMode;renderOps()}
+
 function editTemplate(i){
-  const t=TEMPLATES[i];if(!t)return;
-  const name=prompt('模板名称：',t.name);if(name===null)return;
-  const desc=prompt('描述：',t.desc);if(desc===null)return;
-  const trigger=prompt('触发方式：',t.trigger);if(trigger===null)return;
-  const steps=prompt('步骤（用逗号分隔）：',t.steps.join('，'));if(steps===null)return;
-  const cat=prompt('分类（reporting/data/monitoring/content/marketing/crm）：',t.cat);if(cat===null)return;
-  t.name=name;t.desc=desc;t.trigger=trigger;t.steps=steps.split(/[,，]/).map(s=>s.trim()).filter(Boolean);t.cat=cat;
-  saveTemplates();renderOps();showToast('模板已更新','success',1500);
+  const tpl=TEMPLATES[i];if(!tpl)return;
+  formDialog('编辑工作流: '+tpl.name,[
+    {key:'name',label:'名称',type:'text',value:tpl.name},
+    {key:'desc',label:'描述',type:'text',value:tpl.desc},
+    {key:'cat',label:'分类',type:'select',value:tpl.cat,options:[
+      {v:'reporting',l:'报告'},{v:'data',l:'数据'},{v:'monitoring',l:'监控'},
+      {v:'content',l:'内容'},{v:'marketing',l:'营销'},{v:'crm',l:'CRM'}
+    ]},
+    {key:'trigger',label:'触发方式',type:'text',value:tpl.trigger,placeholder:'定时/手动/Webhook/事件'},
+    {key:'steps',label:'步骤（每行一步）',type:'textarea',value:tpl.steps.join('\n')},
+    {key:'vars',label:'变量（每行一个）',type:'textarea',value:tpl.vars.join('\n')}
+  ],vals=>{
+    tpl.name=vals.name;tpl.desc=vals.desc;tpl.cat=vals.cat;tpl.trigger=vals.trigger;
+    tpl.steps=vals.steps.split('\n').map(s=>s.trim()).filter(Boolean);
+    tpl.vars=vals.vars.split('\n').map(s=>s.trim()).filter(Boolean);
+    saveTemplates();renderOps();showToast('工作流已更新','success',1500);
+  });
 }
+
 function deleteTemplate(i){
-  if(!confirm('确定删除 "'+TEMPLATES[i].name+'" ？'))return;
-  TEMPLATES.splice(i,1);saveTemplates();renderOps();showToast('模板已删除','info',1500);
+  confirmDialog('确定删除工作流 "'+TEMPLATES[i].name+'" ？',()=>{
+    TEMPLATES.splice(i,1);saveTemplates();renderOps();showToast('已删除','info',1500);
+  },'删除',true);
 }
+
 function addTemplate(){
-  const name=prompt('模板名称：');if(!name)return;
-  const desc=prompt('描述：')||'';
-  const cat=prompt('分类（reporting/data/monitoring/content/marketing/crm）：')||'content';
-  const trigger=prompt('触发方式：')||'手动';
-  const steps=prompt('步骤（用逗号分隔）：')||'步骤1，步骤2';
-  TEMPLATES.push({id:'custom_'+Date.now(),name,cat,desc,trigger,steps:steps.split(/[,，]/).map(s=>s.trim()).filter(Boolean),vars:['自定义变量']});
-  saveTemplates();renderOps();showToast('模板已添加','success');
+  formDialog('创建新工作流',[
+    {key:'name',label:'名称',type:'text',placeholder:'例：数据备份'},
+    {key:'desc',label:'描述',type:'text',placeholder:'简要说明工作流的用途'},
+    {key:'cat',label:'分类',type:'select',value:'content',options:[
+      {v:'reporting',l:'报告'},{v:'data',l:'数据'},{v:'monitoring',l:'监控'},
+      {v:'content',l:'内容'},{v:'marketing',l:'营销'},{v:'crm',l:'CRM'}
+    ]},
+    {key:'trigger',label:'触发方式',type:'text',value:'手动',placeholder:'定时/手动/Webhook'},
+    {key:'steps',label:'步骤（每行一步）',type:'textarea',placeholder:'步骤1\n步骤2\n步骤3'}
+  ],vals=>{
+    if(!vals.name){showToast('名称不能为空','warning');return}
+    TEMPLATES.push({id:'custom_'+Date.now(),name:vals.name,cat:vals.cat,desc:vals.desc||'',trigger:vals.trigger||'手动',
+      steps:vals.steps?vals.steps.split('\n').map(s=>s.trim()).filter(Boolean):['步骤1'],vars:['自定义变量']});
+    saveTemplates();renderOps();showToast('工作流已创建','success');
+  });
 }
+
 function resetTemplates(){
-  if(!confirm('确定重置所有模板为默认数据？'))return;
-  TEMPLATES=JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));saveTemplates();renderOps();showToast('已重置为默认模板','success');
+  confirmDialog('确定重置所有工作流为默认数据？这将丢失所有自定义工作流。',()=>{
+    TEMPLATES=JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));saveTemplates();renderOps();showToast('已重置为默认','success');
+  },'重置',true);
+}
+
+// ─── SAMPLE DATA LOADERS & CLEAR ─────────────────────
+function loadSampleOps(){
+  TEMPLATES=JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
+  // Add a few extra custom ones for demonstration
+  TEMPLATES.push({id:'sample_1',name:'每日数据同步',cat:'data',desc:'每天自动从多个数据源同步最新数据到仪表盘',trigger:'定时：每天08:00',steps:['连接数据源','拉取增量数据','数据清洗','写入数据库','刷新缓存'],vars:['sources（必填）','batchSize（默认：1000）']});
+  TEMPLATES.push({id:'sample_2',name:'客户满意度调研',cat:'crm',desc:'定期向客户发送满意度调研问卷并汇总结果',trigger:'定时：每月1日',steps:['筛选活跃客户','生成调研链接','发送邮件','收集回复','生成分析报告'],vars:['templateId（必填）','minScore（默认：1）']});
+  saveTemplates();renderOps();showToast(t('sampleLoaded'),'success');
+}
+function loadSampleSales(){
+  DEAL_STAGES=[
+    {id:'discovery',label:'需求发现',count:30,color:'#3b82f6'},
+    {id:'demo',label:'产品演示',count:22,color:'#06b6d4'},
+    {id:'proposal',label:'方案报价',count:15,color:'#8b5cf6'},
+    {id:'negotiation',label:'商务谈判',count:9,color:'#f59e0b'},
+    {id:'contract',label:'合同签署',count:5,color:'#10b981'},
+    {id:'onboard',label:'客户上线',count:3,color:'#22c55e'}
+  ];
+  LEAD_STATUSES=[
+    {id:'cold',label:'冷线索',count:60,color:'#64748b'},
+    {id:'warm',label:'温线索',count:38,color:'#3b82f6'},
+    {id:'hot',label:'热线索',count:22,color:'#f59e0b'},
+    {id:'qualified',label:'已验证',count:15,color:'#8b5cf6'},
+    {id:'converted',label:'已转化',count:8,color:'#10b981'},
+    {id:'lost',label:'已流失',count:12,color:'#ef4444'}
+  ];
+  saveDeals();saveLeads();renderSales();showToast(t('sampleLoaded'),'success');
+}
+function loadSamplePM(){
+  ROADMAP=[
+    {lane:'P0',title:'MCP Server v1.0',status:'completed',date:'2026-01'},
+    {lane:'P0',title:'RAG知识库集成',status:'completed',date:'2026-02'},
+    {lane:'P0',title:'多平台内容发布',status:'in_progress',date:'2026-03'},
+    {lane:'P0',title:'实时数据看板',status:'planned',date:'2026-04'},
+    {lane:'P1',title:'邮件自动化系统',status:'completed',date:'2026-02'},
+    {lane:'P1',title:'n8n工作流导出',status:'in_progress',date:'2026-03'},
+    {lane:'P1',title:'Figma设计桥接',status:'planned',date:'2026-04'},
+    {lane:'P1',title:'AI智能推荐',status:'planned',date:'2026-05'},
+    {lane:'P2',title:'仪表盘v2重构',status:'in_progress',date:'2026-03'},
+    {lane:'P2',title:'Chrome浏览器插件',status:'planned',date:'2026-Q3'},
+    {lane:'P3',title:'移动端APP',status:'planned',date:'2026-Q4'},
+  ];
+  SPRINT_TASKS={
+    todo:['添加OAuth登录','编写API文档','配置CI/CD','用户反馈收集系统'],
+    in_progress:['统一仪表盘UI','地区文化数据测试','MCP连接稳定性'],
+    review:['内容分发器v2','数据导出功能'],
+    done:['MCP注册更新','平台对比表','Service Worker配置','PWA离线支持'],
+  };
+  FEEDBACK=[
+    {text:'添加深色/浅色主题切换',votes:28,cat:'feature'},
+    {text:'小屏手机布局错乱',votes:22,cat:'bug'},
+    {text:'导出仪表盘数据为CSV',votes:19,cat:'feature'},
+    {text:'优化素材库搜索功能',votes:15,cat:'improve'},
+    {text:'添加定时发布提醒通知',votes:12,cat:'feature'},
+    {text:'接入更多MCP工具服务',votes:10,cat:'feature'},
+    {text:'Sprint看板拖拽排序',votes:8,cat:'improve'},
+  ];
+  saveRoadmap();saveSprint();saveFeedback();renderPM();showToast(t('sampleLoaded'),'success');
+}
+function clearModuleData(mod){
+  const msgs={ops:t('confirmClearOps'),sales:t('confirmClearSales'),pm:t('confirmClearPM')};
+  confirmDialog(msgs[mod]||'确定清除数据？',()=>{
+    if(mod==='ops'){TEMPLATES=[];saveTemplates();renderOps()}
+    else if(mod==='sales'){DEAL_STAGES=[];LEAD_STATUSES=[];saveDeals();saveLeads();renderSales()}
+    else if(mod==='pm'){ROADMAP=[];SPRINT_TASKS={todo:[],in_progress:[],review:[],done:[]};FEEDBACK=[];saveRoadmap();saveSprint();saveFeedback();renderPM()}
+    showToast(t('dataCleared'),'success');
+  },t('clearData'),true);
+}
+
+// Workflow run simulation
+function runWorkflow(i){
+  const tpl=TEMPLATES[i];if(!tpl)return;
+  tpl._runStatus='running';renderOps();
+  // Expand the card
+  const cards=document.querySelectorAll('.tpl-card');
+  if(cards[i])cards[i].classList.add('expanded');
+  // Simulate step-by-step execution
+  let step=0;
+  const interval=setInterval(()=>{
+    if(step>0){const prev=document.getElementById('step_'+i+'_'+(step-1));if(prev)prev.style.background='var(--green)';prev.style.color='#fff'}
+    const cur=document.getElementById('step_'+i+'_'+step);
+    if(cur){cur.style.background='var(--accent)';cur.style.color='#fff';cur.style.transition='all .3s'}
+    step++;
+    if(step>tpl.steps.length){
+      clearInterval(interval);
+      // Try MCP call
+      const mcpRepo=tpl.cat==='crm'?'sales-crm':tpl.cat==='content'?'media-ops':'ops-flow';
+      callMCP(mcpRepo,'run_workflow',{id:tpl.id}).then(res=>{
+        tpl._runStatus=res?'done':'done';
+        renderOps();showToast('工作流 "'+tpl.name+'" 执行完成','success',3000);
+      });
+    }
+  },800);
 }
 
 // ─── SALES-CRM: FUNNEL DATA ────────────────────────────
 const DEF_DEAL=[{id:'contact',label:'初次接触',count:24,color:'#3b82f6'},{id:'qualified',label:'意向确认',count:18,color:'#06b6d4'},{id:'proposal',label:'方案报价',count:11,color:'#8b5cf6'},{id:'negotiation',label:'谈判中',count:6,color:'#f59e0b'},{id:'closed_won',label:'已成交',count:3,color:'#10b981'}];
 const DEF_LEAD=[{id:'new',label:'新线索',count:45,color:'#3b82f6'},{id:'contacted',label:'已接触',count:32,color:'#06b6d4'},{id:'qualified',label:'已意向',count:20,color:'#8b5cf6'},{id:'converted',label:'已转化',count:11,color:'#10b981'},{id:'lost',label:'已流失',count:9,color:'#ef4444'}];
-let DEAL_STAGES=JSON.parse(localStorage.getItem('chub_deals'))||JSON.parse(JSON.stringify(DEF_DEAL));
-let LEAD_STATUSES=JSON.parse(localStorage.getItem('chub_leads'))||JSON.parse(JSON.stringify(DEF_LEAD));
+let DEAL_STAGES=safeJSON('chub_deals')||JSON.parse(JSON.stringify(DEF_DEAL));
+let LEAD_STATUSES=safeJSON('chub_leads')||JSON.parse(JSON.stringify(DEF_LEAD));
 function saveDeals(){localStorage.setItem('chub_deals',JSON.stringify(DEAL_STAGES))}
 function saveLeads(){localStorage.setItem('chub_leads',JSON.stringify(LEAD_STATUSES))}
+let salesEditMode=false;
 
 function renderSales(){
+  // Toolbar
+  document.getElementById('salesToolbar').innerHTML=`
+    <button class="toolbar-btn${salesEditMode?' active':''}" onclick="toggleSalesEdit()">${salesEditMode?t('exitEdit'):t('editMode')}</button>
+    ${salesEditMode?`<button class="toolbar-btn primary" onclick="addDealStage()">+ ${t('addDeal')}</button>
+    <button class="toolbar-btn primary" onclick="addLeadStatus()">+ ${t('addLead')}</button>
+    <button class="toolbar-btn danger" onclick="resetSalesData()">${t('resetDef')}</button>`
+    :`<button class="toolbar-btn" onclick="loadSampleSales()">${t('loadSample')}</button><button class="toolbar-btn danger" onclick="clearModuleData('sales')">${t('clearData')}</button>`}
+    <span class="edit-indicator">${salesEditMode?t('salesEditHint'):t('salesReadHint')}</span>`;
+
   const maxDeal=Math.max(...DEAL_STAGES.map(s=>s.count),1);
   let fhtml='';
   DEAL_STAGES.forEach((s,i)=>{
     const w=Math.max(Math.round(s.count/maxDeal*100),15);
-    fhtml+=`<div class="funnel-stage"><span class="funnel-label">${s.label}</span><div class="funnel-bar" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editDealCount(${i})">${s.count}</span></div></div>`;
+    const labelClick=salesEditMode?`onclick="editDealStage(${i})" style="cursor:pointer;text-decoration:underline dotted"`:'';
+    const delBtn=salesEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteDealStage(${i})">x</span>`:'';
+    fhtml+=`<div class="funnel-stage"><span class="funnel-label" ${labelClick}>${s.label}${delBtn}</span><div class="funnel-bar" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editDealCount(${i})">${s.count}</span></div></div>`;
     if(i<DEAL_STAGES.length-1){
       const conv=s.count>0?Math.round(DEAL_STAGES[i+1].count/s.count*100):0;
       fhtml+=`<div class="conv-arrow">&darr; ${conv}% ${t('convRate')}</div>`;
@@ -988,18 +1306,74 @@ function renderSales(){
   document.getElementById('leadBars').innerHTML=LEAD_STATUSES.map((s,i)=>{
     const w=Math.max(Math.round(s.count/maxLead*100),8);
     const pct=Math.round(s.count/maxLead*100);
-    return`<div class="lead-row"><span class="lead-label">${s.label}</span><div class="lead-bar-wrap"><div class="lead-bar-fill" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editLeadCount(${i})">${s.count}</span></div></div><span class="lead-stat">${pct}%</span></div>`;
+    const labelClick=salesEditMode?`onclick="editLeadStage(${i})" style="cursor:pointer;text-decoration:underline dotted"`:'';
+    const delBtn=salesEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteLeadStatus(${i})">x</span>`:'';
+    return`<div class="lead-row"><span class="lead-label" ${labelClick}>${s.label}${delBtn}</span><div class="lead-bar-wrap"><div class="lead-bar-fill" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editLeadCount(${i})">${s.count}</span></div></div><span class="lead-stat">${pct}%</span></div>`;
   }).join('');
 }
+function toggleSalesEdit(){salesEditMode=!salesEditMode;renderSales()}
+
 function editDealCount(i){
-  const v=prompt('修改 '+DEAL_STAGES[i].label+' 数量：',DEAL_STAGES[i].count);
-  if(v===null)return;const n=parseInt(v);if(isNaN(n)||n<0)return;
-  DEAL_STAGES[i].count=n;saveDeals();renderSales();showToast('商机数据已更新','success',1500);
+  formDialog('修改 '+DEAL_STAGES[i].label,[
+    {key:'count',label:'数量',type:'number',value:String(DEAL_STAGES[i].count)}
+  ],vals=>{
+    const n=parseInt(vals.count);if(isNaN(n)||n<0)return;
+    DEAL_STAGES[i].count=n;saveDeals();renderSales();showToast('已更新','success',1500);
+  });
 }
 function editLeadCount(i){
-  const v=prompt('修改 '+LEAD_STATUSES[i].label+' 数量：',LEAD_STATUSES[i].count);
-  if(v===null)return;const n=parseInt(v);if(isNaN(n)||n<0)return;
-  LEAD_STATUSES[i].count=n;saveLeads();renderSales();showToast('线索数据已更新','success',1500);
+  formDialog('修改 '+LEAD_STATUSES[i].label,[
+    {key:'count',label:'数量',type:'number',value:String(LEAD_STATUSES[i].count)}
+  ],vals=>{
+    const n=parseInt(vals.count);if(isNaN(n)||n<0)return;
+    LEAD_STATUSES[i].count=n;saveLeads();renderSales();showToast('已更新','success',1500);
+  });
+}
+function editDealStage(i){
+  const s=DEAL_STAGES[i];
+  formDialog('编辑商机阶段',[
+    {key:'label',label:'名称',type:'text',value:s.label},
+    {key:'count',label:'数量',type:'number',value:String(s.count)},
+    {key:'color',label:'颜色(HEX)',type:'text',value:s.color}
+  ],vals=>{s.label=vals.label;s.count=parseInt(vals.count)||0;s.color=vals.color||s.color;saveDeals();renderSales();showToast('已更新','success')});
+}
+function editLeadStage(i){
+  const s=LEAD_STATUSES[i];
+  formDialog('编辑线索状态',[
+    {key:'label',label:'名称',type:'text',value:s.label},
+    {key:'count',label:'数量',type:'number',value:String(s.count)},
+    {key:'color',label:'颜色(HEX)',type:'text',value:s.color}
+  ],vals=>{s.label=vals.label;s.count=parseInt(vals.count)||0;s.color=vals.color||s.color;saveLeads();renderSales();showToast('已更新','success')});
+}
+function addDealStage(){
+  formDialog('添加商机阶段',[
+    {key:'label',label:'名称',type:'text',placeholder:'例：已签约'},
+    {key:'count',label:'初始数量',type:'number',value:'0'},
+    {key:'color',label:'颜色(HEX)',type:'text',value:'#3b82f6'}
+  ],vals=>{
+    if(!vals.label)return;
+    DEAL_STAGES.push({id:'stage_'+Date.now(),label:vals.label,count:parseInt(vals.count)||0,color:vals.color||'#3b82f6'});
+    saveDeals();renderSales();showToast('已添加','success');
+  });
+}
+function addLeadStatus(){
+  formDialog('添加线索状态',[
+    {key:'label',label:'名称',type:'text',placeholder:'例：待跟进'},
+    {key:'count',label:'初始数量',type:'number',value:'0'},
+    {key:'color',label:'颜色(HEX)',type:'text',value:'#3b82f6'}
+  ],vals=>{
+    if(!vals.label)return;
+    LEAD_STATUSES.push({id:'lead_'+Date.now(),label:vals.label,count:parseInt(vals.count)||0,color:vals.color||'#3b82f6'});
+    saveLeads();renderSales();showToast('已添加','success');
+  });
+}
+function deleteDealStage(i){confirmDialog('确定删除 "'+DEAL_STAGES[i].label+'"？',()=>{DEAL_STAGES.splice(i,1);saveDeals();renderSales();showToast('已删除','info')},'删除',true)}
+function deleteLeadStatus(i){confirmDialog('确定删除 "'+LEAD_STATUSES[i].label+'"？',()=>{LEAD_STATUSES.splice(i,1);saveLeads();renderSales();showToast('已删除','info')},'删除',true)}
+function resetSalesData(){
+  confirmDialog('确定重置所有销售数据？',()=>{
+    DEAL_STAGES=JSON.parse(JSON.stringify(DEF_DEAL));LEAD_STATUSES=JSON.parse(JSON.stringify(DEF_LEAD));
+    saveDeals();saveLeads();renderSales();showToast('已重置','success');
+  },'重置',true);
 }
 
 // ─── PM-TOOLKIT: ROADMAP + SPRINT + FEEDBACK ────────────
@@ -1027,9 +1401,9 @@ const DEF_FEEDBACK=[
   {text:'优化素材库搜索功能',votes:15,cat:'improve'},
   {text:'添加定时发布提醒通知',votes:12,cat:'feature'},
 ];
-let ROADMAP=JSON.parse(localStorage.getItem('chub_roadmap'))||JSON.parse(JSON.stringify(DEF_ROADMAP));
-let SPRINT_TASKS=JSON.parse(localStorage.getItem('chub_sprint'))||JSON.parse(JSON.stringify(DEF_SPRINT));
-let FEEDBACK=JSON.parse(localStorage.getItem('chub_feedback'))||JSON.parse(JSON.stringify(DEF_FEEDBACK));
+let ROADMAP=safeJSON('chub_roadmap')||JSON.parse(JSON.stringify(DEF_ROADMAP));
+let SPRINT_TASKS=safeJSON('chub_sprint')||JSON.parse(JSON.stringify(DEF_SPRINT));
+let FEEDBACK=safeJSON('chub_feedback')||JSON.parse(JSON.stringify(DEF_FEEDBACK));
 function saveRoadmap(){localStorage.setItem('chub_roadmap',JSON.stringify(ROADMAP))}
 function saveSprint(){localStorage.setItem('chub_sprint',JSON.stringify(SPRINT_TASKS))}
 function saveFeedback(){localStorage.setItem('chub_feedback',JSON.stringify(FEEDBACK))}
@@ -1039,7 +1413,8 @@ function renderPM(){
   // PM toolbar
   const pmToolbar=`<div class="toolbar" style="margin-bottom:16px">
     <button class="toolbar-btn${pmEditMode?' active':''}" onclick="togglePmEdit()">${pmEditMode?t('exitEdit'):t('editMode')}</button>
-    ${pmEditMode?`<button class="toolbar-btn" onclick="resetPmData()">${t('resetDef')}</button>`:''}
+    ${pmEditMode?`<button class="toolbar-btn" onclick="resetPmData()">${t('resetDef')}</button>`
+    :`<button class="toolbar-btn" onclick="loadSamplePM()">${t('loadSample')}</button><button class="toolbar-btn danger" onclick="clearModuleData('pm')">${t('clearData')}</button>`}
     <span class="edit-indicator">${pmEditMode?t('editClickHint'):t('readOnlyHint')}</span>
   </div>`;
 
@@ -1061,10 +1436,10 @@ function renderPM(){
   const cols=[['todo',t('todo')],['in_progress',t('inProg')],['review',t('review')],['done',t('done')]];
   document.getElementById('sprintBoard').innerHTML=cols.map(([k,label])=>{
     const tasks=SPRINT_TASKS[k]||[];
-    const taskHtml=tasks.map((t,ti)=>{
+    const taskHtml=tasks.map((tk,ti)=>{
       const editClick=pmEditMode?`onclick="editSprintTask('${k}',${ti})"`:'';
       const delBtn=pmEditMode?`<span style="float:right;cursor:pointer;color:var(--red);font-size:11px" onclick="event.stopPropagation();deleteSprintTask('${k}',${ti})">x</span>`:'';
-      return`<div class="task-chip" style="${pmEditMode?'cursor:pointer':''}" ${editClick}>${t}${delBtn}</div>`;
+      return`<div class="task-chip" style="${pmEditMode?'cursor:pointer':''}" ${editClick}>${esc(tk)}${delBtn}</div>`;
     }).join('');
     const addBtn=pmEditMode?`<div class="task-chip" style="cursor:pointer;border-style:dashed;color:var(--accent);text-align:center" onclick="addSprintTask('${k}')">+ 添加</div>`:'';
     return`<div class="sprint-col"><div class="sprint-col-title">${label}<span class="cnt">${tasks.length}</span></div>${taskHtml}${addBtn}</div>`;
@@ -1074,65 +1449,88 @@ function renderPM(){
   const catCls={feature:'fb-feature',bug:'fb-bug',improve:'fb-improve'};
   const catLabel={feature:'新功能',bug:'Bug',improve:'优化'};
   const fbAddBtn=pmEditMode?`<div style="margin-top:12px"><button class="toolbar-btn primary" onclick="addFeedback()">+ 添加反馈</button></div>`:'';
-  document.getElementById('fbList').innerHTML=FEEDBACK.sort((a,b)=>b.votes-a.votes).map((f,i)=>{
+  const sortedFb=[...FEEDBACK].map((f,origIdx)=>({...f,_idx:origIdx})).sort((a,b)=>b.votes-a.votes);
+  document.getElementById('fbList').innerHTML=sortedFb.map(f=>{
+    const i=f._idx;
     const editClick=pmEditMode?`onclick="editFeedback(${i})"`:'';
     const voteClick=pmEditMode?'':`onclick="voteFeedback(${i})"`;
     const delBtn=pmEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:8px" onclick="event.stopPropagation();deleteFeedback(${i})">x</span>`:'';
-    return`<div class="fb-item" style="${pmEditMode?'cursor:pointer':''}" ${editClick}><div class="fb-votes" style="cursor:pointer" ${voteClick}>${f.votes}</div><div class="fb-text">${f.text}</div><span class="fb-cat ${catCls[f.cat]}">${catLabel[f.cat]}</span>${delBtn}</div>`;
+    return`<div class="fb-item" style="${pmEditMode?'cursor:pointer':''}" ${editClick}><div class="fb-votes" style="cursor:pointer" ${voteClick}>${f.votes}</div><div class="fb-text">${esc(f.text)}</div><span class="fb-cat ${catCls[f.cat]}">${catLabel[f.cat]}</span>${delBtn}</div>`;
   }).join('')+fbAddBtn;
 }
 
 function togglePmEdit(){pmEditMode=!pmEditMode;renderPM()}
 function resetPmData(){
-  if(!confirm('确定重置所有项目管理数据？'))return;
-  ROADMAP=JSON.parse(JSON.stringify(DEF_ROADMAP));SPRINT_TASKS=JSON.parse(JSON.stringify(DEF_SPRINT));FEEDBACK=JSON.parse(JSON.stringify(DEF_FEEDBACK));
-  saveRoadmap();saveSprint();saveFeedback();renderPM();showToast('已重置为默认数据','success');
+  confirmDialog('确定重置所有项目管理数据？',()=>{
+    ROADMAP=JSON.parse(JSON.stringify(DEF_ROADMAP));SPRINT_TASKS=JSON.parse(JSON.stringify(DEF_SPRINT));FEEDBACK=JSON.parse(JSON.stringify(DEF_FEEDBACK));
+    saveRoadmap();saveSprint();saveFeedback();renderPM();showToast('已重置','success');
+  },'重置',true);
 }
 // Roadmap CRUD
 function editRoadmapItem(i){
   const r=ROADMAP[i];if(!r)return;
-  const title=prompt('标题：',r.title);if(title===null)return;
-  const date=prompt('日期：',r.date);if(date===null)return;
-  const status=prompt('状态（completed/in_progress/planned/delayed）：',r.status);if(status===null)return;
-  const lane=prompt('优先级（P0/P1/P2/P3）：',r.lane);if(lane===null)return;
-  r.title=title;r.date=date;r.status=status;r.lane=lane;
-  saveRoadmap();renderPM();showToast('路线图已更新','success',1500);
+  formDialog('编辑路线图项目',[
+    {key:'title',label:'标题',type:'text',value:r.title},
+    {key:'date',label:'日期',type:'text',value:r.date,placeholder:'例：2026-04'},
+    {key:'status',label:'状态',type:'select',value:r.status,options:[
+      {v:'completed',l:'已完成'},{v:'in_progress',l:'进行中'},{v:'planned',l:'计划中'},{v:'delayed',l:'延期'}]},
+    {key:'lane',label:'优先级',type:'select',value:r.lane,options:[
+      {v:'P0',l:'P0 (最高)'},{v:'P1',l:'P1'},{v:'P2',l:'P2'},{v:'P3',l:'P3 (最低)'}]}
+  ],vals=>{r.title=vals.title;r.date=vals.date;r.status=vals.status;r.lane=vals.lane;saveRoadmap();renderPM();showToast('已更新','success')});
 }
 function deleteRoadmapItem(i){ROADMAP.splice(i,1);saveRoadmap();renderPM();showToast('已删除','info',1500)}
 function addRoadmapItem(lane){
-  const title=prompt('标题：');if(!title)return;
-  const date=prompt('日期（如2026-04）：')||'2026-Q2';
-  ROADMAP.push({lane,title,status:'planned',date});saveRoadmap();renderPM();showToast('已添加到路线图','success');
+  formDialog('添加路线图项目',[
+    {key:'title',label:'标题',type:'text',placeholder:'例：新功能名称'},
+    {key:'date',label:'日期',type:'text',value:'2026-Q2',placeholder:'例：2026-04'}
+  ],vals=>{
+    if(!vals.title)return;
+    ROADMAP.push({lane,title:vals.title,status:'planned',date:vals.date||'TBD'});saveRoadmap();renderPM();showToast('已添加','success');
+  });
 }
 // Sprint CRUD
 function editSprintTask(col,ti){
-  const val=prompt('编辑任务：',SPRINT_TASKS[col][ti]);if(val===null)return;
-  const newCol=prompt('移动到（todo/in_progress/review/done）：',col);if(newCol===null)return;
-  SPRINT_TASKS[col].splice(ti,1);
-  if(!SPRINT_TASKS[newCol])SPRINT_TASKS[newCol]=[];
-  SPRINT_TASKS[newCol].push(val);
-  saveSprint();renderPM();showToast('任务已更新','success',1500);
+  formDialog('编辑任务',[
+    {key:'val',label:'任务名称',type:'text',value:SPRINT_TASKS[col][ti]},
+    {key:'newCol',label:'移动到',type:'select',value:col,options:[
+      {v:'todo',l:'待处理'},{v:'in_progress',l:'进行中'},{v:'review',l:'待审核'},{v:'done',l:'已完成'}]}
+  ],vals=>{
+    SPRINT_TASKS[col].splice(ti,1);
+    if(!SPRINT_TASKS[vals.newCol])SPRINT_TASKS[vals.newCol]=[];
+    SPRINT_TASKS[vals.newCol].push(vals.val);
+    saveSprint();renderPM();showToast('已更新','success');
+  });
 }
 function deleteSprintTask(col,ti){SPRINT_TASKS[col].splice(ti,1);saveSprint();renderPM();showToast('已删除','info',1500)}
 function addSprintTask(col){
-  const val=prompt('新任务名称：');if(!val)return;
-  if(!SPRINT_TASKS[col])SPRINT_TASKS[col]=[];
-  SPRINT_TASKS[col].push(val);saveSprint();renderPM();showToast('任务已添加','success');
+  formDialog('添加任务到 '+{todo:'待处理',in_progress:'进行中',review:'待审核',done:'已完成'}[col],[
+    {key:'val',label:'任务名称',type:'text',placeholder:'输入任务名称'}
+  ],vals=>{
+    if(!vals.val)return;
+    if(!SPRINT_TASKS[col])SPRINT_TASKS[col]=[];
+    SPRINT_TASKS[col].push(vals.val);saveSprint();renderPM();showToast('已添加','success');
+  });
 }
 // Feedback CRUD
-function voteFeedback(i){FEEDBACK[i].votes++;saveFeedback();renderPM();showToast('+1 投票','success',1000)}
+function voteFeedback(i){FEEDBACK[i].votes++;saveFeedback();renderPM();showToast('+1','success',800)}
 function editFeedback(i){
-  const text=prompt('反馈内容：',FEEDBACK[i].text);if(text===null)return;
-  const cat=prompt('分类（feature/bug/improve）：',FEEDBACK[i].cat);if(cat===null)return;
-  const votes=prompt('票数：',FEEDBACK[i].votes);if(votes===null)return;
-  FEEDBACK[i].text=text;FEEDBACK[i].cat=cat;FEEDBACK[i].votes=parseInt(votes)||0;
-  saveFeedback();renderPM();showToast('反馈已更新','success',1500);
+  formDialog('编辑反馈',[
+    {key:'text',label:'反馈内容',type:'textarea',value:FEEDBACK[i].text},
+    {key:'cat',label:'分类',type:'select',value:FEEDBACK[i].cat,options:[
+      {v:'feature',l:'新功能'},{v:'bug',l:'Bug'},{v:'improve',l:'优化'}]},
+    {key:'votes',label:'票数',type:'number',value:String(FEEDBACK[i].votes)}
+  ],vals=>{FEEDBACK[i].text=vals.text;FEEDBACK[i].cat=vals.cat;FEEDBACK[i].votes=parseInt(vals.votes)||0;saveFeedback();renderPM();showToast('已更新','success')});
 }
 function deleteFeedback(i){FEEDBACK.splice(i,1);saveFeedback();renderPM();showToast('已删除','info',1500)}
 function addFeedback(){
-  const text=prompt('反馈内容：');if(!text)return;
-  const cat=prompt('分类（feature/bug/improve）：')||'feature';
-  FEEDBACK.push({text,votes:1,cat});saveFeedback();renderPM();showToast('反馈已添加','success');
+  formDialog('添加反馈',[
+    {key:'text',label:'反馈内容',type:'textarea',placeholder:'描述你的建议或问题'},
+    {key:'cat',label:'分类',type:'select',value:'feature',options:[
+      {v:'feature',l:'新功能'},{v:'bug',l:'Bug'},{v:'improve',l:'优化'}]}
+  ],vals=>{
+    if(!vals.text)return;
+    FEEDBACK.push({text:vals.text,votes:1,cat:vals.cat||'feature'});saveFeedback();renderPM();showToast('已添加','success');
+  });
 }
 
 // ─── PANELS ─────────────────────────────────────────────
@@ -1164,7 +1562,7 @@ function saveHistory(){
   historyTimer=setTimeout(()=>{
     const text=(document.getElementById('previewInput').value||'').trim();
     if(text.length<10)return;
-    let hist=JSON.parse(localStorage.getItem('chub_history')||'[]');
+    let hist=safeJSON('chub_history')||[];
     if(hist.length>0&&hist[0].text===text)return;
     const now=new Date();
     hist.unshift({id:Date.now(),ts:now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}),text,preview:text.slice(0,60),len:text.length});
@@ -1175,18 +1573,18 @@ function saveHistory(){
 }
 
 function renderHistory(){
-  const hist=JSON.parse(localStorage.getItem('chub_history')||'[]');
+  const hist=safeJSON('chub_history')||[];
   const el=document.getElementById('historyList');
   if(!hist.length){el.innerHTML='<p style="font-size:13px;color:var(--text-secondary)">暂无历史记录。</p>';return}
   el.innerHTML=hist.map(h=>`<div class="hist-entry">
     <div class="hist-meta"><span>${h.ts}</span><span>${h.len} 字</span></div>
-    <div class="hist-preview">${h.preview}${h.len>60?'...':''}</div>
+    <div class="hist-preview">${esc(h.preview)}${h.len>60?'...':''}</div>
     <div class="hist-actions"><button class="hist-btn" onclick="restoreHistory(${h.id})">恢复</button><button class="hist-btn" onclick="deleteHistory(${h.id})">删除</button></div>
   </div>`).join('');
 }
 
 function restoreHistory(id){
-  const hist=JSON.parse(localStorage.getItem('chub_history')||'[]');
+  const hist=safeJSON('chub_history')||[];
   const entry=hist.find(h=>h.id===id);
   if(!entry)return;
   document.getElementById('previewInput').value=entry.text;
@@ -1201,7 +1599,7 @@ function restoreHistory(id){
 }
 
 function deleteHistory(id){
-  let hist=JSON.parse(localStorage.getItem('chub_history')||'[]');
+  let hist=safeJSON('chub_history')||[];
   hist=hist.filter(h=>h.id!==id);
   localStorage.setItem('chub_history',JSON.stringify(hist));
   renderHistory();
@@ -1214,10 +1612,15 @@ function savePrefs(){
 }
 function loadPrefs(){
   try{
-    const p=JSON.parse(localStorage.getItem('chub_prefs'));
+    const p=safeJSON('chub_prefs');
     if(!p)return;
     if(p.tab){const btn=document.querySelector(`[data-tab="${p.tab}"]`);if(btn)switchMain(p.tab,btn)}
-    if(p.sub){const subBtns=document.querySelectorAll('.sub-tab');subBtns.forEach(b=>{if(b.textContent.trim()&&document.getElementById('sub-'+p.sub)){switchSub(p.sub,document.querySelector('.sub-tab.active')||subBtns[0])}});activeSub=p.sub}
+    if(p.sub&&document.getElementById('sub-'+p.sub)){
+      const subBtns=document.querySelectorAll('.sub-tab');
+      const targetBtn=[...subBtns].find(b=>b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+p.sub+"'"));
+      if(targetBtn)switchSub(p.sub,targetBtn);
+      activeSub=p.sub;
+    }
     if(p.cat)activeCat=p.cat;
     if(p.region){const sel=document.getElementById('regionSelect');if(sel)sel.value=p.region}
   }catch(e){}
@@ -1228,7 +1631,7 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPWA
 function pwaInstall(){if(deferredPWAPrompt){deferredPWAPrompt.prompt();deferredPWAPrompt=null}}
 
 // ─── SERVICE WORKER ─────────────────────────────────────
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>showToast('离线缓存不可用','warning'))}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 
 // ─── MCP API INTEGRATION ────────────────────────────────────
 const MCP_ENDPOINTS = {
@@ -1283,8 +1686,9 @@ function renderMCPStatus() {
 }
 
 function promptMCPConfig(repo) {
-  const url = prompt(repo + ' MCP Server URL:', MCP_ENDPOINTS[repo].url || 'http://localhost:3000');
-  if (url) configureMCP(repo, url);
+  formDialog('配置 '+repo+' MCP',[
+    {key:'url',label:'MCP Server URL',type:'text',value:MCP_ENDPOINTS[repo].url||'',placeholder:'http://localhost:3000'}
+  ],vals=>{if(vals.url&&vals.url.trim())configureMCP(repo,vals.url.trim())});
 }
 
 // Sync functions - try MCP first, fall back to localStorage
@@ -1331,11 +1735,13 @@ async function syncRoadmap() {
 }
 
 // ─── INIT ───────────────────────────────────────────────
+document.documentElement.lang=currentLang==='zh'?'zh-CN':'en';
 loadPrefs();
 renderPlatformTable();
 renderPreview();
 renderRegion();
 renderIndustryGrid();
+renderMCPStatus();
 applyLang();
 </script>
 </body>
