@@ -332,10 +332,10 @@ tr:hover td{background:rgba(51,65,85,.4)}
   <span class="stat-item"><strong>4</strong> 仓库</span>
   <span class="stat-item"><strong>73</strong> MCP工具</span>
   <span class="stat-item"><strong>2,462</strong> 测试通过</span>
-  <span class="stat-item">media-ops <strong>v0.7.0</strong></span>
-  <span class="stat-item">ops-flow <strong>v0.7.0</strong></span>
-  <span class="stat-item">sales-crm <strong>v0.8.0</strong></span>
-  <span class="stat-item">pm-toolkit <strong>v0.8.0</strong></span>
+  <span class="stat-item">media-ops <strong>v0.8.0</strong></span>
+  <span class="stat-item">ops-flow <strong>v0.6.0</strong></span>
+  <span class="stat-item">sales-crm <strong>v0.6.0</strong></span>
+  <span class="stat-item">pm-toolkit <strong>v0.6.0</strong></span>
 </div>
 
 <div class="stats-bar" id="mcpStatus" style="border-bottom:1px solid var(--border);gap:16px;font-size:12px"></div>
@@ -355,7 +355,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
     <div class="overview-card">
       <div class="oc-bar" style="background:var(--accent-media)"></div>
       <div class="oc-body">
-        <div class="oc-head"><span class="oc-icon">&#127909;</span><span class="oc-name">media-ops</span><span class="oc-ver">v0.7.0</span></div>
+        <div class="oc-head"><span class="oc-icon">&#127909;</span><span class="oc-name">media-ops</span><span class="oc-ver">v0.8.0</span></div>
         <div class="oc-tools"><strong>26</strong> MCP工具 | 13平台 | 9地区</div>
         <ul class="oc-features">
           <li>内容多平台分发（13平台）</li>
@@ -370,12 +370,12 @@ tr:hover td{background:rgba(51,65,85,.4)}
     <div class="overview-card">
       <div class="oc-bar" style="background:var(--accent-ops)"></div>
       <div class="oc-body">
-        <div class="oc-head"><span class="oc-icon">&#9881;</span><span class="oc-name">ops-flow</span><span class="oc-ver">v0.7.0</span></div>
+        <div class="oc-head"><span class="oc-icon">&#9881;</span><span class="oc-name">ops-flow</span><span class="oc-ver">v0.6.0</span></div>
         <div class="oc-tools"><strong>10</strong> MCP工具 | 10模板 | Cron调度</div>
         <ul class="oc-features">
           <li>工作流自动化（10模板）</li>
-          <li>内置Cron定时调度器（v0.7.0）</li>
-          <li>HTML/PDF报告导出（v0.7.0）</li>
+          <li>内置Cron定时调度器</li>
+          <li>HTML/PDF报告导出</li>
           <li>ETL数据管道</li>
           <li>邮件自动化（SMTP）</li>
           <li>n8n工作流导出</li>
@@ -385,14 +385,14 @@ tr:hover td{background:rgba(51,65,85,.4)}
     <div class="overview-card">
       <div class="oc-bar" style="background:var(--accent-sales)"></div>
       <div class="oc-body">
-        <div class="oc-head"><span class="oc-icon">&#128176;</span><span class="oc-name">sales-crm</span><span class="oc-ver">v0.8.0</span></div>
+        <div class="oc-head"><span class="oc-icon">&#128176;</span><span class="oc-name">sales-crm</span><span class="oc-ver">v0.6.0</span></div>
         <div class="oc-tools"><strong>17</strong> MCP工具 | 5商机阶段 | 数据导入导出</div>
         <ul class="oc-features">
           <li>客户+商机全周期管理</li>
           <li>线索漏斗追踪</li>
           <li>邮件触达序列</li>
-          <li>JSON文件持久化存储（v0.7.0）</li>
-          <li>CSV/JSON数据导入导出（v0.8.0）</li>
+          <li>JSON文件持久化存储</li>
+          <li>CSV/JSON数据导入导出</li>
           <li>自动销售报告</li>
         </ul>
       </div>
@@ -400,15 +400,15 @@ tr:hover td{background:rgba(51,65,85,.4)}
     <div class="overview-card">
       <div class="oc-bar" style="background:var(--accent-pm)"></div>
       <div class="oc-body">
-        <div class="oc-head"><span class="oc-icon">&#128203;</span><span class="oc-name">pm-toolkit</span><span class="oc-ver">v0.8.0</span></div>
+        <div class="oc-head"><span class="oc-icon">&#128203;</span><span class="oc-name">pm-toolkit</span><span class="oc-ver">v0.6.0</span></div>
         <div class="oc-tools"><strong>20</strong> MCP工具 | 路线图 + 冲刺 + 报告导出</div>
         <ul class="oc-features">
           <li>产品路线图管理</li>
           <li>冲刺+任务追踪</li>
           <li>用户反馈投票</li>
-          <li>JSON文件持久化存储（v0.7.0）</li>
-          <li>HTML/PDF报告导出（v0.8.0）</li>
-          <li>CSV/JSON数据导入导出（v0.8.0）</li>
+          <li>JSON文件持久化存储</li>
+          <li>HTML/PDF报告导出</li>
+          <li>CSV/JSON数据导入导出</li>
         </ul>
       </div>
     </div>
@@ -1693,26 +1693,24 @@ function promptMCPConfig(repo) {
 
 // Sync functions - try MCP first, fall back to localStorage
 async function syncPlatforms() {
-  const data = await callMCP('media-ops', 'list_platforms');
-  if (data && data.platforms) {
-    PLATFORMS = data.platforms;
-    savePlatforms();
-    renderPlatformTable();
-    showToast('平台数据已从MCP同步', 'success', 2000);
+  const data = await callMCP('media-ops', 'fetch_all_trending');
+  if (data && (data.platforms || data.trending)) {
+    if(data.platforms){PLATFORMS=data.platforms;savePlatforms();renderPlatformTable()}
+    showToast('媒体数据已从MCP同步', 'success', 2000);
     return true;
   }
   return false;
 }
 
 async function syncDeals() {
-  const data = await callMCP('sales-crm', 'get_pipeline');
-  if (data && data.stages) {
-    DEAL_STAGES = data.stages.map(s => ({
+  const data = await callMCP('sales-crm', 'get_funnel');
+  const stages = data && (data.stages || data.funnel || data.pipeline);
+  if (stages && Array.isArray(stages)) {
+    DEAL_STAGES = stages.map(s => ({
       id: s.id || s.name, label: s.name || s.label,
       count: s.count || 0, color: s.color || '#3b82f6'
     }));
-    saveDeals();
-    renderSales();
+    saveDeals();renderSales();
     showToast('商机数据已从MCP同步', 'success', 2000);
     return true;
   }
@@ -1720,14 +1718,14 @@ async function syncDeals() {
 }
 
 async function syncRoadmap() {
-  const data = await callMCP('pm-toolkit', 'list_milestones');
-  if (data && data.milestones) {
-    ROADMAP = data.milestones.map(m => ({
-      lane: m.priority || 'P1', title: m.title || m.name,
+  const data = await callMCP('pm-toolkit', 'get_roadmap');
+  const items = data && (data.milestones || data.roadmap || data.items);
+  if (items && Array.isArray(items)) {
+    ROADMAP = items.map(m => ({
+      lane: m.priority || m.lane || 'P1', title: m.title || m.name,
       status: m.status || 'planned', date: m.date || ''
     }));
-    saveRoadmap();
-    renderPM();
+    saveRoadmap();renderPM();
     showToast('路线图已从MCP同步', 'success', 2000);
     return true;
   }
