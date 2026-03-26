@@ -1104,6 +1104,7 @@ function renderPlatformTable(){
     <button class="toolbar-btn" onclick="sortPlatBy('limit')">${t('sortLimit')}</button>
     <button class="toolbar-btn" onclick="sortPlatBy('name')">${t('sortName')}</button>
     ${platEditMode?`<button class="toolbar-btn primary" onclick="addPlatform()">${t('addPlat')}</button><button class="toolbar-btn" onclick="resetPlatforms()">${t('resetDef')}</button>`:''}
+    <button class="toolbar-btn" onclick="exportModule('media-ops',['chub_platforms','chub_regions'])">&#128229; 导出</button>
     <span class="edit-indicator">${platEditMode?t('editClickHint'):t('readOnlyHint')}</span>
   `;
   // Table
@@ -1352,6 +1353,7 @@ function renderOps(){
     ${opsEditMode?`<button class="toolbar-btn primary" onclick="addTemplate()">+ ${t('addWf')}</button><button class="toolbar-btn danger" onclick="resetTemplates()">${t('resetDef')}</button>`
     :`<button class="toolbar-btn" onclick="loadSampleOps()">${t('loadSample')}</button><button class="toolbar-btn danger" onclick="clearModuleData('ops')">${t('clearData')}</button>`}
     <button class="toolbar-btn" onclick="openEnvConfigDialog()">&#9881; 环境配置</button>
+    <button class="toolbar-btn" onclick="exportModule('ops-flow',['chub_templates','chub_env_config'])">&#128229; 导出</button>
     <span class="edit-indicator">${opsEditMode?t('editClickCard'):t('readOnlyCard')}</span>`;
   const cardsHtml=filtered.map((tpl,fi)=>{
     const ri=TEMPLATES.indexOf(tpl);
@@ -1544,6 +1546,7 @@ function renderSales(){
     <button class="toolbar-btn primary" onclick="addLeadStatus()">+ ${t('addLead')}</button>
     <button class="toolbar-btn danger" onclick="resetSalesData()">${t('resetDef')}</button>`
     :`<button class="toolbar-btn" onclick="loadSampleSales()">${t('loadSample')}</button><button class="toolbar-btn danger" onclick="clearModuleData('sales')">${t('clearData')}</button>`}
+    <button class="toolbar-btn" onclick="exportModule('sales-crm',['chub_deals','chub_leads'])">&#128229; 导出</button>
     <span class="edit-indicator">${salesEditMode?t('salesEditHint'):t('salesReadHint')}</span>`;
 
   const maxDeal=Math.max(...DEAL_STAGES.map(s=>s.count),1);
@@ -1691,6 +1694,7 @@ function renderPM(){
     <button class="toolbar-btn${pmEditMode?' active':''}" onclick="togglePmEdit()">${pmEditMode?t('exitEdit'):t('editMode')}</button>
     ${pmEditMode?`<button class="toolbar-btn" onclick="resetPmData()">${t('resetDef')}</button>`
     :`<button class="toolbar-btn" onclick="loadSamplePM()">${t('loadSample')}</button><button class="toolbar-btn danger" onclick="clearModuleData('pm')">${t('clearData')}</button>`}
+    <button class="toolbar-btn" onclick="exportModule('pm-toolkit',['chub_roadmap','chub_sprint','chub_feedback','chub_fishbone','chub_pdca'])">&#128229; 导出</button>
     <span class="edit-indicator">${pmEditMode?t('editClickHint'):t('readOnlyHint')}</span>
   </div>`;
 
@@ -2031,6 +2035,16 @@ function exportAllData(){
   a.click();URL.revokeObjectURL(a.href);
   showToast('数据已导出','success');
 }
+function exportModule(name,keys){
+  const blob={module:name,exportedAt:new Date().toISOString()};
+  keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{blob[k]=JSON.parse(v)}catch(e){blob[k]=v}});
+  const json=JSON.stringify(blob,null,2);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+  a.download=name+'-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+  showToast(name+' 数据已导出','success');logActivity(name,'export','导出'+keys.length+'项数据');
+}
 function importAllData(input){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
@@ -2185,10 +2199,11 @@ async function callMCP(repo, tool, params = {}) {
 function renderMCPStatus() {
   const el = document.getElementById('mcpStatus');
   if (!el) return;
+  const versions={'media-ops':'v0.8.0','ops-flow':'v0.6.0','sales-crm':'v0.6.0','pm-toolkit':'v0.6.0'};
   el.innerHTML = Object.entries(MCP_ENDPOINTS).map(([repo, ep]) => {
-    const color = ep.status === 'online' ? 'var(--green)' : ep.status === 'error' ? 'var(--red)' : 'var(--text-dim)';
-    const label = ep.status === 'online' ? '在线' : ep.status === 'error' ? '错误' : '离线';
-    return `<span class="stat-item" style="cursor:pointer" onclick="promptMCPConfig('${repo}')"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:4px"></span>${repo} <strong>${label}</strong></span>`;
+    if(ep.status==='online') return `<span class="stat-item" style="cursor:pointer" onclick="promptMCPConfig('${repo}')"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:4px"></span>${repo} <strong>${versions[repo]}</strong></span>`;
+    if(ep.status==='error') return `<span class="stat-item" style="cursor:pointer;color:var(--red)" onclick="promptMCPConfig('${repo}')"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:4px"></span>${repo} <strong>连接失败</strong></span>`;
+    return `<span class="stat-item" style="cursor:pointer" onclick="promptMCPConfig('${repo}')" title="点击配置MCP连接">${repo} <strong>${versions[repo]}</strong></span>`;
   }).join('');
 }
 
