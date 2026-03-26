@@ -30,6 +30,8 @@ a:hover{text-decoration:underline}
 .back-link{font-size:13px;color:var(--text-secondary)}
 .gear-btn{background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:18px;padding:4px 8px;border-radius:4px}
 .gear-btn:hover{color:var(--text);background:var(--card-hover)}
+.lang-btn{background:var(--card-hover);border:1px solid var(--border);color:var(--accent);cursor:pointer;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;font-family:inherit;letter-spacing:.5px}
+.lang-btn:hover{background:var(--accent);color:var(--bg)}
 
 /* Stats bar */
 .stats-bar{display:flex;gap:24px;padding:12px 24px;background:#162032;border-bottom:1px solid var(--border);flex-wrap:wrap}
@@ -74,6 +76,18 @@ a:hover{text-decoration:underline}
 .oc-features li{font-size:13px;padding:4px 0;color:var(--text);border-bottom:1px solid var(--border)}
 .oc-features li:last-child{border-bottom:none}
 .oc-features li::before{content:'+ ';color:var(--accent);font-weight:600}
+
+/* Industry examples */
+.industry-section{margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+.industry-title{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text)}
+.industry-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.ind-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:16px;transition:border-color .2s,transform .15s}
+.ind-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.ind-icon{font-size:24px;margin-bottom:8px;display:block}
+.ind-name{font-size:14px;font-weight:600;margin-bottom:4px}
+.ind-desc{font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:8px}
+.ind-tools{display:flex;flex-wrap:wrap;gap:4px}
+.ind-tag{font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(56,189,248,.1);color:var(--accent);border:1px solid rgba(56,189,248,.2)}
 
 /* Table (media-ops) */
 .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
@@ -215,7 +229,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
   .main-tabs{padding:0 12px}
   .main-tab{padding:12px 14px;font-size:13px}
   .tab-pane{padding:16px}
-  .overview-grid,.tpl-grid,.preview-grid{grid-template-columns:1fr}
+  .overview-grid,.tpl-grid,.preview-grid,.industry-grid{grid-template-columns:1fr}
   .sprint-board{grid-template-columns:repeat(2,1fr)}
   .deal-funnel,.lead-bars,.fb-list{max-width:100%}
   .stats-bar{gap:12px;padding:10px 16px}
@@ -270,7 +284,8 @@ tr:hover td{background:rgba(51,65,85,.4)}
 <!-- TOPBAR -->
 <div class="topbar">
   <a class="back-link" href="index.html">&larr; Home</a>
-  <div class="topbar-title">Career-Hub 仪表盘</div>
+  <div class="topbar-title" data-i18n="title">Career-Hub 仪表盘</div>
+  <button class="lang-btn" onclick="toggleLang()" title="切换语言/Switch Language" id="langBtn">EN</button>
   <button class="gear-btn" onclick="togglePanel('settings')" title="设置">&#9881;</button>
 </div>
 
@@ -360,6 +375,10 @@ tr:hover td{background:rgba(51,65,85,.4)}
       </div>
     </div>
   </div>
+  <div class="industry-section">
+    <div class="industry-title" data-i18n="indTitle">行业应用场景</div>
+    <div class="industry-grid" id="industryGrid"></div>
+  </div>
 </div>
 
 <!-- ==================== TAB 2: MEDIA-OPS ==================== -->
@@ -374,7 +393,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
   <div id="sub-m-compare" class="sub-pane active">
     <div class="toolbar" id="platformToolbar"></div>
     <div id="platformTableWrap"></div>
-    <p style="margin-top:12px;font-size:12px;color:var(--text-secondary)"><span style="background:var(--overseas);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px">OS</span> = 海外平台 &nbsp; | &nbsp; 点击单元格可编辑，点击表头可排序</p>
+    <p style="margin-top:12px;font-size:12px;color:var(--text-secondary)" id="platHint"><span style="background:var(--overseas);color:#fff;padding:1px 6px;border-radius:3px;font-size:11px">OS</span> = <span data-i18n="osLabel">海外平台</span> &nbsp; | &nbsp; <span data-i18n="sortHint">点击单元格可编辑，点击表头可排序</span></p>
   </div>
 
   <!-- Sub: Preview -->
@@ -473,6 +492,142 @@ let activeMain='overview';
 let activeSub='m-compare';
 let deferredPWAPrompt=null;
 
+// ─── I18N: LANGUAGE SYSTEM ─────────────────────────────
+let currentLang=(localStorage.getItem('chub_lang'))||(navigator.language&&navigator.language.startsWith('zh')?'zh':'en');
+const LANG={
+  zh:{
+    title:'Career-Hub 仪表盘',langBtn:'EN',
+    repos:'仓库',mcpTools:'MCP工具',testsPassed:'测试通过',
+    tabOverview:'总览',tabMedia:'媒体运营',tabOps:'工作流',tabSales:'销售CRM',tabPm:'项目管理',
+    indTitle:'行业应用场景',
+    compare:'平台对比',preview:'内容预览',regional:'地区指南',
+    osLabel:'海外平台',sortHint:'点击单元格可编辑，点击表头可排序',
+    editMode:'编辑模式',exitEdit:'退出编辑',sortPri:'按优先级排序',sortLimit:'按字数排序',sortName:'按名称排序',addPlat:'+ 添加平台',resetDef:'重置默认',editing:'编辑中',readOnly:'只读模式',
+    dealFunnel:'商机漏斗',leadFunnel:'线索漏斗',convRate:'转化率',
+    roadmap:'产品路线图',sprint:'当前冲刺看板',feedback:'热门反馈',
+    todo:'待处理',inProg:'进行中',review:'待审核',done:'已完成',
+    settings:'设置',history:'历史记录',viewHist:'查看历史',cfgMcp:'配置MCP连接',syncMcp:'同步MCP数据',clearCache:'清除缓存',installPwa:'安装应用 (PWA)',
+    noHist:'暂无历史记录，请先使用内容预览功能。',saved:'已保存',deleted:'已删除',reset:'已重置为默认数据',updated:'已更新',added:'已添加',
+    inputHint:'在此输入内容…实时预览13个平台的适配效果。',selectRegion:'选择目标地区',
+    platName:'平台',charLimit:'字数限制',contentStyle:'内容风格',hashtagLabel:'话题标签',featureLabel:'功能特色',priorityLabel:'优先级',actions:'操作',
+    toOverseas:'改海外',toDomestic:'改国内',cyclePri:'切换优先级',delBtn:'删除',
+    editClickHint:'编辑中 - 点击单元格修改',readOnlyHint:'只读模式',
+    editClickCard:'编辑中 - 点击卡片可编辑',readOnlyCard:'只读模式 - 点击卡片展开详情',
+  },
+  en:{
+    title:'Career-Hub Dashboard',langBtn:'中文',
+    repos:'Repos',mcpTools:'MCP Tools',testsPassed:'Tests Passed',
+    tabOverview:'Overview',tabMedia:'Media Ops',tabOps:'Workflow',tabSales:'Sales CRM',tabPm:'PM Toolkit',
+    indTitle:'Industry Use Cases',
+    compare:'Platform Compare',preview:'Content Preview',regional:'Regional Guide',
+    osLabel:'Overseas',sortHint:'Click cells to edit, click headers to sort',
+    editMode:'Edit Mode',exitEdit:'Exit Edit',sortPri:'Sort by Priority',sortLimit:'Sort by Limit',sortName:'Sort by Name',addPlat:'+ Add Platform',resetDef:'Reset Default',editing:'Editing',readOnly:'Read-only',
+    dealFunnel:'Deal Pipeline',leadFunnel:'Lead Funnel',convRate:'Conversion',
+    roadmap:'Product Roadmap',sprint:'Current Sprint Board',feedback:'Top Feedback',
+    todo:'To Do',inProg:'In Progress',review:'In Review',done:'Done',
+    settings:'Settings',history:'History',viewHist:'View History',cfgMcp:'Configure MCP',syncMcp:'Sync MCP Data',clearCache:'Clear Cache',installPwa:'Install App (PWA)',
+    noHist:'No history yet. Try the content preview first.',saved:'Saved',deleted:'Deleted',reset:'Reset to defaults',updated:'Updated',added:'Added',
+    inputHint:'Enter content... preview adaptation across 13 platforms.',selectRegion:'Select target region',
+    platName:'Platform',charLimit:'Char Limit',contentStyle:'Content Style',hashtagLabel:'Hashtags',featureLabel:'Features',priorityLabel:'Priority',actions:'Actions',
+    toOverseas:'Set Overseas',toDomestic:'Set Domestic',cyclePri:'Cycle Priority',delBtn:'Delete',
+    editClickHint:'Editing - click cells to modify',readOnlyHint:'Read-only mode',
+    editClickCard:'Editing - click cards to edit',readOnlyCard:'Read-only - click cards to expand',
+  }
+};
+function t(key){return(LANG[currentLang]&&LANG[currentLang][key])||LANG.zh[key]||key}
+function toggleLang(){
+  currentLang=currentLang==='zh'?'en':'zh';
+  localStorage.setItem('chub_lang',currentLang);
+  applyLang();
+}
+function applyLang(){
+  document.getElementById('langBtn').textContent=t('langBtn');
+  // Static i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
+  // Tabs
+  const tabMap={overview:'tabOverview',media:'tabMedia',ops:'tabOps',sales:'tabSales',pm:'tabPm'};
+  document.querySelectorAll('.main-tab').forEach(btn=>{
+    const k=btn.dataset.tab;if(k&&tabMap[k])btn.textContent=t(tabMap[k]);
+  });
+  // Sub-tabs
+  const subBtns=document.querySelectorAll('.sub-tab');
+  if(subBtns[0])subBtns[0].textContent=t('compare');
+  if(subBtns[1])subBtns[1].textContent=t('preview');
+  if(subBtns[2])subBtns[2].textContent=t('regional');
+  // Stats bar
+  const statItems=document.querySelectorAll('.stats-bar:first-of-type .stat-item');
+  if(statItems[0])statItems[0].innerHTML='<strong>4</strong> '+t('repos');
+  if(statItems[1])statItems[1].innerHTML='<strong>73</strong> '+t('mcpTools');
+  if(statItems[2])statItems[2].innerHTML='<strong>2,462</strong> '+t('testsPassed');
+  // Settings panel
+  const panelBtns=document.querySelectorAll('#settingsPanel .panel-btn');
+  if(panelBtns[0])panelBtns[0].textContent=t('viewHist');
+  if(panelBtns[1])panelBtns[1].textContent=t('cfgMcp');
+  if(panelBtns[2])panelBtns[2].textContent=t('syncMcp');
+  if(panelBtns[3])panelBtns[3].textContent=t('clearCache');
+  const pwaBtn=document.getElementById('pwaInstallBtn');if(pwaBtn)pwaBtn.textContent=t('installPwa');
+  document.querySelector('#settingsPanel .panel-title').textContent=t('settings');
+  document.querySelector('#historyPanel .panel-title').textContent=t('history');
+  // Sales titles
+  const funnelTitles=document.querySelectorAll('.funnel-title');
+  if(funnelTitles[0])funnelTitles[0].textContent=t('dealFunnel');
+  if(funnelTitles[1])funnelTitles[1].textContent=t('leadFunnel');
+  // PM titles
+  const pmTitles=document.querySelectorAll('.pm-title');
+  if(pmTitles[0])pmTitles[0].textContent=t('sprint');
+  if(pmTitles[1])pmTitles[1].textContent=t('feedback');
+  // Preview input
+  const previewInput=document.getElementById('previewInput');
+  if(previewInput)previewInput.placeholder=t('inputHint');
+  // Region label
+  const regLabel=document.querySelector('#sub-m-regional .label');
+  if(regLabel)regLabel.textContent=t('selectRegion');
+  // Re-render dynamic sections
+  renderPlatformTable();
+  renderIndustryGrid();
+  if(activeMain==='ops')renderOps();
+  if(activeMain==='sales')renderSales();
+  if(activeMain==='pm')renderPM();
+}
+
+// ─── INDUSTRY USE CASES DATA ──────────────────────────
+const INDUSTRIES={
+  zh:[
+    {icon:'\u{1F916}',name:'AI运营',desc:'利用AI工具自动化内容生产、数据分析、用户增长。支持多平台智能分发和效果追踪。',tools:['media-ops','ops-flow'],tags:['AI写作','智能分发','数据监控','用户画像']},
+    {icon:'\u{1F4B0}',name:'AI销售',desc:'AI驱动的销售线索挖掘、客户评分、自动跟进和成交预测。智能CRM全流程赋能。',tools:['sales-crm','ops-flow'],tags:['线索评分','智能跟进','成交预测','客户画像']},
+    {icon:'\u{1F3ED}',name:'实体制造',desc:'生产流程自动化监控、供应链数据ETL、设备维护提醒和质量报告生成。',tools:['ops-flow','pm-toolkit'],tags:['生产监控','供应链','设备维护','质量报告']},
+    {icon:'\u{2699}\u{FE0F}',name:'机械工程',desc:'项目进度追踪、技术文档管理、设备参数监控和维修工单自动化。',tools:['pm-toolkit','ops-flow'],tags:['项目管理','技术文档','工单系统','参数监控']},
+    {icon:'\u{1F393}',name:'教育培训',desc:'课程内容多渠道分发、学员管理CRM、培训反馈收集和效果评估报告。',tools:['media-ops','sales-crm','pm-toolkit'],tags:['课程分发','学员管理','效果评估','招生转化']},
+    {icon:'\u{1F4CA}',name:'咨询服务',desc:'客户项目全周期管理、咨询报告自动化、知识库积累和方案复用。',tools:['pm-toolkit','ops-flow','sales-crm'],tags:['项目管理','报告生成','知识库','方案复用']},
+    {icon:'\u{1F3AF}',name:'市场营销',desc:'多渠道Campaign管理、A/B测试自动化、ROI追踪和营销漏斗优化。',tools:['media-ops','ops-flow','sales-crm'],tags:['Campaign','A/B测试','ROI追踪','漏斗优化']},
+    {icon:'\u{1F4F1}',name:'电商运营',desc:'商品内容批量生成、多平台上架、订单跟踪和客户售后自动化。',tools:['media-ops','ops-flow','sales-crm'],tags:['商品管理','多平台','订单跟踪','售后自动化']},
+    {icon:'\u{1F3E5}',name:'医疗健康',desc:'健康内容合规发布、患者管理CRM、随访提醒和数据报告生成。',tools:['media-ops','sales-crm','ops-flow'],tags:['合规内容','患者管理','随访提醒','数据报告']},
+    {icon:'\u{1F3E0}',name:'房产中介',desc:'房源内容多平台分发、客户跟进管理、成交漏斗和业绩报表。',tools:['media-ops','sales-crm','pm-toolkit'],tags:['房源分发','客户跟进','成交管理','业绩报表']},
+  ],
+  en:[
+    {icon:'\u{1F916}',name:'AI Operations',desc:'Automate content creation, data analytics and user growth with AI. Multi-platform smart distribution and performance tracking.',tools:['media-ops','ops-flow'],tags:['AI Writing','Smart Distribution','Data Monitor','User Profiling']},
+    {icon:'\u{1F4B0}',name:'AI Sales',desc:'AI-powered lead mining, scoring, auto follow-up and deal prediction. Full-cycle intelligent CRM enablement.',tools:['sales-crm','ops-flow'],tags:['Lead Scoring','Smart Follow-up','Deal Prediction','Customer Profiling']},
+    {icon:'\u{1F3ED}',name:'Manufacturing',desc:'Production workflow monitoring, supply chain ETL, equipment maintenance alerts and quality reports.',tools:['ops-flow','pm-toolkit'],tags:['Production','Supply Chain','Maintenance','Quality Reports']},
+    {icon:'\u{2699}\u{FE0F}',name:'Mechanical Engineering',desc:'Project tracking, technical docs management, equipment parameter monitoring and work order automation.',tools:['pm-toolkit','ops-flow'],tags:['Project Mgmt','Tech Docs','Work Orders','Monitoring']},
+    {icon:'\u{1F393}',name:'Education & Training',desc:'Multi-channel course distribution, student CRM, training feedback collection and effectiveness reports.',tools:['media-ops','sales-crm','pm-toolkit'],tags:['Course Distribution','Student CRM','Assessment','Enrollment']},
+    {icon:'\u{1F4CA}',name:'Consulting',desc:'Full project lifecycle management, automated consulting reports, knowledge base building and solution reuse.',tools:['pm-toolkit','ops-flow','sales-crm'],tags:['Project Mgmt','Reports','Knowledge Base','Reuse']},
+    {icon:'\u{1F3AF}',name:'Marketing',desc:'Multi-channel campaign management, A/B testing automation, ROI tracking and funnel optimization.',tools:['media-ops','ops-flow','sales-crm'],tags:['Campaigns','A/B Testing','ROI Tracking','Funnel']},
+    {icon:'\u{1F4F1}',name:'E-commerce',desc:'Batch product content generation, multi-platform listing, order tracking and after-sales automation.',tools:['media-ops','ops-flow','sales-crm'],tags:['Products','Multi-platform','Orders','After-sales']},
+    {icon:'\u{1F3E5}',name:'Healthcare',desc:'Compliant health content publishing, patient CRM, follow-up reminders and data reporting.',tools:['media-ops','sales-crm','ops-flow'],tags:['Compliance','Patient CRM','Follow-up','Reporting']},
+    {icon:'\u{1F3E0}',name:'Real Estate',desc:'Property listing distribution, client follow-up management, deal pipeline and performance dashboards.',tools:['media-ops','sales-crm','pm-toolkit'],tags:['Listings','Client Mgmt','Pipeline','Reports']},
+  ]
+};
+function renderIndustryGrid(){
+  const list=INDUSTRIES[currentLang]||INDUSTRIES.zh;
+  const repoColors={'media-ops':'var(--accent-media)','ops-flow':'var(--accent-ops)','sales-crm':'var(--accent-sales)','pm-toolkit':'var(--accent-pm)'};
+  document.getElementById('industryGrid').innerHTML=list.map(ind=>`<div class="ind-card">
+    <span class="ind-icon">${ind.icon}</span>
+    <div class="ind-name">${ind.name}</div>
+    <div class="ind-desc">${ind.desc}</div>
+    <div class="ind-tools">${ind.tools.map(t=>`<span class="ind-tag" style="color:${repoColors[t]||'var(--accent)'};border-color:${repoColors[t]||'var(--accent)'}">${t}</span>`).join('')}${ind.tags.map(tg=>`<span class="ind-tag">${tg}</span>`).join('')}</div>
+  </div>`).join('');
+}
+
 // ─── TAB SWITCHING ──────────────────────────────────────
 function switchMain(id,btn){
   document.querySelectorAll('.tab-pane').forEach(e=>e.classList.remove('active'));
@@ -551,23 +706,23 @@ function renderPlatformTable(){
   const tb=document.getElementById('platformToolbar');
   tb.innerHTML=`
     <button class="toolbar-btn${platEditMode?' active':''}" onclick="togglePlatEdit()">
-      ${platEditMode?'退出编辑':'编辑模式'}
+      ${platEditMode?t('exitEdit'):t('editMode')}
     </button>
-    <button class="toolbar-btn" onclick="sortPlatBy('priority')">按优先级排序</button>
-    <button class="toolbar-btn" onclick="sortPlatBy('limit')">按字数排序</button>
-    <button class="toolbar-btn" onclick="sortPlatBy('name')">按名称排序</button>
-    ${platEditMode?'<button class="toolbar-btn primary" onclick="addPlatform()">+ 添加平台</button><button class="toolbar-btn" onclick="resetPlatforms()">重置默认</button>':''}
-    <span class="edit-indicator">${platEditMode?'编辑中 - 点击单元格修改':'只读模式'}</span>
+    <button class="toolbar-btn" onclick="sortPlatBy('priority')">${t('sortPri')}</button>
+    <button class="toolbar-btn" onclick="sortPlatBy('limit')">${t('sortLimit')}</button>
+    <button class="toolbar-btn" onclick="sortPlatBy('name')">${t('sortName')}</button>
+    ${platEditMode?`<button class="toolbar-btn primary" onclick="addPlatform()">${t('addPlat')}</button><button class="toolbar-btn" onclick="resetPlatforms()">${t('resetDef')}</button>`:''}
+    <span class="edit-indicator">${platEditMode?t('editClickHint'):t('readOnlyHint')}</span>
   `;
   // Table
   const cols=[
-    {key:'name',label:'平台'},{key:'limit',label:'字数限制'},{key:'styleLabel',label:'内容风格'},
-    {key:'hashtags',label:'话题标签'},{key:'features',label:'功能特色'},{key:'priority',label:'优先级'}
+    {key:'name',label:t('platName')},{key:'limit',label:t('charLimit')},{key:'styleLabel',label:t('contentStyle')},
+    {key:'hashtags',label:t('hashtagLabel')},{key:'features',label:t('featureLabel')},{key:'priority',label:t('priorityLabel')}
   ];
   const ths=cols.map(c=>{
     const cls='sort-header'+(platSort.col===c.key?(' sort-'+platSort.dir):'');
     return`<th class="${cls}" onclick="sortPlatBy('${c.key}')">${c.label}</th>`;
-  }).join('')+(platEditMode?'<th>操作</th>':'');
+  }).join('')+(platEditMode?`<th>${t('actions')}</th>`:'');
 
   const rows=PLATFORMS.map((p,i)=>{
     const rc=p.os?'overseas-row':'';
@@ -575,9 +730,9 @@ function renderPlatformTable(){
     const osBadge=p.os?'<span style="font-size:10px;background:var(--overseas);color:#fff;padding:1px 5px;border-radius:3px;margin-left:4px">OS</span>':'';
     const priCls='badge-'+p.priority.toLowerCase();
     const actions=platEditMode?`<td><div class="row-actions">
-      <button class="row-btn" onclick="togglePlatOS(${i})">${p.os?'改国内':'改海外'}</button>
-      <button class="row-btn" onclick="cyclePriority(${i})">切换优先级</button>
-      <button class="row-btn del" onclick="deletePlatform(${i})">删除</button>
+      <button class="row-btn" onclick="togglePlatOS(${i})">${p.os?t('toDomestic'):t('toOverseas')}</button>
+      <button class="row-btn" onclick="cyclePriority(${i})">${t('cyclePri')}</button>
+      <button class="row-btn del" onclick="deletePlatform(${i})">${t('delBtn')}</button>
     </div></td>`:'';
     return`<tr class="${rc}" data-idx="${i}">
       <td><span class="platform-name">${platEditMode?`<span ${ce} data-field="name" data-idx="${i}" style="min-width:60px;display:inline-block">${p.name}</span>`:`${p.name}`}${osBadge}</span></td>
@@ -755,9 +910,9 @@ function renderOps(){
   const filtered=activeCat==='all'?TEMPLATES:TEMPLATES.filter(t=>t.cat===activeCat);
   // Toolbar
   const toolbarHtml=`<div class="toolbar" style="margin-bottom:16px">
-    <button class="toolbar-btn${opsEditMode?' active':''}" onclick="toggleOpsEdit()">${opsEditMode?'退出编辑':'编辑模式'}</button>
-    ${opsEditMode?'<button class="toolbar-btn primary" onclick="addTemplate()">+ 添加模板</button><button class="toolbar-btn" onclick="resetTemplates()">重置默认</button>':''}
-    <span class="edit-indicator">${opsEditMode?'编辑中 - 点击卡片可编辑':'只读模式 - 点击卡片展开详情'}</span>
+    <button class="toolbar-btn${opsEditMode?' active':''}" onclick="toggleOpsEdit()">${opsEditMode?t('exitEdit'):t('editMode')}</button>
+    ${opsEditMode?`<button class="toolbar-btn primary" onclick="addTemplate()">${t('addPlat').replace('平台','模板').replace('Platform','Template')}</button><button class="toolbar-btn" onclick="resetTemplates()">${t('resetDef')}</button>`:''}
+    <span class="edit-indicator">${opsEditMode?t('editClickCard'):t('readOnlyCard')}</span>
   </div>`;
   const cardsHtml=filtered.map((t,fi)=>{
     const ri=TEMPLATES.indexOf(t);
@@ -824,7 +979,7 @@ function renderSales(){
     fhtml+=`<div class="funnel-stage"><span class="funnel-label">${s.label}</span><div class="funnel-bar" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editDealCount(${i})">${s.count}</span></div></div>`;
     if(i<DEAL_STAGES.length-1){
       const conv=s.count>0?Math.round(DEAL_STAGES[i+1].count/s.count*100):0;
-      fhtml+=`<div class="conv-arrow">&darr; ${conv}% 转化率</div>`;
+      fhtml+=`<div class="conv-arrow">&darr; ${conv}% ${t('convRate')}</div>`;
     }
   });
   document.getElementById('dealFunnel').innerHTML=fhtml;
@@ -883,9 +1038,9 @@ let pmEditMode=false;
 function renderPM(){
   // PM toolbar
   const pmToolbar=`<div class="toolbar" style="margin-bottom:16px">
-    <button class="toolbar-btn${pmEditMode?' active':''}" onclick="togglePmEdit()">${pmEditMode?'退出编辑':'编辑模式'}</button>
-    ${pmEditMode?'<button class="toolbar-btn" onclick="resetPmData()">重置默认</button>':''}
-    <span class="edit-indicator">${pmEditMode?'编辑中 - 点击项目可编辑':'只读模式'}</span>
+    <button class="toolbar-btn${pmEditMode?' active':''}" onclick="togglePmEdit()">${pmEditMode?t('exitEdit'):t('editMode')}</button>
+    ${pmEditMode?`<button class="toolbar-btn" onclick="resetPmData()">${t('resetDef')}</button>`:''}
+    <span class="edit-indicator">${pmEditMode?t('editClickHint'):t('readOnlyHint')}</span>
   </div>`;
 
   // Roadmap
@@ -900,10 +1055,10 @@ function renderPM(){
     }).join('')}${pmEditMode?`<div class="ms-chip" style="cursor:pointer;border-style:dashed;color:var(--accent)" onclick="addRoadmapItem('${l}')">+ 添加</div>`:''}</div></div>`;
   }).join('');
 
-  document.getElementById('roadmapLanes').innerHTML=pmToolbar+'<div style="margin-bottom:8px;font-size:15px;font-weight:600">产品路线图</div>'+roadmapHtml;
+  document.getElementById('roadmapLanes').innerHTML=pmToolbar+'<div style="margin-bottom:8px;font-size:15px;font-weight:600">'+t('roadmap')+'</div>'+roadmapHtml;
 
   // Sprint Board
-  const cols=[['todo','待处理'],['in_progress','进行中'],['review','待审核'],['done','已完成']];
+  const cols=[['todo',t('todo')],['in_progress',t('inProg')],['review',t('review')],['done',t('done')]];
   document.getElementById('sprintBoard').innerHTML=cols.map(([k,label])=>{
     const tasks=SPRINT_TASKS[k]||[];
     const taskHtml=tasks.map((t,ti)=>{
@@ -1055,7 +1210,7 @@ function deleteHistory(id){
 
 // ─── PREFS PERSISTENCE ──────────────────────────────────
 function savePrefs(){
-  localStorage.setItem('chub_prefs',JSON.stringify({tab:activeMain,sub:activeSub,cat:activeCat,region:document.getElementById('regionSelect')?.value||'us'}));
+  localStorage.setItem('chub_prefs',JSON.stringify({tab:activeMain,sub:activeSub,cat:activeCat,region:document.getElementById('regionSelect')?.value||'us',lang:currentLang}));
 }
 function loadPrefs(){
   try{
@@ -1180,6 +1335,8 @@ loadPrefs();
 renderPlatformTable();
 renderPreview();
 renderRegion();
+renderIndustryGrid();
+applyLang();
 </script>
 </body>
 </html>
