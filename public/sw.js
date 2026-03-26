@@ -1,4 +1,4 @@
-const CACHE_NAME = 'career-hub-v8';
+const CACHE_NAME = 'career-hub-v9';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -12,8 +12,8 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 // Activate: clean old caches

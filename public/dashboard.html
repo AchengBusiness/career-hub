@@ -4,7 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#f8fafc">
+<meta name="description" content="Career-Hub: AI-powered career management dashboard with multi-platform content distribution, CRM, workflow automation, and PM toolkit.">
+<meta property="og:title" content="Career-Hub Dashboard">
+<meta property="og:description" content="All-in-one AI career management: media ops, sales CRM, workflow automation, and project management.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://achengbusiness.github.io/career-hub/dashboard.html">
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230284c7'/><text x='50' y='68' text-anchor='middle' font-size='50' fill='white'>C</text></svg>">
 <title>Career-Hub 仪表盘</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -222,10 +228,10 @@ tr:hover td{background:rgba(51,65,85,.4)}
 .task-pri-high{color:var(--red);font-weight:600}
 .task-pri-medium{color:var(--yellow);font-weight:600}
 .task-pri-low{color:var(--green)}
-.task-overdue{border-color:var(--red);background:color-mix(in srgb,var(--red) 8%,var(--surface))}
+.task-overdue{border-color:var(--red);background:var(--surface);background:color-mix(in srgb,var(--red) 8%,var(--surface))}
 .task-chip[draggable="true"]{cursor:grab}
 .task-chip.dragging{opacity:.4}
-.sprint-col.drag-over{background:color-mix(in srgb,var(--accent-pm) 12%,var(--card-bg));outline:2px dashed var(--accent-pm);outline-offset:-2px}
+.sprint-col.drag-over{background:var(--card-hover);background:color-mix(in srgb,var(--accent-pm) 12%,var(--card-bg));outline:2px dashed var(--accent-pm);outline-offset:-2px}
 .pm-search-input{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card-bg);color:var(--text);margin-bottom:10px;font-family:inherit}
 .pm-search-input:focus{outline:none;border-color:var(--accent-pm)}
 .fb-list{max-width:600px}
@@ -395,15 +401,15 @@ tr:hover td{background:rgba(51,65,85,.4)}
   <a class="back-link" href="index.html">&larr; Home</a>
   <div class="topbar-title" data-i18n="title">Career-Hub 仪表盘</div>
   <div style="position:relative;flex:1;max-width:320px;margin:0 8px">
-    <input id="globalSearchInput" type="text" placeholder="全局搜索..." autocomplete="off"
+    <input id="globalSearchInput" type="text" placeholder="全局搜索..." autocomplete="off" aria-label="全局搜索"
       style="width:100%;padding:6px 32px 6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);color:var(--text);font-size:13px;font-family:inherit;outline:none"
       oninput="globalSearch(this.value)" onfocus="showGlobalSearch()" onblur="setTimeout(hideGlobalSearch,200)">
     <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:13px;pointer-events:none">&#128269;</span>
     <div id="globalSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px var(--shadow);z-index:500;max-height:360px;overflow-y:auto;font-size:13px"></div>
   </div>
-  <button class="gear-btn" onclick="cycleTheme()" title="切换主题" id="themeBtn">&#9728;</button>
-  <button class="lang-btn" onclick="toggleLang()" title="切换语言/Switch Language" id="langBtn">EN</button>
-  <button class="gear-btn" onclick="togglePanel('settings')" title="设置">&#9881;</button>
+  <button class="gear-btn" onclick="cycleTheme()" title="切换主题" aria-label="切换主题" id="themeBtn">&#9728;</button>
+  <button class="lang-btn" onclick="toggleLang()" title="切换语言/Switch Language" aria-label="切换语言" id="langBtn">EN</button>
+  <button class="gear-btn" onclick="togglePanel('settings')" title="设置" aria-label="设置">&#9881;</button>
 </div>
 
 <!-- STATS BAR -->
@@ -525,7 +531,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
         <li><strong>第 3 步：一键复制</strong> — 点击任意平台卡片右上角的 <strong>复制</strong> 按钮，即可将适配后的内容复制到剪贴板，直接粘贴到对应平台</li>
       </ul>
       <div style="margin-top:6px;font-size:12px;color:var(--text-dim)">提示：内容超过10字会自动保存到历史记录；点击"加载示例内容"可快速体验。</div>
-      <button class="guide-toggle" onclick="this.parentElement.style.display='none'">收起指南</button>
+      <button class="guide-toggle" onclick="this.parentElement.style.display='none';_guideCollapsed[this.parentElement.id]=true;savePrefs()">收起指南</button>
     </div>
     <div class="label" style="margin-bottom:8px">输入内容，预览各平台适配效果</div>
     <textarea class="preview-input" id="previewInput" placeholder="试试输入：今天分享一个提高工作效率的方法，使用AI工具自动化你的日常工作流程，节省80%的重复劳动时间..." oninput="debouncePreview()"></textarea>
@@ -562,7 +568,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
       <li>使用分类标签筛选不同类型的工作流</li>
       <li>工作流与 ops-flow MCP Server 联动，连接后支持真实执行</li>
     </ul>
-    <button class="guide-toggle" onclick="this.parentElement.style.display='none'">收起指南</button>
+    <button class="guide-toggle" onclick="this.parentElement.style.display='none';_guideCollapsed[this.parentElement.id]=true;savePrefs()">收起指南</button>
   </div>
   <div class="toolbar" id="opsToolbar"></div>
   <div class="cat-pills" id="catPills"></div>
@@ -580,7 +586,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
       <li><strong>颜色选择</strong>：编辑阶段时提供12色预设色板，也可手动输入HEX颜色值。</li>
       <li><strong>MCP同步</strong>：连接 sales-crm MCP Server 后，数据可实时同步到后端。</li>
     </ul>
-    <button class="guide-toggle" onclick="this.parentElement.style.display='none'">收起指南</button>
+    <button class="guide-toggle" onclick="this.parentElement.style.display='none';_guideCollapsed[this.parentElement.id]=true;savePrefs()">收起指南</button>
   </div>
   <div class="toolbar" id="salesToolbar"></div>
   <div class="funnel-section">
@@ -605,7 +611,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
       <li><strong>PDCA循环</strong>：Plan-Do-Check-Act持续改进循环</li>
       <li><strong>编辑方式</strong>：点击"编辑模式"后，点击条目可编辑，x 删除，+ 添加</li>
     </ul>
-    <button class="guide-toggle" onclick="this.parentElement.style.display='none'">收起指南</button>
+    <button class="guide-toggle" onclick="this.parentElement.style.display='none';_guideCollapsed[this.parentElement.id]=true;savePrefs()">收起指南</button>
   </div>
   <div class="pm-sub-tabs">
     <button class="pm-sub-tab active" onclick="switchPmSub('pm-roadmap',this)" data-pmsub="pm-roadmap">路线图</button>
@@ -639,18 +645,18 @@ tr:hover td{background:rgba(51,65,85,.4)}
 </div>
 
 <!-- TOAST CONTAINER -->
-<div id="toast-container"></div>
+<div id="toast-container" aria-live="assertive" aria-atomic="false" role="status"></div>
 
 <!-- CUSTOM DIALOG -->
 <div class="dlg-overlay" id="dlgOverlay">
-  <div class="dlg-box" id="dlgBox"></div>
+  <div class="dlg-box" id="dlgBox" role="dialog" aria-modal="true" aria-labelledby="dlgTitle"></div>
 </div>
 
 <!-- OVERLAY -->
 <div class="panel-overlay" id="panelOverlay" onclick="closeAllPanels()"></div>
 
 <!-- SETTINGS PANEL -->
-<div class="side-panel" id="settingsPanel">
+<div class="side-panel" id="settingsPanel" role="dialog" aria-modal="true" aria-label="Settings">
   <div class="panel-head">
     <span class="panel-title">设置</span>
     <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
@@ -671,7 +677,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
 </div>
 
 <!-- HISTORY PANEL -->
-<div class="side-panel" id="historyPanel">
+<div class="side-panel" id="historyPanel" role="dialog" aria-modal="true" aria-label="History">
   <div class="panel-head">
     <span class="panel-title">历史记录</span>
     <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
@@ -680,7 +686,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
 </div>
 
 <!-- ACTIVITY LOG PANEL -->
-<div class="side-panel" id="activityPanel">
+<div class="side-panel" id="activityPanel" role="dialog" aria-modal="true" aria-label="Activity Log">
   <div class="panel-head">
     <span class="panel-title">活动日志</span>
     <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
@@ -694,9 +700,10 @@ let activeMain='overview';
 let activeSub='m-compare';
 let activePmSub='pm-roadmap';
 let deferredPWAPrompt=null;
+let _guideCollapsed={};
 
 // ─── I18N: LANGUAGE SYSTEM ─────────────────────────────
-let currentLang=(localStorage.getItem('chub_lang'))||(navigator.language&&navigator.language.startsWith('zh')?'zh':'en');
+let currentLang=(()=>{try{const v=localStorage.getItem('chub_lang');return v?JSON.parse(v):null}catch(e){return null}})()||(navigator.language&&navigator.language.startsWith('zh')?'zh':'en');
 const LANG={
   zh:{
     title:'Career-Hub 仪表盘',langBtn:'EN',
@@ -727,6 +734,14 @@ const LANG={
     addWf:'添加工作流',addDeal:'添加商机阶段',addLead:'添加线索状态',
     salesEditHint:'编辑中 - 点击数字修改，点击标签编辑',salesReadHint:'点击数字可修改数量',
     leadStatusDesc:'线索状态说明：',leadStatusLegend:'冷 = 未接触/无回复 | 温 = 有互动但未明确 | 热 = 明确表达兴趣 | 已验证 = 确认预算+需求 | 已转化 = 升级为商机 | 已流失 = 放弃跟进',
+    confirmAction:'确认操作',cancelBtn:'取消',okBtn:'确定',saveBtn:'保存',
+    guidePreviewTitle:'内容预览 — 三步完成多平台适配',guidePreviewS1:'第 1 步：输入内容',guidePreviewD1:'在下方文本框粘贴或输入你要发布的文案（文章、帖子、视频文案均可）',guidePreviewS2:'第 2 步：查看预览',guidePreviewD2:'系统实时生成各平台的适配预览，进度条颜色表示字数：',guidePreviewS3:'第 3 步：一键复制',guidePreviewD3:'点击任意平台卡片右上角的"复制"按钮，即可将适配后的内容复制到剪贴板',guidePreviewTip:'提示：内容超过10字会自动保存到历史记录；点击"加载示例内容"可快速体验。',
+    guideOpsTitle:'工作流使用指南',guideOps1:'点击任意工作流卡片展开详情，查看执行步骤和所需参数',guideOps2:'展开后点击"运行"按钮可模拟执行工作流（需配置MCP连接后可实际运行）',guideOps3:'点击"编辑模式"可修改工作流名称、描述、步骤等',guideOps4:'使用分类标签筛选不同类型的工作流',
+    guideSalesTitle:'Sales CRM 使用指南',guideSales1:'商机漏斗：展示客户从"初次接触"到"已成交"的完整销售路径',guideSales2:'线索漏斗：展示潜在客户按意向强度的分布',guideSales3:'操作方法：点击数字可直接修改数量；"编辑模式"下可编辑阶段详情',
+    guidePmTitle:'项目管理工具箱',guidePm1:'路线图：按优先级 P0-P3 排列',guidePm2:'甘特图：基于路线图数据的时间轴视图',guidePm3:'冲刺看板：4列看板（待处理/进行中/待审核/已完成）',guidePm4:'鱼骨图 + PDCA：因果分析与持续改进工具',
+    collapseGuide:'收起指南',
+    fishPeople:'人员',fishProcess:'流程',fishTools:'工具',fishEnvironment:'环境',fishMaterials:'材料',fishMethods:'方法',
+    catAll:'全部',catReporting:'报告',catData:'数据',catMonitoring:'监控',catContent:'内容',catMarketing:'营销',catCrm:'CRM',
   },
   en:{
     title:'Career-Hub Dashboard',langBtn:'中文',
@@ -757,6 +772,14 @@ const LANG={
     addWf:'Add Workflow',addDeal:'Add Deal Stage',addLead:'Add Lead Status',
     salesEditHint:'Editing - click numbers to modify, click labels to edit',salesReadHint:'Click numbers to modify',
     leadStatusDesc:'Lead Status Guide:',leadStatusLegend:'Cold = No contact/no reply | Warm = Engaged but unclear | Hot = Expressed clear interest | Qualified = Budget+needs confirmed | Converted = Upgraded to deal | Lost = Follow-up abandoned',
+    confirmAction:'Confirm',cancelBtn:'Cancel',okBtn:'OK',saveBtn:'Save',
+    guidePreviewTitle:'Content Preview — 3 Steps to Multi-Platform Adaptation',guidePreviewS1:'Step 1: Enter Content',guidePreviewD1:'Paste or type your content in the text box below',guidePreviewS2:'Step 2: View Preview',guidePreviewD2:'Real-time preview for each platform; progress bar colors indicate length:',guidePreviewS3:'Step 3: One-Click Copy',guidePreviewD3:'Click the "Copy" button on any platform card to copy adapted content',guidePreviewTip:'Tip: Content over 10 chars auto-saves to history; click "Load Sample" to try it out.',
+    guideOpsTitle:'Workflow Guide',guideOps1:'Click any workflow card to expand details and view steps',guideOps2:'Click "Run" to simulate workflow execution (requires MCP connection for live run)',guideOps3:'Click "Edit Mode" to modify workflow name, description, and steps',guideOps4:'Use category tabs to filter different workflow types',
+    guideSalesTitle:'Sales CRM Guide',guideSales1:'Deal Pipeline: full sales path from first contact to closed deal',guideSales2:'Lead Funnel: distribution by intent strength',guideSales3:'Click numbers to edit; use "Edit Mode" to modify stage details',
+    guidePmTitle:'PM Toolkit',guidePm1:'Roadmap: sorted by priority P0-P3',guidePm2:'Gantt Chart: timeline view from roadmap data',guidePm3:'Sprint Board: 4-column kanban (To Do / In Progress / In Review / Done)',guidePm4:'Fishbone + PDCA: root-cause analysis & continuous improvement',
+    collapseGuide:'Collapse Guide',
+    fishPeople:'People',fishProcess:'Process',fishTools:'Tools',fishEnvironment:'Environment',fishMaterials:'Materials',fishMethods:'Methods',
+    catAll:'All',catReporting:'Reporting',catData:'Data',catMonitoring:'Monitoring',catContent:'Content',catMarketing:'Marketing',catCrm:'CRM',
   }
 };
 function t(key){return(LANG[currentLang]&&LANG[currentLang][key])||LANG.zh[key]||key}
@@ -790,13 +813,19 @@ function updateOverviewCards(){
   if(e('ocPM'))e('ocPM').innerHTML=`<strong>${tc['pm-toolkit']||20}</strong> MCP工具 | ${rc}路线图 + ${sc}任务 + ${fc}反馈`;
 }
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-function safeJSON(key,fallback){try{const v=localStorage.getItem(key);return v?JSON.parse(v):(fallback||null)}catch(e){localStorage.removeItem(key);return fallback||null}}
+// P1-1+P1-5: localStorage safety wrapper
+const _lsAvailable=(()=>{try{const k='__ls_test__';localStorage.setItem(k,'1');localStorage.removeItem(k);return true}catch(e){return false}})();
+function safeSet(key,val){if(!_lsAvailable)return;try{localStorage.setItem(key,JSON.stringify(val))}catch(e){if(e.name==='QuotaExceededError')showToast('存储空间不足，请导出并清理数据','error',5000)}}
+function safeRemove(key){if(!_lsAvailable)return;try{localStorage.removeItem(key)}catch(e){}}
+function safeJSON(key,fallback){if(!_lsAvailable)return fallback||null;try{const v=localStorage.getItem(key);return v?JSON.parse(v):(fallback||null)}catch(e){try{localStorage.removeItem(key)}catch(x){};return fallback||null}}
 function isValidColor(c){return/^#[0-9a-fA-F]{3,8}$/.test(c)}
+// AbortSignal.timeout polyfill for older browsers
+if(typeof AbortSignal.timeout!=='function'){AbortSignal.timeout=function(ms){const c=new AbortController();setTimeout(()=>c.abort(),ms);return c.signal}}
 
 // ─── THEME SYSTEM ────────────────────────────────────
 const THEME_ICONS={light:'\u2600',dark:'\u263E',system:'\u2699'};
 function applyTheme(){
-  const saved=localStorage.getItem('chub_theme')||'light';
+  const saved=safeJSON('chub_theme','light')||'light';
   const root=document.documentElement;
   if(saved==='dark'){root.setAttribute('data-theme','dark');document.querySelector('meta[name="theme-color"]').content='#1e293b'}
   else if(saved==='light'){root.setAttribute('data-theme','light');document.querySelector('meta[name="theme-color"]').content='#f8fafc'}
@@ -806,15 +835,15 @@ function applyTheme(){
 }
 function cycleTheme(){
   const order=['light','dark','system'];
-  const cur=localStorage.getItem('chub_theme')||'light';
+  const cur=safeJSON('chub_theme','light')||'light';
   const next=order[(order.indexOf(cur)+1)%order.length];
-  localStorage.setItem('chub_theme',next);
+  safeSet('chub_theme',next);
   applyTheme();
   const labels={light:'浅色模式',dark:'深色模式',system:'跟随系统'};
   showToast(labels[next],'info',1500);
 }
 window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{
-  if((localStorage.getItem('chub_theme')||'light')==='system')applyTheme();
+  if((safeJSON('chub_theme','light')||'light')==='system')applyTheme();
 });
 
 // ─── TAB SWITCHING HELPER ────────────────────────────
@@ -827,16 +856,26 @@ function switchToTab(id){
 function openDialog(html){
   const o=document.getElementById('dlgOverlay'),b=document.getElementById('dlgBox');
   b.innerHTML=html;o.classList.add('open');
-  const firstInput=b.querySelector('input,textarea,select');if(firstInput)setTimeout(()=>firstInput.focus(),50);
+  const firstFocus=b.querySelector('input,textarea,select,button');if(firstFocus)setTimeout(()=>firstFocus.focus(),50);
 }
 function closeDialog(){document.getElementById('dlgOverlay').classList.remove('open')}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('dlgOverlay').classList.contains('open'))closeDialog()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('dlgOverlay').classList.contains('open'))closeDialog();
+  if(e.key==='Tab'&&document.getElementById('dlgOverlay').classList.contains('open')){
+    const b=document.getElementById('dlgBox');
+    const focusable=b.querySelectorAll('input,textarea,select,button,[tabindex]:not([tabindex="-1"])');
+    if(!focusable.length)return;
+    const first=focusable[0],last=focusable[focusable.length-1];
+    if(e.shiftKey){if(document.activeElement===first){e.preventDefault();last.focus()}}
+    else{if(document.activeElement===last){e.preventDefault();first.focus()}}
+  }
+});
 
 function confirmDialog(msg,onOk,okText,dangerMode){
-  openDialog(`<div class="dlg-title">${dangerMode?'&#9888;&#65039;':'&#10067;'} 确认操作</div>
-  <div class="dlg-msg">${msg}</div>
-  <div class="dlg-btns"><button class="dlg-btn" onclick="closeDialog()">取消</button>
-  <button class="dlg-btn ${dangerMode?'dlg-btn-danger':'dlg-btn-ok'}" id="dlgOkBtn">${okText||'确定'}</button></div>`);
+  openDialog(`<div class="dlg-title">${dangerMode?'&#9888;&#65039;':'&#10067;'} ${esc(t('confirmAction')||'确认操作')}</div>
+  <div class="dlg-msg">${esc(msg)}</div>
+  <div class="dlg-btns"><button class="dlg-btn" onclick="closeDialog()">${esc(t('cancelBtn')||'取消')}</button>
+  <button class="dlg-btn ${dangerMode?'dlg-btn-danger':'dlg-btn-ok'}" id="dlgOkBtn">${esc(okText||t('okBtn')||'确定')}</button></div>`);
   document.getElementById('dlgOkBtn').onclick=()=>{closeDialog();onOk()};
 }
 
@@ -853,7 +892,7 @@ function formDialog(title,fields,onOk,extraBtns){
     else html+=`<input type="${f.type||'text'}" id="dlg_${f.key}" value="${esc(f.value||'')}" placeholder="${esc(f.placeholder||'')}">`;
     html+=`</div>`;
   });
-  html+=`<div class="dlg-btns">${extraBtns||''}<button class="dlg-btn" onclick="closeDialog()">取消</button><button class="dlg-btn dlg-btn-ok" id="dlgOkBtn">保存</button></div>`;
+  html+=`<div class="dlg-btns">${extraBtns||''}<button class="dlg-btn" onclick="closeDialog()">${esc(t('cancelBtn'))}</button><button class="dlg-btn dlg-btn-ok" id="dlgOkBtn">${esc(t('saveBtn'))}</button></div>`;
   openDialog(html);
   document.getElementById('dlgOkBtn').onclick=()=>{
     const vals={};fields.forEach(f=>{const el=document.getElementById('dlg_'+f.key);vals[f.key]=el?el.value:''});
@@ -890,14 +929,14 @@ function openEnvConfigDialog(){
     {key:'smtpHost',label:'SMTP 服务器',type:'text',value:env.smtpHost,placeholder:'例：smtp.gmail.com'},
     {key:'smtpPort',label:'SMTP 端口',type:'text',value:env.smtpPort,placeholder:'587'},
     {key:'smtpUser',label:'SMTP 用户名',type:'text',value:env.smtpUser,placeholder:'your@email.com'},
-    {key:'smtpPass',label:'SMTP 密码',type:'text',value:env.smtpPass,placeholder:'应用专用密码'},
+    {key:'smtpPass',label:'SMTP 密码 (明文存储于localStorage)',type:'text',value:env.smtpPass,placeholder:'建议使用应用专用密码'},
     {key:'emailFrom',label:'发件人地址',type:'text',value:env.emailFrom,placeholder:'noreply@example.com'},
     {key:'webhookUrl',label:'Webhook URL',type:'text',value:env.webhookUrl,placeholder:'https://hooks.example.com/...'},
     {key:'timezone',label:'时区',type:'select',value:env.timezone,options:[
       {v:'Asia/Shanghai',l:'北京时间 (UTC+8)'},{v:'America/New_York',l:'纽约 (UTC-5)'},{v:'Europe/London',l:'伦敦 (UTC+0)'},{v:'Asia/Tokyo',l:'东京 (UTC+9)'},{v:'America/Los_Angeles',l:'洛杉矶 (UTC-8)'}
     ]}
   ],vals=>{
-    localStorage.setItem('chub_env_config',JSON.stringify(vals));
+    safeSet('chub_env_config',vals);
     showToast('环境配置已保存','success');
   });
 }
@@ -923,11 +962,12 @@ function loadSampleContent(){
 }
 function toggleLang(){
   currentLang=currentLang==='zh'?'en':'zh';
-  localStorage.setItem('chub_lang',currentLang);
+  safeSet('chub_lang',currentLang);
   document.documentElement.lang=currentLang==='zh'?'zh-CN':'en';
   applyLang();
 }
 function applyLang(){
+  document.title=t('title');
   document.getElementById('langBtn').textContent=t('langBtn');
   // Static i18n elements
   document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
@@ -1091,7 +1131,7 @@ function showToastWithUndo(msg,undoFn){
   const c=document.getElementById('toast-container');
   const d=document.createElement('div');
   d.className='toast toast-info';
-  d.innerHTML='\u2139 '+msg+' <button onclick="this.parentElement._undoFn();this.parentElement.remove()" style="margin-left:8px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px">撤销</button>';
+  d.innerHTML='\u2139 '+esc(msg)+' <button onclick="this.parentElement._undoFn();this.parentElement.remove()" style="margin-left:8px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px">撤销</button>';
   d._undoFn=undoFn;
   c.appendChild(d);
   setTimeout(()=>{if(d.parentElement){d.classList.add('toast-exit');setTimeout(()=>d.remove(),300)}},5000);
@@ -1114,7 +1154,7 @@ const DEFAULT_PLATFORMS=[
   {id:'igpost',name:'IG Post',limit:2200,style:'lifestyle',tags:['#lifestyle','#success'],os:true,styleLabel:'图文精致, 品牌展示',hashtags:'3-10',features:'购物标签, 轮播, 探索页发现',priority:'P1'},
 ];
 let PLATFORMS=safeJSON('chub_platforms')||JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
-function savePlatforms(){localStorage.setItem('chub_platforms',JSON.stringify(PLATFORMS));updateStatsBar();logActivity('platforms','更新','共'+PLATFORMS.length+'个平台')}
+function savePlatforms(){safeSet('chub_platforms',PLATFORMS);updateStatsBar();logActivity('platforms','更新','共'+PLATFORMS.length+'个平台')}
 
 // ─── PLATFORM TABLE: SORT + EDIT + RENDER ─────────────
 let platSort={col:null,dir:'asc'};
@@ -1170,12 +1210,12 @@ function renderPlatformTable(){
       <button class="row-btn del" onclick="deletePlatform(${i})">${t('delBtn')}</button>
     </div></td>`:'';
     return`<tr class="${rc}" data-idx="${i}">
-      <td><span class="platform-name">${platEditMode?`<span ${ce} data-field="name" data-idx="${i}" style="min-width:60px;display:inline-block">${p.name}</span>`:`${p.name}`}${osBadge}</span></td>
-      <td ${ce} data-field="limit" data-idx="${i}"><span class="char-limit">${p.limit}</span></td>
-      <td ${ce} data-field="styleLabel" data-idx="${i}">${p.styleLabel}</td>
-      <td ${ce} data-field="hashtags" data-idx="${i}">${p.hashtags}</td>
-      <td ${ce} data-field="features" data-idx="${i}">${p.features}</td>
-      <td><span class="badge ${priCls}">${p.priority}</span></td>
+      <td><span class="platform-name">${platEditMode?`<span ${ce} data-field="name" data-idx="${i}" style="min-width:60px;display:inline-block">${esc(p.name)}</span>`:`${esc(p.name)}`}${osBadge}</span></td>
+      <td ${ce} data-field="limit" data-idx="${i}"><span class="char-limit">${esc(''+p.limit)}</span></td>
+      <td ${ce} data-field="styleLabel" data-idx="${i}">${esc(p.styleLabel)}</td>
+      <td ${ce} data-field="hashtags" data-idx="${i}">${esc(p.hashtags)}</td>
+      <td ${ce} data-field="features" data-idx="${i}">${esc(p.features)}</td>
+      <td><span class="badge ${priCls}">${esc(p.priority)}</span></td>
       ${actions}
     </tr>`;
   }).join('');
@@ -1211,9 +1251,7 @@ function cyclePriority(i){
   savePlatforms();renderPlatformTable();showToast('优先级已切换','success',1500);
 }
 function deletePlatform(i){
-  confirmDialog('确定删除平台 "'+PLATFORMS[i].name+'" ？',()=>{
-    PLATFORMS.splice(i,1);savePlatforms();renderPlatformTable();showToast('已删除','info',1500);
-  },'删除',true);
+  deleteWithUndo(PLATFORMS,i,savePlatforms,renderPlatformTable,'平台');
 }
 function resetPlatforms(){
   PLATFORMS=JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
@@ -1303,7 +1341,7 @@ const DEFAULT_REGIONS={
   latam:{label:'拉丁美洲',tips:['巴西人日均社交媒体3h49m全球最高（Statista），Instagram Reels（日均700万+帖子）和WhatsApp是巴西必备双平台','按国家细分：Instagram主导阿根廷/巴西/智利，Facebook主导哥伦比亚/墨西哥/秘鲁，TikTok在哥伦比亚增长最快（LatAm Intersect PR 2025）','WhatsApp和Telegram群组是重要内容发现渠道，群组种草效果往往超越付费广告','Meme是政治话语和文化评论载体（尤其巴西和墨西哥），创造可分享Meme格式的自然流量远超普通内容','西班牙语不能通用：墨西哥/阿根廷/哥伦比亚的词汇/俚语/正式程度差异巨大；巴西需全葡萄牙语','TikTok在拉美13-24岁用户中日均使用87分钟，竖屏视频是年轻受众的主要格式（Awisee 2025）'],taboos:['避免在国家政治冲突中选边：哥伦比亚/墨西哥/智利有记录的"水军"协同虚假宣传，涉政内容会被默认为付费虚假信息（Americas Market Intelligence 2025）','禁止嘲讽天主教会或民间宗教表达（亡灵节、圣周、守护圣人节），宗教与文化身份在拉美深度绑定','禁止用大男子主义或圣母主义刻板印象来定义性别角色，即使以批判角度使用也会两面不讨好'],tags:['#LatinAmerica','#Latinx','#Brasil','#Mexico'],times:'工作日12-2 PM和7-9 PM当地时间（午餐和晚间双高峰）；巴西周末参与度全球最高',audience:'全球社交媒体使用时长最高受众，WhatsApp/Telegram私群是核心发现渠道，年轻用户以TikTok为主，文化自豪感强，对去地域化内容抵触，足球是最大流量触发点'}
 };
 let REGIONS=safeJSON('chub_regions')||JSON.parse(JSON.stringify(DEFAULT_REGIONS));
-function saveRegions(){localStorage.setItem('chub_regions',JSON.stringify(REGIONS));logActivity('regions','更新','地区数据')}
+function saveRegions(){safeSet('chub_regions',REGIONS);logActivity('regions','更新','地区数据')}
 
 let regionEditMode=false;
 function renderRegion(){
@@ -1410,8 +1448,8 @@ const DEFAULT_TEMPLATES=[
   {id:'social-analytics',name:'社媒数据汇总',cat:'monitoring',desc:'汇总多个社交媒体平台的数据指标，生成统一分析报告',trigger:'定时：每周一8:00',steps:['连接各平台API','拉取核心指标','跨平台对比分析','生成可视化图表','输出汇总报告'],vars:['platforms（必填）','metrics（默认：followers,engagement,reach）','period（默认：7d）']},
 ];
 let TEMPLATES=safeJSON('chub_templates')||JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
-function saveTemplates(){localStorage.setItem('chub_templates',JSON.stringify(TEMPLATES));updateStatsBar();logActivity('templates','更新','共'+TEMPLATES.length+'个工作流')}
-function getCatLabels(){return{all:'全部 ('+TEMPLATES.length+')',reporting:'报告',data:'数据',monitoring:'监控',content:'内容',marketing:'营销',crm:'CRM'}}
+function saveTemplates(){safeSet('chub_templates',TEMPLATES);updateStatsBar();logActivity('templates','更新','共'+TEMPLATES.length+'个工作流')}
+function getCatLabels(){return{all:t('catAll')+' ('+TEMPLATES.length+')',reporting:t('catReporting'),data:t('catData'),monitoring:t('catMonitoring'),content:t('catContent'),marketing:t('catMarketing'),crm:t('catCrm')}}
 let activeCat='all';
 let opsEditMode=false;
 
@@ -1612,8 +1650,8 @@ const DEF_DEAL=[{id:'contact',label:'初次接触',count:24,color:'#3b82f6'},{id
 const DEF_LEAD=[{id:'new',label:'新线索',count:45,color:'#3b82f6'},{id:'contacted',label:'已接触',count:32,color:'#06b6d4'},{id:'qualified',label:'已意向',count:20,color:'#8b5cf6'},{id:'converted',label:'已转化',count:11,color:'#10b981'},{id:'lost',label:'已流失',count:9,color:'#ef4444'}];
 let DEAL_STAGES=safeJSON('chub_deals')||JSON.parse(JSON.stringify(DEF_DEAL));
 let LEAD_STATUSES=safeJSON('chub_leads')||JSON.parse(JSON.stringify(DEF_LEAD));
-function saveDeals(){localStorage.setItem('chub_deals',JSON.stringify(DEAL_STAGES));updateStatsBar();logActivity('deals','更新','商机阶段')}
-function saveLeads(){localStorage.setItem('chub_leads',JSON.stringify(LEAD_STATUSES));logActivity('leads','更新','线索状态')}
+function saveDeals(){safeSet('chub_deals',DEAL_STAGES);updateStatsBar();logActivity('deals','更新','商机阶段')}
+function saveLeads(){safeSet('chub_leads',LEAD_STATUSES);logActivity('leads','更新','线索状态')}
 const DEF_CONTACTS=[
   {id:1,name:'张明',company:'华为技术',phone:'138****1234',email:'zhang@example.com',stage:'qualified',note:'对AI方案感兴趣',createdAt:'2026-03-15'},
   {id:2,name:'李婷',company:'字节跳动',phone:'139****5678',email:'li@example.com',stage:'proposal',note:'需要定制CRM集成',createdAt:'2026-03-18'},
@@ -1622,7 +1660,7 @@ const DEF_CONTACTS=[
 let CONTACTS=safeJSON('chub_contacts')||JSON.parse(JSON.stringify(DEF_CONTACTS));
 let _contactIdCounter=10;
 (function(){let mx=10;CONTACTS.forEach(c=>{if(c.id>=mx)mx=c.id+1});_contactIdCounter=mx})();
-function saveContacts(){localStorage.setItem('chub_contacts',JSON.stringify(CONTACTS));logActivity('contacts','更新','共'+CONTACTS.length+'个联系人')}
+function saveContacts(){safeSet('chub_contacts',CONTACTS);logActivity('contacts','更新','共'+CONTACTS.length+'个联系人')}
 let salesEditMode=false;
 
 function renderSales(){
@@ -1732,8 +1770,8 @@ function addLeadStatus(){
     saveLeads();renderSales();showToast('已添加','success');
   });
 }
-function deleteDealStage(i){confirmDialog('确定删除 "'+DEAL_STAGES[i].label+'"？',()=>{DEAL_STAGES.splice(i,1);saveDeals();renderSales();showToast('已删除','info')},'删除',true)}
-function deleteLeadStatus(i){confirmDialog('确定删除 "'+LEAD_STATUSES[i].label+'"？',()=>{LEAD_STATUSES.splice(i,1);saveLeads();renderSales();showToast('已删除','info')},'删除',true)}
+function deleteDealStage(i){deleteWithUndo(DEAL_STAGES,i,saveDeals,renderSales,'商机阶段')}
+function deleteLeadStatus(i){deleteWithUndo(LEAD_STATUSES,i,saveLeads,renderSales,'线索状态')}
 function resetSalesData(){
   confirmDialog('确定重置所有销售数据？',()=>{
     DEAL_STAGES=JSON.parse(JSON.stringify(DEF_DEAL));LEAD_STATUSES=JSON.parse(JSON.stringify(DEF_LEAD));
@@ -1770,7 +1808,7 @@ function editContact(i){
     saveContacts();renderSales();showToast('已更新','success');
   });
 }
-function deleteContact(i){confirmDialog('确定删除联系人 "'+CONTACTS[i].name+'"？',()=>{CONTACTS.splice(i,1);saveContacts();renderSales();showToast('已删除','info')},'删除',true)}
+function deleteContact(i){deleteWithUndo(CONTACTS,i,saveContacts,renderSales,'联系人')}
 
 // ─── PM-TOOLKIT: ROADMAP + SPRINT + FEEDBACK ────────────
 const DEF_ROADMAP=[
@@ -1812,16 +1850,16 @@ const DEF_FEEDBACK=[
 ];
 let ROADMAP=safeJSON('chub_roadmap')||JSON.parse(JSON.stringify(DEF_ROADMAP));
 let ROADMAP_LANES=safeJSON('chub_roadmap_lanes')||['P0','P1','P2','P3'];
-function saveRoadmapLanes(){localStorage.setItem('chub_roadmap_lanes',JSON.stringify(ROADMAP_LANES))}
+function saveRoadmapLanes(){safeSet('chub_roadmap_lanes',ROADMAP_LANES)}
 let SPRINT_TASKS=migrateSprintTasks(safeJSON('chub_sprint'));
 // Fix P1-6: Ensure _sprintIdCounter doesn't duplicate existing IDs
 (function(){let mx=10;Object.values(SPRINT_TASKS).forEach(col=>col.forEach(t=>{if(t&&t.id&&t.id>=mx)mx=t.id+1}));_sprintIdCounter=mx})();
 let SPRINT_META=safeJSON('chub_sprint_meta')||{name:'Sprint 1',startDate:'',endDate:''};
-function saveSprintMeta(){localStorage.setItem('chub_sprint_meta',JSON.stringify(SPRINT_META))}
+function saveSprintMeta(){safeSet('chub_sprint_meta',SPRINT_META)}
 let FEEDBACK=safeJSON('chub_feedback')||JSON.parse(JSON.stringify(DEF_FEEDBACK));
-function saveRoadmap(){localStorage.setItem('chub_roadmap',JSON.stringify(ROADMAP));updateStatsBar();logActivity('roadmap','更新','共'+ROADMAP.length+'项')}
-function saveSprint(){localStorage.setItem('chub_sprint',JSON.stringify(SPRINT_TASKS));logActivity('sprint','更新','冲刺看板')}
-function saveFeedback(){localStorage.setItem('chub_feedback',JSON.stringify(FEEDBACK));logActivity('feedback','更新','共'+FEEDBACK.length+'条反馈')}
+function saveRoadmap(){safeSet('chub_roadmap',ROADMAP);updateStatsBar();logActivity('roadmap','更新','共'+ROADMAP.length+'项')}
+function saveSprint(){safeSet('chub_sprint',SPRINT_TASKS);logActivity('sprint','更新','冲刺看板')}
+function saveFeedback(){safeSet('chub_feedback',FEEDBACK);logActivity('feedback','更新','共'+FEEDBACK.length+'条反馈')}
 let pmEditMode=false;
 const pmSearch={roadmap:'',sprint:'',feedback:''};
 let _pmSearchTimer=null;
@@ -1883,8 +1921,9 @@ function renderPM(){
       const isOverdue=due&&k!=='done'&&due<new Date().toISOString().slice(0,10);
       const editClick=pmEditMode?`onclick="editSprintTask('${k}',${origIdx})"`:'';
       const delBtn=pmEditMode?`<span style="float:right;cursor:pointer;color:var(--red);font-size:11px" onclick="event.stopPropagation();deleteSprintTask('${k}',${origIdx})">x</span>`:'';
+      const moveBtns=pmEditMode?`<span style="float:right;margin-right:4px;font-size:11px"><button aria-label="Move left" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);font-size:11px;padding:0 2px" onclick="event.stopPropagation();moveSprintTask('${k}',${origIdx},-1)">\u25C0</button><button aria-label="Move right" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);font-size:11px;padding:0 2px" onclick="event.stopPropagation();moveSprintTask('${k}',${origIdx},1)">\u25B6</button></span>`:'';
       const meta=(due||assignee)?`<div class="task-chip-meta">${due?'<span>&#128197; '+esc(due)+'</span>':''}${assignee?'<span>&#128100; '+esc(assignee)+'</span>':''}<span class="${priCls[pri]||''}">${priLabel[pri]||pri}</span></div>`:'';
-      return`<div class="task-chip${isOverdue?' task-overdue':''}" draggable="true" data-col="${k}" data-idx="${origIdx}" style="${pmEditMode?'cursor:pointer':''}" ondragstart="sprintDragStart(event)" ondragend="sprintDragEnd(event)" ${editClick}>${esc(title)}${delBtn}${meta}</div>`;
+      return`<div class="task-chip${isOverdue?' task-overdue':''}" draggable="true" data-col="${k}" data-idx="${origIdx}" style="${pmEditMode?'cursor:pointer':''}" ondragstart="sprintDragStart(event)" ondragend="sprintDragEnd(event)" ${editClick}>${esc(title)}${delBtn}${moveBtns}${meta}</div>`;
     }).join('');
     const addBtn=pmEditMode?`<div class="task-chip" style="cursor:pointer;border-style:dashed;color:var(--accent);text-align:center" onclick="addSprintTask('${k}')">+ 添加</div>`:'';
     return`<div class="sprint-col" data-col="${k}" ondragover="sprintDragOver(event)" ondragleave="sprintDragLeave(event)" ondrop="sprintDrop(event)"><div class="sprint-col-title">${label}<span class="cnt">${cntLabel}</span></div>${taskHtml}${addBtn}</div>`;
@@ -1983,6 +2022,7 @@ function editSprintTask(col,ti){
 function deleteSprintTask(col,ti){confirmDialog('确定删除此任务？',()=>{deleteWithUndo(SPRINT_TASKS[col],ti,saveSprint,renderPM,'任务')},'删除',true)}
 let _dragData=null;
 function sprintDragStart(e){const el=e.currentTarget;_dragData={col:el.dataset.col,idx:parseInt(el.dataset.idx)};el.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','')}
+function moveSprintTask(fromCol,idx,dir){const cols=['todo','in_progress','review','done'];const ci=cols.indexOf(fromCol);const toCol=cols[ci+dir];if(!toCol)return;const task=SPRINT_TASKS[fromCol].splice(idx,1)[0];if(!task)return;SPRINT_TASKS[toCol].push(task);saveSprint();logActivity('sprint','move',(task.title||'task')+' \u2192 '+toCol);renderPM()}
 function sprintDragEnd(e){e.currentTarget.classList.remove('dragging');_dragData=null;document.querySelectorAll('.sprint-col').forEach(c=>c.classList.remove('drag-over'))}
 function sprintDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over')}
 function sprintDragLeave(e){e.currentTarget.classList.remove('drag-over')}
@@ -2002,10 +2042,11 @@ function addSprintTask(col){
   });
 }
 // Feedback CRUD
-const _votedFeedback=new Set();
+const _votedFeedback=new Set((()=>{try{const v=sessionStorage.getItem('chub_voted');return v?JSON.parse(v):[]}catch(e){return[]}})());
+function _saveVoted(){try{sessionStorage.setItem('chub_voted',JSON.stringify([..._votedFeedback]))}catch(e){}}
 function voteFeedback(i){
   if(_votedFeedback.has(i)){showToast('你已经投过票了','warning',1500);return}
-  _votedFeedback.add(i);
+  _votedFeedback.add(i);_saveVoted();
   FEEDBACK[i].votes++;saveFeedback();renderPM();showToast('+1','success',800);
 }
 function editFeedback(i){
@@ -2076,12 +2117,12 @@ const DEF_FISHBONE={
   }
 };
 let FISHBONE=safeJSON('chub_fishbone')||JSON.parse(JSON.stringify(DEF_FISHBONE));
-function saveFishbone(){localStorage.setItem('chub_fishbone',JSON.stringify(FISHBONE));logActivity('fishbone','更新','鱼骨图')}
+function saveFishbone(){safeSet('chub_fishbone',FISHBONE);logActivity('fishbone','更新','鱼骨图')}
 
 function renderFishbone(){
   const el=document.getElementById('fishboneChart');
   const cats=Object.keys(FISHBONE.categories);
-  const catLabels={people:'人员',process:'流程',tools:'工具',environment:'环境',materials:'材料',methods:'方法'};
+  const catLabels={people:t('fishPeople'),process:t('fishProcess'),tools:t('fishTools'),environment:t('fishEnvironment'),materials:t('fishMaterials'),methods:t('fishMethods')};
   const catColors={people:'var(--accent)',process:'var(--green)',tools:'var(--orange)',environment:'var(--accent2)',materials:'var(--yellow)',methods:'var(--red)'};
   // Build SVG
   const W=800,H=360,spine=H/2,headX=W-80,tailX=60;
@@ -2132,7 +2173,7 @@ function editFishboneProblem(){
   });
 }
 function editFishboneCategory(catKey){
-  const catLabels={people:'人员',process:'流程',tools:'工具',environment:'环境',materials:'材料',methods:'方法'};
+  const catLabels={people:t('fishPeople'),process:t('fishProcess'),tools:t('fishTools'),environment:t('fishEnvironment'),materials:t('fishMaterials'),methods:t('fishMethods')};
   const items=FISHBONE.categories[catKey]||[];
   formDialog('编辑'+catLabels[catKey]+'原因',[
     {key:'items',label:'原因列表（每行一个）',type:'textarea',value:items.join('\n')}
@@ -2155,7 +2196,7 @@ const DEF_PDCA={
   act:['调整下周优先级','更新流程改进措施','归档经验教训到知识库']
 };
 let PDCA=safeJSON('chub_pdca')||JSON.parse(JSON.stringify(DEF_PDCA));
-function savePDCA(){localStorage.setItem('chub_pdca',JSON.stringify(PDCA));logActivity('pdca','更新','PDCA循环')}
+function savePDCA(){safeSet('chub_pdca',PDCA);logActivity('pdca','更新','PDCA循环')}
 
 function renderPDCA(){
   const el=document.getElementById('pdcaChart');
@@ -2190,14 +2231,16 @@ function resetPDCA(){
 }
 
 // ─── ACTIVITY LOG ───────────────────────────────────────
+// P2-19: logActivity with in-memory cache to avoid redundant LS reads
+let _activityCache=null;
 function logActivity(module,action,detail){
-  let log=safeJSON('chub_activity')||[];
-  log.unshift({ts:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}),module,action,detail:detail||''});
-  if(log.length>30)log=log.slice(0,30);
-  localStorage.setItem('chub_activity',JSON.stringify(log));
+  if(!_activityCache)_activityCache=safeJSON('chub_activity')||[];
+  _activityCache.unshift({ts:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}),module,action,detail:detail||''});
+  if(_activityCache.length>30)_activityCache=_activityCache.slice(0,30);
+  safeSet('chub_activity',_activityCache);
 }
 function renderActivityLog(){
-  const log=safeJSON('chub_activity')||[];
+  const log=_activityCache||safeJSON('chub_activity')||[];
   const el=document.getElementById('activityList');
   if(!log.length){el.innerHTML='<p style="color:var(--text-secondary)">暂无活动记录。</p>';return}
   const moduleColors={platforms:'var(--accent-media)',templates:'var(--accent-ops)',deals:'var(--accent-sales)',leads:'var(--accent-sales)',roadmap:'var(--accent-pm)',sprint:'var(--accent-pm)',feedback:'var(--accent-pm)',fishbone:'var(--accent-pm)',pdca:'var(--accent-pm)',regions:'var(--overseas)'};
@@ -2272,6 +2315,7 @@ function importAllData(input){
   const file=input.files[0];if(!file)return;
   if(!file.name.endsWith('.json')){showToast('请选择 .json 格式的备份文件','error');input.value='';return}
   const reader=new FileReader();
+  reader.onerror=function(){showToast('文件读取失败，请重试','error');input.value=''};
   reader.onload=function(e){
     try{
       const d=JSON.parse(e.target.result);
@@ -2283,10 +2327,12 @@ function importAllData(input){
       if(!hasKnownKey){showToast('无效的备份文件：未找到已知数据字段','error');return}
       // Validate critical arrays
       if(d.chub_platforms&&!Array.isArray(d.chub_platforms)){showToast('备份文件数据格式错误：platforms 必须为数组','error');return}
+      if(d.chub_platforms&&d.chub_platforms.length&&typeof d.chub_platforms[0]!=='object'){showToast('备份文件数据格式错误：platforms 条目无效','error');return}
       if(d.chub_templates&&!Array.isArray(d.chub_templates)){showToast('备份文件数据格式错误：templates 必须为数组','error');return}
+      if(d.chub_templates&&d.chub_templates.length&&(!d.chub_templates[0].id&&!d.chub_templates[0].name)){showToast('备份文件数据格式错误：templates 缺少 id/name','error');return}
       if(d.chub_feedback&&!Array.isArray(d.chub_feedback)){showToast('备份文件数据格式错误：feedback 必须为数组','error');return}
       confirmDialog('确定导入数据？当前数据将被覆盖。',()=>{
-        DATA_KEYS.forEach(k=>{if(d[k]!==undefined)localStorage.setItem(k,JSON.stringify(d[k]))});
+        DATA_KEYS.forEach(k=>{if(d[k]!==undefined)safeSet(k,d[k])});
         showToast('数据已导入 | 2秒后刷新...','success');
         setTimeout(()=>location.reload(),2000);
       },'导入',true);
@@ -2299,7 +2345,7 @@ function importAllData(input){
 // ─── CACHE CLEAR ────────────────────────────────────────
 function clearAllCache(){
   if(window.caches)caches.keys().then(ks=>ks.forEach(k=>caches.delete(k)));
-  ['chub_prefs','chub_history','chub_platforms','chub_deals','chub_leads','chub_templates','chub_roadmap','chub_sprint','chub_feedback','chub_regions','chub_theme','chub_env_config','chub_fishbone','chub_pdca','chub_activity'].forEach(k=>localStorage.removeItem(k));
+  ['chub_prefs','chub_history','chub_platforms','chub_deals','chub_leads','chub_templates','chub_roadmap','chub_sprint','chub_feedback','chub_regions','chub_theme','chub_env_config','chub_fishbone','chub_pdca','chub_activity'].forEach(k=>safeRemove(k));
   showToast('缓存已清除 | 2秒后刷新...','success');
   setTimeout(()=>location.reload(),2000);
 }
@@ -2314,9 +2360,10 @@ function saveHistory(){
     let hist=safeJSON('chub_history')||[];
     if(hist.length>0&&hist[0].text===text)return;
     const now=new Date();
-    hist.unshift({id:Date.now(),ts:now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}),text,preview:text.slice(0,60),len:text.length});
+    const stored=text.length>2000?text.slice(0,2000):text;
+    hist.unshift({id:Date.now(),ts:now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}),text:stored,preview:text.slice(0,60),len:text.length});
     if(hist.length>50)hist=hist.slice(0,50);
-    localStorage.setItem('chub_history',JSON.stringify(hist));
+    safeSet('chub_history',hist);
     showToast('已保存到历史','success',2000);
   },2000);
 }
@@ -2350,15 +2397,15 @@ function restoreHistory(id){
 function deleteHistory(id){
   let hist=safeJSON('chub_history')||[];
   hist=hist.filter(h=>h.id!==id);
-  localStorage.setItem('chub_history',JSON.stringify(hist));
+  safeSet('chub_history',hist);
   renderHistory();
   showToast('记录已删除','info');
 }
 
 // ─── PREFS PERSISTENCE ──────────────────────────────────
 function savePrefs(){
-  localStorage.setItem('chub_prefs',JSON.stringify({tab:activeMain,sub:activeSub,pmSub:activePmSub,cat:activeCat,region:document.getElementById('regionSelect')?.value||'us',lang:currentLang,
-    platEdit:platEditMode,salesEdit:salesEditMode,pmEdit:pmEditMode,opsEdit:opsEditMode,regionEdit:regionEditMode}));
+  safeSet('chub_prefs',{tab:activeMain,sub:activeSub,pmSub:activePmSub,cat:activeCat,region:document.getElementById('regionSelect')?.value||'us',lang:currentLang,
+    platEdit:platEditMode,salesEdit:salesEditMode,pmEdit:pmEditMode,opsEdit:opsEditMode,regionEdit:regionEditMode,guidesCollapsed:_guideCollapsed});
 }
 function loadPrefs(){
   try{
@@ -2383,7 +2430,8 @@ function loadPrefs(){
     if(p.pmEdit)pmEditMode=!!p.pmEdit;
     if(p.opsEdit)opsEditMode=!!p.opsEdit;
     if(p.regionEdit)regionEditMode=!!p.regionEdit;
-  }catch(e){}
+    if(p.guidesCollapsed){_guideCollapsed=p.guidesCollapsed;Object.keys(_guideCollapsed).forEach(id=>{const el=document.getElementById(id);if(el&&_guideCollapsed[id])el.style.display='none'})}
+  }catch(e){safeRemove('chub_prefs');console.warn('loadPrefs failed, reset:',e)}
 }
 
 // ─── PWA INSTALL ────────────────────────────────────────
