@@ -385,6 +385,8 @@ tr:hover td{background:rgba(51,65,85,.4)}
 .run-error{background:rgba(239,68,68,.15);color:var(--red)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" defer></script>
 </head>
 <body>
 
@@ -606,6 +608,7 @@ tr:hover td{background:rgba(51,65,85,.4)}
     <button class="pm-sub-tab" onclick="switchPmSub('pm-fishbone',this)" data-pmsub="pm-fishbone">鱼骨图</button>
     <button class="pm-sub-tab" onclick="switchPmSub('pm-pdca',this)" data-pmsub="pm-pdca">PDCA循环</button>
   </div>
+  <div id="pmToolbarArea"></div>
   <div id="sub-pm-roadmap" class="pm-sub-pane active">
     <div class="roadmap-lanes" id="roadmapLanes"></div>
   </div>
@@ -1036,9 +1039,11 @@ function switchPmSub(id,btn){
   document.querySelectorAll('.pm-sub-pane').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll('.pm-sub-tab').forEach(e=>e.classList.remove('active'));
   document.getElementById('sub-'+id).classList.add('active');
-  btn.classList.add('active');
+  if(btn)btn.classList.add('active');
+  else{const b=document.querySelector('[data-pmsub="'+id+'"]');if(b)b.classList.add('active')}
   activePmSub=id;
   savePrefs();
+  renderPM();
   if(id==='pm-gantt')renderGantt();
   if(id==='pm-fishbone')renderFishbone();
   if(id==='pm-pdca')renderPDCA();
@@ -1689,14 +1694,21 @@ let _pmSearchTimer=null;
 function searchPM(field,val){pmSearch[field]=val.toLowerCase();clearTimeout(_pmSearchTimer);_pmSearchTimer=setTimeout(()=>{renderPM();const el=document.getElementById('pmSearch_'+field);if(el)el.focus()},150)}
 
 function renderPM(){
-  // PM toolbar
+  // PM toolbar — now in #pmToolbarArea, visible across all sub-tabs
+  const sub=(typeof activePmSub!=='undefined'?activePmSub:null)||'pm-roadmap';
+  const exportMap={'pm-roadmap':['roadmapLanes','roadmap',['chub_roadmap']],'pm-gantt':['ganttChart','gantt',['chub_roadmap']],'pm-sprint':['sprintBoard','sprint',['chub_sprint']],'pm-feedback':['fbList','feedback',['chub_feedback']],'pm-fishbone':['fishboneChart','fishbone',['chub_fishbone']],'pm-pdca':['pdcaChart','pdca',['chub_pdca']]};
+  const ex=exportMap[sub];
+  const exportBtns=ex?`<button class="toolbar-btn" onclick="exportAsPNG('${ex[0]}','${ex[1]}')">&#128247; PNG</button><button class="toolbar-btn" onclick="exportAsPDF('${ex[0]}','${ex[1]}')">&#128196; PDF</button><button class="toolbar-btn" onclick="exportModule('${ex[1]}',${JSON.stringify(ex[2])})">&#128229; JSON</button>`
+    :`<button class="toolbar-btn" onclick="exportModule('pm-toolkit',['chub_roadmap','chub_sprint','chub_feedback','chub_fishbone','chub_pdca'])">&#128229; JSON</button>`;
   const pmToolbar=`<div class="toolbar" style="margin-bottom:16px">
     <button class="toolbar-btn${pmEditMode?' active':''}" onclick="togglePmEdit()">${pmEditMode?t('exitEdit'):t('editMode')}</button>
     ${pmEditMode?`<button class="toolbar-btn" onclick="resetPmData()">${t('resetDef')}</button>`
     :`<button class="toolbar-btn" onclick="loadSamplePM()">${t('loadSample')}</button><button class="toolbar-btn danger" onclick="clearModuleData('pm')">${t('clearData')}</button>`}
-    <button class="toolbar-btn" onclick="exportModule('pm-toolkit',['chub_roadmap','chub_sprint','chub_feedback','chub_fishbone','chub_pdca'])">&#128229; 导出</button>
+    ${exportBtns}
     <span class="edit-indicator">${pmEditMode?t('editClickHint'):t('readOnlyHint')}</span>
   </div>`;
+  const tba=document.getElementById('pmToolbarArea');
+  if(tba)tba.innerHTML=pmToolbar;
 
   // Roadmap
   const rmSearchBar=`<input class="pm-search-input" id="pmSearch_roadmap" placeholder="搜索路线图..." value="${esc(pmSearch.roadmap)}" oninput="searchPM('roadmap',this.value)">`;
@@ -1711,7 +1723,7 @@ function renderPM(){
     }).join('')}${pmEditMode?`<div class="ms-chip" style="cursor:pointer;border-style:dashed;color:var(--accent)" onclick="addRoadmapItem('${l}')">+ 添加</div>`:''}</div></div>`;
   }).join('');
 
-  document.getElementById('roadmapLanes').innerHTML=pmToolbar+'<div style="margin-bottom:8px;font-size:15px;font-weight:600">'+t('roadmap')+'</div>'+rmSearchBar+roadmapHtml;
+  document.getElementById('roadmapLanes').innerHTML='<div style="margin-bottom:8px;font-size:15px;font-weight:600">'+t('roadmap')+'</div>'+rmSearchBar+roadmapHtml;
 
   // Sprint Board
   const priLabel={high:t('priorityHigh'),medium:t('priorityMedium'),low:t('priorityLow')};
@@ -1871,7 +1883,8 @@ function renderGantt(){
   });
   html+='</tbody></table></div>';
   if(!items.length)html='<div style="text-align:center;padding:32px;color:var(--text-dim)">暂无带日期的路线图项目。请先在路线图中添加项目。</div>';
-  el.innerHTML=html;
+  const ganttToolbar='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><button class="toolbar-btn" onclick="switchPmSub(\'pm-roadmap\');pmEditMode=true;renderPM()">&#9998; 编辑路线图数据</button></div>';
+  el.innerHTML=ganttToolbar+html;
 }
 
 // ─── PM: FISHBONE DIAGRAM ───────────────────────────────
@@ -1977,7 +1990,7 @@ function renderPDCA(){
   const resetBtn='<div style="margin-top:12px"><button class="toolbar-btn" onclick="resetPDCA()">重置PDCA</button></div>';
   el.innerHTML='<div class="pdca-grid">'+quads.map(q=>{
     const items=PDCA[q.key]||[];
-    const lis=items.map((item,i)=>`<li><span class="pdca-del" onclick="deletePDCAItem('${q.key}',${i})">x</span> ${esc(item)}</li>`).join('');
+    const lis=items.map((item,i)=>`<li><span class="pdca-del" onclick="event.stopPropagation();deletePDCAItem('${q.key}',${i})">x</span> <span style="cursor:pointer" onclick="editPDCAItem('${q.key}',${i})">${esc(item)}</span></li>`).join('');
     return`<div class="pdca-quad" style="background:${q.bg};border:1px solid ${q.color}30;color:${q.color}"><h4>${q.label}</h4><ul>${lis}</ul><button class="pdca-add" onclick="addPDCAItem('${q.key}')" style="border-color:${q.color}50;color:${q.color}">+ 添加</button></div>`;
   }).join('')+'</div>'+resetBtn;
 }
@@ -1986,7 +1999,12 @@ function addPDCAItem(key){
     {key:'val',label:'内容',type:'text',placeholder:'输入内容'}
   ],vals=>{if(!vals.val)return;PDCA[key].push(vals.val);savePDCA();renderPDCA();showToast('已添加','success')});
 }
-function deletePDCAItem(key,i){PDCA[key].splice(i,1);savePDCA();renderPDCA();showToast('已删除','info',1500)}
+function editPDCAItem(key,i){
+  formDialog('编辑'+{plan:'计划',do:'执行',check:'检查',act:'处理'}[key]+'项',[
+    {key:'val',label:'内容',type:'text',value:PDCA[key][i]||''}
+  ],vals=>{if(!vals.val)return;PDCA[key][i]=vals.val;savePDCA();renderPDCA();showToast('已更新','success')});
+}
+function deletePDCAItem(key,i){confirmDialog('确定删除？',()=>{PDCA[key].splice(i,1);savePDCA();renderPDCA();showToast('已删除','info',1500)},'删除',true)}
 function resetPDCA(){
   confirmDialog('确定重置PDCA？',()=>{
     PDCA=JSON.parse(JSON.stringify(DEF_PDCA));savePDCA();renderPDCA();showToast('已重置','success');
@@ -2034,6 +2052,33 @@ function exportAllData(){
   a.download='career-hub-backup-'+new Date().toISOString().slice(0,10)+'.json';
   a.click();URL.revokeObjectURL(a.href);
   showToast('数据已导出','success');
+}
+async function exportAsPNG(elementId,filename){
+  if(typeof html2canvas==='undefined'){showToast('导出库加载中，请稍后再试','warning');return}
+  showToast('正在生成截图...','info',2000);
+  const el=document.getElementById(elementId);if(!el)return;
+  try{const canvas=await html2canvas(el,{backgroundColor:'#ffffff',scale:2,useCORS:true});
+  const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=(filename||elementId)+'.png';a.click();
+  showToast('PNG已导出','success');logActivity('export','png',filename)}catch(e){showToast('截图失败：'+e.message,'error')}
+}
+async function exportAsPDF(elementId,filename){
+  if(typeof html2canvas==='undefined'||typeof window.jspdf==='undefined'){showToast('导出库加载中，请稍后再试','warning');return}
+  showToast('正在生成PDF...','info',2000);
+  const el=document.getElementById(elementId);if(!el)return;
+  try{const canvas=await html2canvas(el,{backgroundColor:'#ffffff',scale:2,useCORS:true});
+  const{jsPDF}=window.jspdf;const pdf=new jsPDF('l','mm','a4');
+  const imgW=280,imgH=canvas.height*imgW/canvas.width;
+  if(imgH>190){pdf.addImage(canvas.toDataURL('image/png'),'PNG',5,5,imgW,Math.min(imgH,190))}
+  else{pdf.addImage(canvas.toDataURL('image/png'),'PNG',10,10,imgW,imgH)}
+  pdf.save((filename||elementId)+'.pdf');
+  showToast('PDF已导出','success');logActivity('export','pdf',filename)}catch(e){showToast('PDF生成失败：'+e.message,'error')}
+}
+function pmExportBar(elId,name,jsonKeys){
+  return`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <button class="toolbar-btn" onclick="exportAsPNG('${elId}','${name}')">&#128247; PNG</button>
+    <button class="toolbar-btn" onclick="exportAsPDF('${elId}','${name}')">&#128196; PDF</button>
+    <button class="toolbar-btn" onclick="exportModule('${name}',${JSON.stringify(jsonKeys)})">&#128229; JSON</button>
+  </div>`;
 }
 function exportModule(name,keys){
   const blob={module:name,exportedAt:new Date().toISOString()};
