@@ -217,6 +217,13 @@ tr:hover td{background:rgba(51,65,85,.4)}
 .sprint-col-title{font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between}
 .sprint-col-title .cnt{background:var(--card-hover);padding:1px 6px;border-radius:4px;font-size:11px}
 .task-chip{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:12px;margin-bottom:6px;line-height:1.4}
+.task-chip-meta{display:flex;gap:6px;margin-top:3px;font-size:10px;color:var(--text-dim);flex-wrap:wrap}
+.task-chip-meta span{display:inline-flex;align-items:center;gap:2px}
+.task-pri-high{color:var(--red);font-weight:600}
+.task-pri-medium{color:var(--yellow);font-weight:600}
+.task-pri-low{color:var(--green)}
+.pm-search-input{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card-bg);color:var(--text);margin-bottom:10px;font-family:inherit}
+.pm-search-input:focus{outline:none;border-color:var(--accent-pm)}
 .fb-list{max-width:600px}
 .fb-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
 .fb-votes{background:var(--card-bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:14px;font-weight:700;color:var(--accent-pm);text-align:center;min-width:44px}
@@ -388,9 +395,10 @@ tr:hover td{background:rgba(51,65,85,.4)}
 
 <!-- STATS BAR -->
 <div class="stats-bar">
-  <span class="stat-item"><strong>4</strong> 仓库</span>
-  <span class="stat-item"><strong>73</strong> MCP工具</span>
-  <span class="stat-item"><strong>2,462</strong> 测试通过</span>
+  <span class="stat-item" id="statPlatforms"><strong>0</strong> 平台</span>
+  <span class="stat-item" id="statWorkflows"><strong>0</strong> 工作流</span>
+  <span class="stat-item" id="statRoadmap"><strong>0</strong> 路线图</span>
+  <span class="stat-item" id="statDeals"><strong>0</strong> 商机</span>
   <span class="stat-item">media-ops <strong>v0.8.0</strong></span>
   <span class="stat-item">ops-flow <strong>v0.6.0</strong></span>
   <span class="stat-item">sales-crm <strong>v0.6.0</strong></span>
@@ -633,8 +641,12 @@ tr:hover td{background:rgba(51,65,85,.4)}
     <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
   </div>
   <button class="panel-btn" onclick="togglePanel('history')">查看历史</button>
+  <button class="panel-btn" onclick="togglePanel('activity')">活动日志</button>
   <button class="panel-btn" onclick="openMCPConfigDialog()">配置MCP连接</button>
   <button class="panel-btn" onclick="syncAllMCP()">同步MCP数据</button>
+  <button class="panel-btn" onclick="exportAllData()">导出数据备份</button>
+  <button class="panel-btn" onclick="document.getElementById('importFileInput').click()">导入数据备份</button>
+  <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importAllData(this)">
   <button class="panel-btn panel-btn-danger" onclick="confirmDialog('确定清除所有缓存并刷新？',clearAllCache)">清除缓存</button>
   <button class="panel-btn" id="pwaInstallBtn" style="display:none" onclick="pwaInstall()">安装应用 (PWA)</button>
   <div style="margin-top:24px;font-size:12px;color:var(--text-dim)">
@@ -652,6 +664,15 @@ tr:hover td{background:rgba(51,65,85,.4)}
   <div id="historyList"><p style="font-size:13px;color:var(--text-secondary)">暂无历史记录，请先使用内容预览功能。</p></div>
 </div>
 
+<!-- ACTIVITY LOG PANEL -->
+<div class="side-panel" id="activityPanel">
+  <div class="panel-head">
+    <span class="panel-title">活动日志</span>
+    <button class="panel-close" onclick="closeAllPanels()">&#10005;</button>
+  </div>
+  <div id="activityList" style="font-size:13px"><p style="color:var(--text-secondary)">暂无活动记录。</p></div>
+</div>
+
 <script>
 // ─── STATE ──────────────────────────────────────────────
 let activeMain='overview';
@@ -665,6 +686,7 @@ const LANG={
   zh:{
     title:'Career-Hub 仪表盘',langBtn:'EN',
     repos:'仓库',mcpTools:'MCP工具',testsPassed:'测试通过',
+    platforms:'平台',workflows:'工作流',roadmapItems:'路线图',totalDeals:'商机',
     tabOverview:'总览',tabMedia:'媒体运营',tabOps:'工作流',tabSales:'销售CRM',tabPm:'项目管理',
     indTitle:'行业应用场景',
     compare:'平台对比',preview:'内容预览',regional:'地区指南',
@@ -674,7 +696,8 @@ const LANG={
     roadmap:'产品路线图',sprint:'当前冲刺看板',feedback:'热门反馈',
     pmRoadmap:'路线图',pmGantt:'甘特图',pmSprint:'冲刺看板',pmFeedback:'热门反馈',pmFishbone:'鱼骨图',pmPDCA:'PDCA循环',
     todo:'待处理',inProg:'进行中',review:'待审核',done:'已完成',
-    settings:'设置',history:'历史记录',viewHist:'查看历史',cfgMcp:'配置MCP连接',syncMcp:'同步MCP数据',clearCache:'清除缓存',installPwa:'安装应用 (PWA)',
+    dueDate:'截止日期',assignee:'负责人',priorityHigh:'高',priorityMedium:'中',priorityLow:'低',
+    settings:'设置',history:'历史记录',activityLog:'活动日志',viewHist:'查看历史',cfgMcp:'配置MCP连接',syncMcp:'同步MCP数据',exportData:'导出数据备份',importData:'导入数据备份',clearCache:'清除缓存',installPwa:'安装应用 (PWA)',
     noHist:'暂无历史记录，请先使用内容预览功能。',saved:'已保存',deleted:'已删除',reset:'已重置为默认数据',updated:'已更新',added:'已添加',
     inputHint:'在此输入内容…实时预览13个平台的适配效果。',selectRegion:'选择目标地区',
     platName:'平台',charLimit:'字数限制',contentStyle:'内容风格',hashtagLabel:'话题标签',featureLabel:'功能特色',priorityLabel:'优先级',actions:'操作',
@@ -692,6 +715,7 @@ const LANG={
   en:{
     title:'Career-Hub Dashboard',langBtn:'中文',
     repos:'Repos',mcpTools:'MCP Tools',testsPassed:'Tests Passed',
+    platforms:'Platforms',workflows:'Workflows',roadmapItems:'Roadmap',totalDeals:'Deals',
     tabOverview:'Overview',tabMedia:'Media Ops',tabOps:'Workflow',tabSales:'Sales CRM',tabPm:'PM Toolkit',
     indTitle:'Industry Use Cases',
     compare:'Platform Compare',preview:'Content Preview',regional:'Regional Guide',
@@ -701,7 +725,8 @@ const LANG={
     roadmap:'Product Roadmap',sprint:'Current Sprint Board',feedback:'Top Feedback',
     pmRoadmap:'Roadmap',pmGantt:'Gantt Chart',pmSprint:'Sprint Board',pmFeedback:'Top Feedback',pmFishbone:'Fishbone',pmPDCA:'PDCA Cycle',
     todo:'To Do',inProg:'In Progress',review:'In Review',done:'Done',
-    settings:'Settings',history:'History',viewHist:'View History',cfgMcp:'Configure MCP',syncMcp:'Sync MCP Data',clearCache:'Clear Cache',installPwa:'Install App (PWA)',
+    dueDate:'Due Date',assignee:'Assignee',priorityHigh:'High',priorityMedium:'Medium',priorityLow:'Low',
+    settings:'Settings',history:'History',activityLog:'Activity Log',viewHist:'View History',cfgMcp:'Configure MCP',syncMcp:'Sync MCP Data',exportData:'Export Data Backup',importData:'Import Data Backup',clearCache:'Clear Cache',installPwa:'Install App (PWA)',
     noHist:'No history yet. Try the content preview first.',saved:'Saved',deleted:'Deleted',reset:'Reset to defaults',updated:'Updated',added:'Added',
     inputHint:'Enter content... preview adaptation across 13 platforms.',selectRegion:'Select target region',
     platName:'Platform',charLimit:'Char Limit',contentStyle:'Content Style',hashtagLabel:'Hashtags',featureLabel:'Features',priorityLabel:'Priority',actions:'Actions',
@@ -718,6 +743,17 @@ const LANG={
   }
 };
 function t(key){return(LANG[currentLang]&&LANG[currentLang][key])||LANG.zh[key]||key}
+function updateStatsBar(){
+  const pc=typeof PLATFORMS!=='undefined'?PLATFORMS.length:0;
+  const wc=typeof TEMPLATES!=='undefined'?TEMPLATES.length:0;
+  const rc=typeof ROADMAP!=='undefined'?ROADMAP.length:0;
+  const dc=typeof DEAL_STAGES!=='undefined'?DEAL_STAGES.reduce((s,d)=>s+(d.count||0),0):0;
+  const e=id=>document.getElementById(id);
+  if(e('statPlatforms'))e('statPlatforms').innerHTML='<strong>'+pc+'</strong> '+t('platforms');
+  if(e('statWorkflows'))e('statWorkflows').innerHTML='<strong>'+wc+'</strong> '+t('workflows');
+  if(e('statRoadmap'))e('statRoadmap').innerHTML='<strong>'+rc+'</strong> '+t('roadmapItems');
+  if(e('statDeals'))e('statDeals').innerHTML='<strong>'+dc+'</strong> '+t('totalDeals');
+}
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function safeJSON(key,fallback){try{const v=localStorage.getItem(key);return v?JSON.parse(v):(fallback||null)}catch(e){localStorage.removeItem(key);return fallback||null}}
 
@@ -770,12 +806,13 @@ function confirmDialog(msg,onOk,okText,dangerMode){
 
 const COLOR_PRESETS=['#3b82f6','#06b6d4','#8b5cf6','#f59e0b','#10b981','#ef4444','#ec4899','#f97316','#14b8a6','#6366f1','#84cc16','#64748b'];
 function formDialog(title,fields,onOk,extraBtns){
-  // fields: [{key,label,type:'text'|'textarea'|'select'|'number'|'colorpicker',value,options:[{v,l}],placeholder}]
+  // fields: [{key,label,type:'text'|'textarea'|'select'|'number'|'date'|'colorpicker',value,options:[{v,l}],placeholder}]
   let html=`<div class="dlg-title">${esc(title)}</div>`;
   fields.forEach(f=>{
     html+=`<div class="dlg-field"><label>${esc(f.label)}</label>`;
     if(f.type==='textarea') html+=`<textarea id="dlg_${f.key}" placeholder="${esc(f.placeholder||'')}">${esc(f.value||'')}</textarea>`;
     else if(f.type==='select') html+=`<select id="dlg_${f.key}">${(f.options||[]).map(o=>`<option value="${esc(o.v)}"${o.v===f.value?' selected':''}>${esc(o.l)}</option>`).join('')}</select>`;
+    else if(f.type==='date') html+=`<input type="date" id="dlg_${f.key}" value="${esc(f.value||'')}" style="font-family:inherit">`;
     else if(f.type==='colorpicker') html+=`<div class="color-swatches" id="dlg_swatches_${f.key}">${COLOR_PRESETS.map(c=>`<div class="color-swatch${c===f.value?' selected':''}" style="background:${c}" data-color="${c}" onclick="pickColor('${f.key}','${c}')"></div>`).join('')}</div><input type="text" id="dlg_${f.key}" value="${esc(f.value||'#3b82f6')}" placeholder="#hex" style="margin-top:6px" oninput="updateSwatchSelection('${f.key}',this.value)">`;
     else html+=`<input type="${f.type||'text'}" id="dlg_${f.key}" value="${esc(f.value||'')}" placeholder="${esc(f.placeholder||'')}">`;
     html+=`</div>`;
@@ -868,17 +905,17 @@ function applyLang(){
   if(subBtns[0])subBtns[0].textContent=t('compare');
   if(subBtns[1])subBtns[1].textContent=t('preview');
   if(subBtns[2])subBtns[2].textContent=t('regional');
-  // Stats bar
-  const statItems=document.querySelectorAll('.stats-bar:first-of-type .stat-item');
-  if(statItems[0])statItems[0].innerHTML='<strong>4</strong> '+t('repos');
-  if(statItems[1])statItems[1].innerHTML='<strong>73</strong> '+t('mcpTools');
-  if(statItems[2])statItems[2].innerHTML='<strong>2,462</strong> '+t('testsPassed');
+  // Stats bar (dynamic)
+  updateStatsBar();
   // Settings panel
   const panelBtns=document.querySelectorAll('#settingsPanel .panel-btn');
   if(panelBtns[0])panelBtns[0].textContent=t('viewHist');
-  if(panelBtns[1])panelBtns[1].textContent=t('cfgMcp');
-  if(panelBtns[2])panelBtns[2].textContent=t('syncMcp');
-  if(panelBtns[3])panelBtns[3].textContent=t('clearCache');
+  if(panelBtns[1])panelBtns[1].textContent=t('activityLog');
+  if(panelBtns[2])panelBtns[2].textContent=t('cfgMcp');
+  if(panelBtns[3])panelBtns[3].textContent=t('syncMcp');
+  if(panelBtns[4])panelBtns[4].textContent=t('exportData');
+  if(panelBtns[5])panelBtns[5].textContent=t('importData');
+  if(panelBtns[6])panelBtns[6].textContent=t('clearCache');
   const pwaBtn=document.getElementById('pwaInstallBtn');if(pwaBtn)pwaBtn.textContent=t('installPwa');
   document.querySelector('#settingsPanel .panel-title').textContent=t('settings');
   document.querySelector('#historyPanel .panel-title').textContent=t('history');
@@ -1013,7 +1050,7 @@ const DEFAULT_PLATFORMS=[
   {id:'igpost',name:'IG Post',limit:2200,style:'lifestyle',tags:['#lifestyle','#success'],os:true,styleLabel:'图文精致, 品牌展示',hashtags:'3-10',features:'购物标签, 轮播, 探索页发现',priority:'P1'},
 ];
 let PLATFORMS=safeJSON('chub_platforms')||JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
-function savePlatforms(){localStorage.setItem('chub_platforms',JSON.stringify(PLATFORMS))}
+function savePlatforms(){localStorage.setItem('chub_platforms',JSON.stringify(PLATFORMS));updateStatsBar();logActivity('platforms','更新','共'+PLATFORMS.length+'个平台')}
 
 // ─── PLATFORM TABLE: SORT + EDIT + RENDER ─────────────
 let platSort={col:null,dir:'asc'};
@@ -1199,7 +1236,7 @@ const DEFAULT_REGIONS={
   latam:{label:'拉丁美洲',tips:['巴西人日均社交媒体3h49m全球最高（Statista），Instagram Reels（日均700万+帖子）和WhatsApp是巴西必备双平台','按国家细分：Instagram主导阿根廷/巴西/智利，Facebook主导哥伦比亚/墨西哥/秘鲁，TikTok在哥伦比亚增长最快（LatAm Intersect PR 2025）','WhatsApp和Telegram群组是重要内容发现渠道，群组种草效果往往超越付费广告','Meme是政治话语和文化评论载体（尤其巴西和墨西哥），创造可分享Meme格式的自然流量远超普通内容','西班牙语不能通用：墨西哥/阿根廷/哥伦比亚的词汇/俚语/正式程度差异巨大；巴西需全葡萄牙语','TikTok在拉美13-24岁用户中日均使用87分钟，竖屏视频是年轻受众的主要格式（Awisee 2025）'],taboos:['避免在国家政治冲突中选边：哥伦比亚/墨西哥/智利有记录的"水军"协同虚假宣传，涉政内容会被默认为付费虚假信息（Americas Market Intelligence 2025）','禁止嘲讽天主教会或民间宗教表达（亡灵节、圣周、守护圣人节），宗教与文化身份在拉美深度绑定','禁止用大男子主义或圣母主义刻板印象来定义性别角色，即使以批判角度使用也会两面不讨好'],tags:['#LatinAmerica','#Latinx','#Brasil','#Mexico'],times:'工作日12-2 PM和7-9 PM当地时间（午餐和晚间双高峰）；巴西周末参与度全球最高',audience:'全球社交媒体使用时长最高受众，WhatsApp/Telegram私群是核心发现渠道，年轻用户以TikTok为主，文化自豪感强，对去地域化内容抵触，足球是最大流量触发点'}
 };
 let REGIONS=safeJSON('chub_regions')||JSON.parse(JSON.stringify(DEFAULT_REGIONS));
-function saveRegions(){localStorage.setItem('chub_regions',JSON.stringify(REGIONS))}
+function saveRegions(){localStorage.setItem('chub_regions',JSON.stringify(REGIONS));logActivity('regions','更新','地区数据')}
 
 let regionEditMode=false;
 function renderRegion(){
@@ -1277,7 +1314,7 @@ const DEFAULT_TEMPLATES=[
   {id:'social-analytics',name:'社媒数据汇总',cat:'monitoring',desc:'汇总多个社交媒体平台的数据指标，生成统一分析报告',trigger:'定时：每周一8:00',steps:['连接各平台API','拉取核心指标','跨平台对比分析','生成可视化图表','输出汇总报告'],vars:['platforms（必填）','metrics（默认：followers,engagement,reach）','period（默认：7d）']},
 ];
 let TEMPLATES=safeJSON('chub_templates')||JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
-function saveTemplates(){localStorage.setItem('chub_templates',JSON.stringify(TEMPLATES))}
+function saveTemplates(){localStorage.setItem('chub_templates',JSON.stringify(TEMPLATES));updateStatsBar();logActivity('templates','更新','共'+TEMPLATES.length+'个工作流')}
 function getCatLabels(){return{all:'全部 ('+TEMPLATES.length+')',reporting:'报告',data:'数据',monitoring:'监控',content:'内容',marketing:'营销',crm:'CRM'}}
 let activeCat='all';
 let opsEditMode=false;
@@ -1413,12 +1450,12 @@ function loadSamplePM(){
     {lane:'P2',title:'Chrome浏览器插件',status:'planned',date:'2026-Q3'},
     {lane:'P3',title:'移动端APP',status:'planned',date:'2026-Q4'},
   ];
-  SPRINT_TASKS={
+  SPRINT_TASKS=migrateSprintTasks({
     todo:['添加OAuth登录','编写API文档','配置CI/CD','用户反馈收集系统'],
     in_progress:['统一仪表盘UI','地区文化数据测试','MCP连接稳定性'],
     review:['内容分发器v2','数据导出功能'],
     done:['MCP注册更新','平台对比表','Service Worker配置','PWA离线支持'],
-  };
+  });
   FEEDBACK=[
     {text:'添加深色/浅色主题切换',votes:28,cat:'feature'},
     {text:'小屏手机布局错乱',votes:22,cat:'bug'},
@@ -1473,8 +1510,8 @@ const DEF_DEAL=[{id:'contact',label:'初次接触',count:24,color:'#3b82f6'},{id
 const DEF_LEAD=[{id:'new',label:'新线索',count:45,color:'#3b82f6'},{id:'contacted',label:'已接触',count:32,color:'#06b6d4'},{id:'qualified',label:'已意向',count:20,color:'#8b5cf6'},{id:'converted',label:'已转化',count:11,color:'#10b981'},{id:'lost',label:'已流失',count:9,color:'#ef4444'}];
 let DEAL_STAGES=safeJSON('chub_deals')||JSON.parse(JSON.stringify(DEF_DEAL));
 let LEAD_STATUSES=safeJSON('chub_leads')||JSON.parse(JSON.stringify(DEF_LEAD));
-function saveDeals(){localStorage.setItem('chub_deals',JSON.stringify(DEAL_STAGES))}
-function saveLeads(){localStorage.setItem('chub_leads',JSON.stringify(LEAD_STATUSES))}
+function saveDeals(){localStorage.setItem('chub_deals',JSON.stringify(DEAL_STAGES));updateStatsBar();logActivity('deals','更新','商机阶段')}
+function saveLeads(){localStorage.setItem('chub_leads',JSON.stringify(LEAD_STATUSES));logActivity('leads','更新','线索状态')}
 let salesEditMode=false;
 
 function renderSales(){
@@ -1590,11 +1627,24 @@ const DEF_ROADMAP=[
   {lane:'P3',title:'Chrome插件',status:'planned',date:'2026-Q3'},
 ];
 const DEF_SPRINT={
-  todo:['添加OAuth登录','编写API文档','配置CI/CD'],
-  in_progress:['统一仪表盘','地区文化测试'],
-  review:['内容分发器v2'],
-  done:['MCP注册更新','平台对比表','Service Worker配置'],
+  todo:[{id:1,title:'添加OAuth登录',due:'2026-04-15',assignee:'',priority:'high'},{id:2,title:'编写API文档',due:'2026-04-20',assignee:'',priority:'medium'},{id:3,title:'配置CI/CD',due:'2026-04-10',assignee:'',priority:'high'}],
+  in_progress:[{id:4,title:'统一仪表盘',due:'2026-03-30',assignee:'',priority:'high'},{id:5,title:'地区文化测试',due:'2026-04-05',assignee:'',priority:'low'}],
+  review:[{id:6,title:'内容分发器v2',due:'2026-03-28',assignee:'',priority:'medium'}],
+  done:[{id:7,title:'MCP注册更新',due:'',assignee:'',priority:'low'},{id:8,title:'平台对比表',due:'',assignee:'',priority:'medium'},{id:9,title:'Service Worker配置',due:'',assignee:'',priority:'low'}],
 };
+let _sprintIdCounter=10;
+function migrateSprintTasks(raw){
+  if(!raw)return JSON.parse(JSON.stringify(DEF_SPRINT));
+  const out={};
+  ['todo','in_progress','review','done'].forEach(col=>{
+    const arr=raw[col]||[];
+    out[col]=arr.map(item=>{
+      if(typeof item==='string') return{id:_sprintIdCounter++,title:item,due:'',assignee:'',priority:'medium'};
+      return item;
+    });
+  });
+  return out;
+}
 const DEF_FEEDBACK=[
   {text:'添加深色/浅色主题切换',votes:28,cat:'feature'},
   {text:'小屏手机布局错乱',votes:22,cat:'bug'},
@@ -1603,12 +1653,15 @@ const DEF_FEEDBACK=[
   {text:'添加定时发布提醒通知',votes:12,cat:'feature'},
 ];
 let ROADMAP=safeJSON('chub_roadmap')||JSON.parse(JSON.stringify(DEF_ROADMAP));
-let SPRINT_TASKS=safeJSON('chub_sprint')||JSON.parse(JSON.stringify(DEF_SPRINT));
+let SPRINT_TASKS=migrateSprintTasks(safeJSON('chub_sprint'));
 let FEEDBACK=safeJSON('chub_feedback')||JSON.parse(JSON.stringify(DEF_FEEDBACK));
-function saveRoadmap(){localStorage.setItem('chub_roadmap',JSON.stringify(ROADMAP))}
-function saveSprint(){localStorage.setItem('chub_sprint',JSON.stringify(SPRINT_TASKS))}
-function saveFeedback(){localStorage.setItem('chub_feedback',JSON.stringify(FEEDBACK))}
+function saveRoadmap(){localStorage.setItem('chub_roadmap',JSON.stringify(ROADMAP));updateStatsBar();logActivity('roadmap','更新','共'+ROADMAP.length+'项')}
+function saveSprint(){localStorage.setItem('chub_sprint',JSON.stringify(SPRINT_TASKS));logActivity('sprint','更新','冲刺看板')}
+function saveFeedback(){localStorage.setItem('chub_feedback',JSON.stringify(FEEDBACK));logActivity('feedback','更新','共'+FEEDBACK.length+'条反馈')}
 let pmEditMode=false;
+const pmSearch={roadmap:'',sprint:'',feedback:''};
+let _pmSearchTimer=null;
+function searchPM(field,val){pmSearch[field]=val.toLowerCase();clearTimeout(_pmSearchTimer);_pmSearchTimer=setTimeout(()=>{renderPM();const el=document.getElementById('pmSearch_'+field);if(el)el.focus()},150)}
 
 function renderPM(){
   // PM toolbar
@@ -1620,9 +1673,10 @@ function renderPM(){
   </div>`;
 
   // Roadmap
+  const rmSearchBar=`<input class="pm-search-input" id="pmSearch_roadmap" placeholder="搜索路线图..." value="${esc(pmSearch.roadmap)}" oninput="searchPM('roadmap',this.value)">`;
   const lanes=['P0','P1','P2','P3'];
   const roadmapHtml=lanes.map(l=>{
-    const items=ROADMAP.filter(r=>r.lane===l);
+    const items=ROADMAP.filter(r=>r.lane===l&&(!pmSearch.roadmap||r.title.toLowerCase().includes(pmSearch.roadmap)));
     return`<div class="lane"><span class="lane-label">${l}</span><div class="lane-items">${items.map((r,_)=>{
       const ri=ROADMAP.indexOf(r);
       const editClick=pmEditMode?`onclick="editRoadmapItem(${ri})"`:'';
@@ -1631,27 +1685,35 @@ function renderPM(){
     }).join('')}${pmEditMode?`<div class="ms-chip" style="cursor:pointer;border-style:dashed;color:var(--accent)" onclick="addRoadmapItem('${l}')">+ 添加</div>`:''}</div></div>`;
   }).join('');
 
-  document.getElementById('roadmapLanes').innerHTML=pmToolbar+'<div style="margin-bottom:8px;font-size:15px;font-weight:600">'+t('roadmap')+'</div>'+roadmapHtml;
+  document.getElementById('roadmapLanes').innerHTML=pmToolbar+'<div style="margin-bottom:8px;font-size:15px;font-weight:600">'+t('roadmap')+'</div>'+rmSearchBar+roadmapHtml;
 
   // Sprint Board
+  const priLabel={high:t('priorityHigh'),medium:t('priorityMedium'),low:t('priorityLow')};
+  const priCls={high:'task-pri-high',medium:'task-pri-medium',low:'task-pri-low'};
+  const sprintSearchBar=`<input class="pm-search-input" id="pmSearch_sprint" placeholder="搜索任务..." value="${esc(pmSearch.sprint)}" oninput="searchPM('sprint',this.value)" style="margin-bottom:12px">`;
   const cols=[['todo',t('todo')],['in_progress',t('inProg')],['review',t('review')],['done',t('done')]];
-  document.getElementById('sprintBoard').innerHTML=cols.map(([k,label])=>{
-    const tasks=SPRINT_TASKS[k]||[];
+  document.getElementById('sprintBoard').innerHTML=sprintSearchBar+cols.map(([k,label])=>{
+    const tasks=(SPRINT_TASKS[k]||[]).filter(tk=>{if(!pmSearch.sprint)return true;const title=typeof tk==='string'?tk:(tk.title||'');return title.toLowerCase().includes(pmSearch.sprint)});
     const taskHtml=tasks.map((tk,ti)=>{
-      const editClick=pmEditMode?`onclick="editSprintTask('${k}',${ti})"`:'';
-      const delBtn=pmEditMode?`<span style="float:right;cursor:pointer;color:var(--red);font-size:11px" onclick="event.stopPropagation();deleteSprintTask('${k}',${ti})">x</span>`:'';
-      return`<div class="task-chip" style="${pmEditMode?'cursor:pointer':''}" ${editClick}>${esc(tk)}${delBtn}</div>`;
+      const origIdx=(SPRINT_TASKS[k]||[]).indexOf(tk);
+      const title=typeof tk==='string'?tk:(tk.title||'');
+      const due=tk.due||'';const assignee=tk.assignee||'';const pri=tk.priority||'medium';
+      const editClick=pmEditMode?`onclick="editSprintTask('${k}',${origIdx})"`:'';
+      const delBtn=pmEditMode?`<span style="float:right;cursor:pointer;color:var(--red);font-size:11px" onclick="event.stopPropagation();deleteSprintTask('${k}',${origIdx})">x</span>`:'';
+      const meta=(due||assignee)?`<div class="task-chip-meta">${due?'<span>&#128197; '+esc(due)+'</span>':''}${assignee?'<span>&#128100; '+esc(assignee)+'</span>':''}<span class="${priCls[pri]||''}">${priLabel[pri]||pri}</span></div>`:'';
+      return`<div class="task-chip" style="${pmEditMode?'cursor:pointer':''}" ${editClick}>${esc(title)}${delBtn}${meta}</div>`;
     }).join('');
     const addBtn=pmEditMode?`<div class="task-chip" style="cursor:pointer;border-style:dashed;color:var(--accent);text-align:center" onclick="addSprintTask('${k}')">+ 添加</div>`:'';
     return`<div class="sprint-col"><div class="sprint-col-title">${label}<span class="cnt">${tasks.length}</span></div>${taskHtml}${addBtn}</div>`;
   }).join('');
 
   // Feedback
+  const fbSearchBar=`<input class="pm-search-input" id="pmSearch_feedback" placeholder="搜索反馈..." value="${esc(pmSearch.feedback)}" oninput="searchPM('feedback',this.value)">`;
   const catCls={feature:'fb-feature',bug:'fb-bug',improve:'fb-improve'};
   const catLabel={feature:'新功能',bug:'Bug',improve:'优化'};
   const fbAddBtn=pmEditMode?`<div style="margin-top:12px"><button class="toolbar-btn primary" onclick="addFeedback()">+ 添加反馈</button></div>`:'';
-  const sortedFb=[...FEEDBACK].map((f,origIdx)=>({...f,_idx:origIdx})).sort((a,b)=>b.votes-a.votes);
-  document.getElementById('fbList').innerHTML=sortedFb.map(f=>{
+  const sortedFb=[...FEEDBACK].map((f,origIdx)=>({...f,_idx:origIdx})).filter(f=>!pmSearch.feedback||f.text.toLowerCase().includes(pmSearch.feedback)).sort((a,b)=>b.votes-a.votes);
+  document.getElementById('fbList').innerHTML=fbSearchBar+sortedFb.map(f=>{
     const i=f._idx;
     const editClick=pmEditMode?`onclick="editFeedback(${i})"`:'';
     const voteClick=pmEditMode?'':`onclick="voteFeedback(${i})"`;
@@ -1691,25 +1753,37 @@ function addRoadmapItem(lane){
 }
 // Sprint CRUD
 function editSprintTask(col,ti){
+  const tk=SPRINT_TASKS[col][ti];if(!tk)return;
+  const obj=typeof tk==='string'?{title:tk,due:'',assignee:'',priority:'medium'}:tk;
   formDialog('编辑任务',[
-    {key:'val',label:'任务名称',type:'text',value:SPRINT_TASKS[col][ti]},
+    {key:'title',label:'任务名称',type:'text',value:obj.title},
+    {key:'due',label:t('dueDate'),type:'date',value:obj.due||''},
+    {key:'assignee',label:t('assignee'),type:'text',value:obj.assignee||'',placeholder:'负责人'},
+    {key:'priority',label:t('priorityLabel'),type:'select',value:obj.priority||'medium',options:[
+      {v:'high',l:t('priorityHigh')},{v:'medium',l:t('priorityMedium')},{v:'low',l:t('priorityLow')}]},
     {key:'newCol',label:'移动到',type:'select',value:col,options:[
       {v:'todo',l:'待处理'},{v:'in_progress',l:'进行中'},{v:'review',l:'待审核'},{v:'done',l:'已完成'}]}
   ],vals=>{
+    const updated={id:obj.id||_sprintIdCounter++,title:vals.title,due:vals.due,assignee:vals.assignee,priority:vals.priority};
     SPRINT_TASKS[col].splice(ti,1);
     if(!SPRINT_TASKS[vals.newCol])SPRINT_TASKS[vals.newCol]=[];
-    SPRINT_TASKS[vals.newCol].push(vals.val);
+    SPRINT_TASKS[vals.newCol].push(updated);
     saveSprint();renderPM();showToast('已更新','success');
   });
 }
 function deleteSprintTask(col,ti){confirmDialog('确定删除此任务？',()=>{SPRINT_TASKS[col].splice(ti,1);saveSprint();renderPM();showToast('已删除','info',1500)},'删除',true)}
 function addSprintTask(col){
   formDialog('添加任务到 '+{todo:'待处理',in_progress:'进行中',review:'待审核',done:'已完成'}[col],[
-    {key:'val',label:'任务名称',type:'text',placeholder:'输入任务名称'}
+    {key:'title',label:'任务名称',type:'text',placeholder:'输入任务名称'},
+    {key:'due',label:t('dueDate'),type:'date',value:''},
+    {key:'assignee',label:t('assignee'),type:'text',value:'',placeholder:'负责人'},
+    {key:'priority',label:t('priorityLabel'),type:'select',value:'medium',options:[
+      {v:'high',l:t('priorityHigh')},{v:'medium',l:t('priorityMedium')},{v:'low',l:t('priorityLow')}]}
   ],vals=>{
-    if(!vals.val)return;
+    if(!vals.title)return;
     if(!SPRINT_TASKS[col])SPRINT_TASKS[col]=[];
-    SPRINT_TASKS[col].push(vals.val);saveSprint();renderPM();showToast('已添加','success');
+    SPRINT_TASKS[col].push({id:_sprintIdCounter++,title:vals.title,due:vals.due||'',assignee:vals.assignee||'',priority:vals.priority||'medium'});
+    saveSprint();renderPM();showToast('已添加','success');
   });
 }
 // Feedback CRUD
@@ -1780,7 +1854,7 @@ const DEF_FISHBONE={
   }
 };
 let FISHBONE=safeJSON('chub_fishbone')||JSON.parse(JSON.stringify(DEF_FISHBONE));
-function saveFishbone(){localStorage.setItem('chub_fishbone',JSON.stringify(FISHBONE))}
+function saveFishbone(){localStorage.setItem('chub_fishbone',JSON.stringify(FISHBONE));logActivity('fishbone','更新','鱼骨图')}
 
 function renderFishbone(){
   const el=document.getElementById('fishboneChart');
@@ -1857,7 +1931,7 @@ const DEF_PDCA={
   act:['调整下周优先级','更新流程改进措施','归档经验教训到知识库']
 };
 let PDCA=safeJSON('chub_pdca')||JSON.parse(JSON.stringify(DEF_PDCA));
-function savePDCA(){localStorage.setItem('chub_pdca',JSON.stringify(PDCA))}
+function savePDCA(){localStorage.setItem('chub_pdca',JSON.stringify(PDCA));logActivity('pdca','更新','PDCA循环')}
 
 function renderPDCA(){
   const el=document.getElementById('pdcaChart');
@@ -1886,6 +1960,21 @@ function resetPDCA(){
   },'重置',true);
 }
 
+// ─── ACTIVITY LOG ───────────────────────────────────────
+function logActivity(module,action,detail){
+  let log=safeJSON('chub_activity')||[];
+  log.unshift({ts:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}),module,action,detail:detail||''});
+  if(log.length>30)log=log.slice(0,30);
+  localStorage.setItem('chub_activity',JSON.stringify(log));
+}
+function renderActivityLog(){
+  const log=safeJSON('chub_activity')||[];
+  const el=document.getElementById('activityList');
+  if(!log.length){el.innerHTML='<p style="color:var(--text-secondary)">暂无活动记录。</p>';return}
+  const moduleColors={platforms:'var(--accent-media)',templates:'var(--accent-ops)',deals:'var(--accent-sales)',leads:'var(--accent-sales)',roadmap:'var(--accent-pm)',sprint:'var(--accent-pm)',feedback:'var(--accent-pm)',fishbone:'var(--accent-pm)',pdca:'var(--accent-pm)',regions:'var(--overseas)'};
+  el.innerHTML=log.map(e=>`<div class="hist-entry" style="border-left:3px solid ${moduleColors[e.module]||'var(--border)'}"><div style="font-size:11px;color:var(--text-dim)">${esc(e.ts)}</div><div><strong>${esc(e.module)}</strong> ${esc(e.action)}${e.detail?' — '+esc(e.detail):''}</div></div>`).join('');
+}
+
 // ─── PANELS ─────────────────────────────────────────────
 function togglePanel(name){
   closeAllPanels();
@@ -1894,16 +1983,47 @@ function togglePanel(name){
   panel.classList.add('open');
   overlay.classList.add('open');
   if(name==='history')renderHistory();
+  if(name==='activity')renderActivityLog();
 }
 function closeAllPanels(){
   document.querySelectorAll('.side-panel').forEach(p=>p.classList.remove('open'));
   document.getElementById('panelOverlay').classList.remove('open');
 }
 
+// ─── DATA EXPORT / IMPORT ───────────────────────────────
+const DATA_KEYS=['chub_platforms','chub_templates','chub_deals','chub_leads','chub_roadmap','chub_sprint','chub_feedback','chub_regions','chub_fishbone','chub_pdca','chub_history','chub_env_config','chub_activity'];
+function exportAllData(){
+  const blob={version:'1.0',exportedAt:new Date().toISOString()};
+  DATA_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v)try{blob[k]=JSON.parse(v)}catch(e){blob[k]=v}});
+  const json=JSON.stringify(blob,null,2);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+  a.download='career-hub-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();URL.revokeObjectURL(a.href);
+  showToast('数据已导出','success');
+}
+function importAllData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d.version){showToast('无效的备份文件','error');return}
+      confirmDialog('确定导入数据？当前数据将被覆盖。',()=>{
+        DATA_KEYS.forEach(k=>{if(d[k])localStorage.setItem(k,JSON.stringify(d[k]))});
+        showToast('数据已导入 | 2秒后刷新...','success');
+        setTimeout(()=>location.reload(),2000);
+      },'导入',true);
+    }catch(err){showToast('文件解析失败: '+err.message,'error')}
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
 // ─── CACHE CLEAR ────────────────────────────────────────
 function clearAllCache(){
   if(window.caches)caches.keys().then(ks=>ks.forEach(k=>caches.delete(k)));
-  ['chub_prefs','chub_history','chub_platforms','chub_deals','chub_leads','chub_templates','chub_roadmap','chub_sprint','chub_feedback','chub_regions','chub_theme','chub_env_config','chub_fishbone','chub_pdca'].forEach(k=>localStorage.removeItem(k));
+  ['chub_prefs','chub_history','chub_platforms','chub_deals','chub_leads','chub_templates','chub_roadmap','chub_sprint','chub_feedback','chub_regions','chub_theme','chub_env_config','chub_fishbone','chub_pdca','chub_activity'].forEach(k=>localStorage.removeItem(k));
   showToast('缓存已清除 | 2秒后刷新...','success');
   setTimeout(()=>location.reload(),2000);
 }
@@ -2100,6 +2220,7 @@ renderRegion();
 renderIndustryGrid();
 renderMCPStatus();
 applyLang();
+updateStatsBar();
 </script>
 </body>
 </html>
