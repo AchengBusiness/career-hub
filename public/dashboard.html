@@ -638,7 +638,7 @@ const LANG={
 };
 function t(key){return(LANG[currentLang]&&LANG[currentLang][key])||LANG.zh[key]||key}
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-function safeJSON(key,fallback){try{const v=localStorage.getItem(key);return v?JSON.parse(v):null}catch(e){localStorage.removeItem(key);return null}}
+function safeJSON(key,fallback){try{const v=localStorage.getItem(key);return v?JSON.parse(v):(fallback||null)}catch(e){localStorage.removeItem(key);return fallback||null}}
 
 // ─── CUSTOM DIALOG SYSTEM ─────────────────────────────
 function openDialog(html){
@@ -958,17 +958,22 @@ function resetPlatforms(){
   savePlatforms();renderPlatformTable();showToast('已重置为默认数据','success');
 }
 function addPlatform(){
-  const name=prompt('平台名称：');if(!name)return;
-  const limit=parseInt(prompt('字数限制：'))||1000;
-  const os=confirm('是否为海外平台？');
-  PLATFORMS.push({id:'custom_'+Date.now(),name,limit,style:'conversational',tags:['#tag'],os,
-    styleLabel:'自定义风格',hashtags:'3-5',features:'自定义功能',priority:'P1'});
-  savePlatforms();renderPlatformTable();showToast('平台已添加，请点击编辑完善信息','success');
+  formDialog(t('addPlat'),[
+    {key:'name',label:'平台名称',type:'text',placeholder:'例：LinkedIn'},
+    {key:'limit',label:'字数限制',type:'number',value:'1000'},
+    {key:'os',label:'平台类型',type:'select',value:'false',options:[{v:'false',l:'国内平台'},{v:'true',l:'海外平台'}]}
+  ],vals=>{
+    if(!vals.name)return;
+    const os=vals.os==='true';
+    PLATFORMS.push({id:'custom_'+Date.now(),name:vals.name,limit:parseInt(vals.limit)||1000,style:'conversational',tags:['#tag'],os,
+      styleLabel:'自定义风格',hashtags:'3-5',features:'自定义功能',priority:'P1'});
+    savePlatforms();renderPlatformTable();showToast(t('added'),'success');
+  });
 }
 
 function applyStyle(t,s){
   if(!t)return'';
-  const ss=t.split(/(?<=[。！？.!?])\s*/);
+  const ss=t.split(/([。！？.!?])\s*/).reduce((a,v,i,arr)=>i%2===0?[...a,v+(arr[i+1]||'')]:a,[]).filter(Boolean);
   switch(s){
     case'punchy':return ss.slice(0,2).join(' ');
     case'hook-driven':case'relatable':case'viral-hook':return ss[0]||t;
@@ -1036,9 +1041,9 @@ function renderRegion(){
   document.getElementById('regionPanel').innerHTML=editToolbar+`<div class="region-panel">
     <div class="region-header">${d.label}</div>
     <div class="region-grid">
-      <div class="region-section"><div class="section-title">${t('regTips')}</div><ul class="tip-list">${d.tips.map(tp=>'<li>'+tp+'</li>').join('')}</ul></div>
-      <div class="region-section"><div class="section-title">${t('regTaboos')}</div>${d.taboos.map(tb=>'<div class="taboo-card">! '+tb+'</div>').join('')}<div style="margin-top:16px"><div class="section-title">${t('regTags')}</div><div>${d.tags.map(tg=>'<span class="ht">'+tg+'</span>').join('')}</div></div></div>
-      <div class="region-section"><div class="section-title">${t('regTimes')}</div><div style="font-size:13px;line-height:1.8">${d.times}</div><div style="margin-top:16px"><div class="section-title">${t('regAudience')}</div><div style="font-size:13px;line-height:1.7">${d.audience}</div></div></div>
+      <div class="region-section"><div class="section-title">${t('regTips')}</div><ul class="tip-list">${d.tips.map(tp=>'<li>'+esc(tp)+'</li>').join('')}</ul></div>
+      <div class="region-section"><div class="section-title">${t('regTaboos')}</div>${d.taboos.map(tb=>'<div class="taboo-card">! '+esc(tb)+'</div>').join('')}<div style="margin-top:16px"><div class="section-title">${t('regTags')}</div><div>${d.tags.map(tg=>'<span class="ht">'+esc(tg)+'</span>').join('')}</div></div></div>
+      <div class="region-section"><div class="section-title">${t('regTimes')}</div><div style="font-size:13px;line-height:1.8">${esc(d.times)}</div><div style="margin-top:16px"><div class="section-title">${t('regAudience')}</div><div style="font-size:13px;line-height:1.7">${esc(d.audience)}</div></div></div>
     </div>${editBtns}</div>`;
 }
 function toggleRegionEdit(){regionEditMode=!regionEditMode;renderRegion()}
@@ -1247,13 +1252,15 @@ function clearModuleData(mod){
 function runWorkflow(i){
   const tpl=TEMPLATES[i];if(!tpl)return;
   tpl._runStatus='running';renderOps();
-  // Expand the card
+  // Expand the correct card (find by data attribute, not positional index)
   const cards=document.querySelectorAll('.tpl-card');
-  if(cards[i])cards[i].classList.add('expanded');
+  const filtered=activeCat==='all'?TEMPLATES:TEMPLATES.filter(tp=>tp.cat===activeCat);
+  const fi=filtered.indexOf(tpl);
+  if(fi>=0&&cards[fi])cards[fi].classList.add('expanded');
   // Simulate step-by-step execution
   let step=0;
   const interval=setInterval(()=>{
-    if(step>0){const prev=document.getElementById('step_'+i+'_'+(step-1));if(prev)prev.style.background='var(--green)';prev.style.color='#fff'}
+    if(step>0){const prev=document.getElementById('step_'+i+'_'+(step-1));if(prev){prev.style.background='var(--green)';prev.style.color='#fff'}}
     const cur=document.getElementById('step_'+i+'_'+step);
     if(cur){cur.style.background='var(--accent)';cur.style.color='#fff';cur.style.transition='all .3s'}
     step++;
