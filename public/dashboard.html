@@ -252,8 +252,8 @@ tr:hover td{background:rgba(51,65,85,.4)}
 .gantt-bar{position:absolute;top:4px;height:20px;border-radius:4px;min-width:4px}
 .gantt-today{position:absolute;top:0;bottom:0;width:2px;background:var(--red);z-index:2}
 /* Fishbone diagram */
-.fishbone-wrap{overflow-x:auto;padding:16px 0}
-.fishbone-svg{display:block;margin:0 auto}
+.fishbone-wrap{overflow-x:auto;padding:16px 0;-webkit-overflow-scrolling:touch}
+.fishbone-svg{display:block;margin:0 auto;max-width:100%;height:auto}
 .fishbone-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 /* PDCA cycle */
 .pdca-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:700px}
@@ -394,6 +394,13 @@ tr:hover td{background:rgba(51,65,85,.4)}
 <div class="topbar">
   <a class="back-link" href="index.html">&larr; Home</a>
   <div class="topbar-title" data-i18n="title">Career-Hub 仪表盘</div>
+  <div style="position:relative;flex:1;max-width:320px;margin:0 8px">
+    <input id="globalSearchInput" type="text" placeholder="全局搜索..." autocomplete="off"
+      style="width:100%;padding:6px 32px 6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);color:var(--text);font-size:13px;font-family:inherit;outline:none"
+      oninput="globalSearch(this.value)" onfocus="showGlobalSearch()" onblur="setTimeout(hideGlobalSearch,200)">
+    <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:13px;pointer-events:none">&#128269;</span>
+    <div id="globalSearchResults" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px var(--shadow);z-index:500;max-height:360px;overflow-y:auto;font-size:13px"></div>
+  </div>
   <button class="gear-btn" onclick="cycleTheme()" title="切换主题" id="themeBtn">&#9728;</button>
   <button class="lang-btn" onclick="toggleLang()" title="切换语言/Switch Language" id="langBtn">EN</button>
   <button class="gear-btn" onclick="togglePanel('settings')" title="设置">&#9881;</button>
@@ -719,6 +726,7 @@ const LANG={
     confirmClearOps:'确定清除所有工作流数据？',confirmClearSales:'确定清除所有销售数据？',confirmClearPM:'确定清除所有项目管理数据？',
     addWf:'添加工作流',addDeal:'添加商机阶段',addLead:'添加线索状态',
     salesEditHint:'编辑中 - 点击数字修改，点击标签编辑',salesReadHint:'点击数字可修改数量',
+    leadStatusDesc:'线索状态说明：',leadStatusLegend:'冷 = 未接触/无回复 | 温 = 有互动但未明确 | 热 = 明确表达兴趣 | 已验证 = 确认预算+需求 | 已转化 = 升级为商机 | 已流失 = 放弃跟进',
   },
   en:{
     title:'Career-Hub Dashboard',langBtn:'中文',
@@ -748,6 +756,7 @@ const LANG={
     confirmClearOps:'Clear all workflow data?',confirmClearSales:'Clear all sales data?',confirmClearPM:'Clear all PM data?',
     addWf:'Add Workflow',addDeal:'Add Deal Stage',addLead:'Add Lead Status',
     salesEditHint:'Editing - click numbers to modify, click labels to edit',salesReadHint:'Click numbers to modify',
+    leadStatusDesc:'Lead Status Guide:',leadStatusLegend:'Cold = No contact/no reply | Warm = Engaged but unclear | Hot = Expressed clear interest | Qualified = Budget+needs confirmed | Converted = Upgraded to deal | Lost = Follow-up abandoned',
   }
 };
 function t(key){return(LANG[currentLang]&&LANG[currentLang][key])||LANG.zh[key]||key}
@@ -774,13 +783,15 @@ function updateOverviewCards(){
   const rc=typeof ROADMAP!=='undefined'?ROADMAP.length:0;
   const sc=typeof SPRINT_TASKS!=='undefined'?Object.values(SPRINT_TASKS).reduce((s,a)=>s+a.length,0):0;
   const fc=typeof FEEDBACK!=='undefined'?FEEDBACK.length:0;
-  if(e('ocMedia'))e('ocMedia').innerHTML=`<strong>26</strong> MCP工具 | ${pc}平台 | ${rgc}地区`;
-  if(e('ocOps'))e('ocOps').innerHTML=`<strong>10</strong> MCP工具 | ${wc}模板 | Cron调度`;
-  if(e('ocSales'))e('ocSales').innerHTML=`<strong>17</strong> MCP工具 | ${ds}商机阶段 | 数据导入导出`;
-  if(e('ocPM'))e('ocPM').innerHTML=`<strong>20</strong> MCP工具 | ${rc}路线图 + ${sc}任务 + ${fc}反馈`;
+  const tc=typeof MCP_TOOL_COUNTS!=='undefined'?MCP_TOOL_COUNTS:{};
+  if(e('ocMedia'))e('ocMedia').innerHTML=`<strong>${tc['media-ops']||26}</strong> MCP工具 | ${pc}平台 | ${rgc}地区`;
+  if(e('ocOps'))e('ocOps').innerHTML=`<strong>${tc['ops-flow']||10}</strong> MCP工具 | ${wc}模板 | Cron调度`;
+  if(e('ocSales'))e('ocSales').innerHTML=`<strong>${tc['sales-crm']||17}</strong> MCP工具 | ${ds}商机阶段 | 数据导入导出`;
+  if(e('ocPM'))e('ocPM').innerHTML=`<strong>${tc['pm-toolkit']||20}</strong> MCP工具 | ${rc}路线图 + ${sc}任务 + ${fc}反馈`;
 }
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function safeJSON(key,fallback){try{const v=localStorage.getItem(key);return v?JSON.parse(v):(fallback||null)}catch(e){localStorage.removeItem(key);return fallback||null}}
+function isValidColor(c){return/^#[0-9a-fA-F]{3,8}$/.test(c)}
 
 // ─── THEME SYSTEM ────────────────────────────────────
 const THEME_ICONS={light:'\u2600',dark:'\u263E',system:'\u2699'};
@@ -925,22 +936,26 @@ function applyLang(){
   document.querySelectorAll('.main-tab').forEach(btn=>{
     const k=btn.dataset.tab;if(k&&tabMap[k])btn.textContent=t(tabMap[k]);
   });
-  // Sub-tabs
-  const subBtns=document.querySelectorAll('.sub-tab');
-  if(subBtns[0])subBtns[0].textContent=t('compare');
-  if(subBtns[1])subBtns[1].textContent=t('preview');
-  if(subBtns[2])subBtns[2].textContent=t('regional');
+  // Sub-tabs — use onclick to identify rather than positional index
+  document.querySelectorAll('.sub-tab').forEach(btn=>{
+    const oc=btn.getAttribute('onclick')||'';
+    if(oc.includes("'m-compare'"))btn.textContent=t('compare');
+    else if(oc.includes("'m-preview'"))btn.textContent=t('preview');
+    else if(oc.includes("'m-regional'"))btn.textContent=t('regional');
+  });
   // Stats bar (dynamic)
   updateStatsBar();
-  // Settings panel
-  const panelBtns=document.querySelectorAll('#settingsPanel .panel-btn');
-  if(panelBtns[0])panelBtns[0].textContent=t('viewHist');
-  if(panelBtns[1])panelBtns[1].textContent=t('activityLog');
-  if(panelBtns[2])panelBtns[2].textContent=t('cfgMcp');
-  if(panelBtns[3])panelBtns[3].textContent=t('syncMcp');
-  if(panelBtns[4])panelBtns[4].textContent=t('exportData');
-  if(panelBtns[5])panelBtns[5].textContent=t('importData');
-  if(panelBtns[6])panelBtns[6].textContent=t('clearCache');
+  // Settings panel — use onclick to identify buttons rather than positional index
+  document.querySelectorAll('#settingsPanel .panel-btn').forEach(btn=>{
+    const oc=btn.getAttribute('onclick')||'';
+    if(oc.includes("'history'"))btn.textContent=t('viewHist');
+    else if(oc.includes("'activity'"))btn.textContent=t('activityLog');
+    else if(oc.includes('openMCPConfigDialog'))btn.textContent=t('cfgMcp');
+    else if(oc.includes('syncAllMCP'))btn.textContent=t('syncMcp');
+    else if(oc.includes('exportAllData'))btn.textContent=t('exportData');
+    else if(oc.includes('importFileInput'))btn.textContent=t('importData');
+    else if(oc.includes('clearAllCache'))btn.textContent=t('clearCache');
+  });
   const pwaBtn=document.getElementById('pwaInstallBtn');if(pwaBtn)pwaBtn.textContent=t('installPwa');
   document.querySelector('#settingsPanel .panel-title').textContent=t('settings');
   document.querySelector('#historyPanel .panel-title').textContent=t('history');
@@ -1060,6 +1075,28 @@ function showToast(msg,type='info',dur=3000){
   setTimeout(()=>{d.classList.add('toast-exit');setTimeout(()=>d.remove(),300)},dur);
 }
 
+// ─── UNDO DELETE ─────────────────────────────────────────
+let _undoStack=[];
+function deleteWithUndo(arr,idx,saveFn,renderFn,label){
+  const item=arr.splice(idx,1)[0];
+  saveFn();renderFn();
+  _undoStack.push({arr,idx,item,saveFn,renderFn});
+  showToastWithUndo((label||'项目')+'已删除',()=>{
+    const u=_undoStack.pop();if(!u)return;
+    u.arr.splice(u.idx,0,u.item);u.saveFn();u.renderFn();
+    showToast('已撤销删除','success',1500);
+  });
+}
+function showToastWithUndo(msg,undoFn){
+  const c=document.getElementById('toast-container');
+  const d=document.createElement('div');
+  d.className='toast toast-info';
+  d.innerHTML='\u2139 '+msg+' <button onclick="this.parentElement._undoFn();this.parentElement.remove()" style="margin-left:8px;background:var(--accent);color:#fff;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px">撤销</button>';
+  d._undoFn=undoFn;
+  c.appendChild(d);
+  setTimeout(()=>{if(d.parentElement){d.classList.add('toast-exit');setTimeout(()=>d.remove(),300)}},5000);
+}
+
 // ─── MEDIA-OPS: PLATFORM DATA ───────────────────────────
 const DEFAULT_PLATFORMS=[
   {id:'twitter',name:'Twitter/X',limit:280,style:'punchy',tags:['#Career','#Growth'],os:true,styleLabel:'实时热点, 观点输出',hashtags:'1-2',features:'实时热搜, X Premium长文',priority:'P0'},
@@ -1143,9 +1180,9 @@ function renderPlatformTable(){
     </tr>`;
   }).join('');
 
-  document.getElementById('platformTableWrap').innerHTML=`
-    <div class="table-wrap"><table><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table></div>
-  `;
+  document.getElementById('platformTableWrap').innerHTML=PLATFORMS.length===0
+    ?`<div style="text-align:center;padding:32px;color:var(--text-dim)">暂无数据。点击"加载示例"开始体验。</div>`
+    :`<div class="table-wrap"><table><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table></div>`;
   // Bind contenteditable blur events
   if(platEditMode){
     document.querySelectorAll('#platformTableWrap [contenteditable]').forEach(el=>{
@@ -1166,7 +1203,7 @@ function sortPlatBy(col){
   else{platSort.col=col;platSort.dir='asc'}
   renderPlatformTable();
 }
-function togglePlatEdit(){platEditMode=!platEditMode;renderPlatformTable()}
+function togglePlatEdit(){platEditMode=!platEditMode;savePrefs();renderPlatformTable()}
 function togglePlatOS(i){PLATFORMS[i].os=!PLATFORMS[i].os;savePlatforms();renderPlatformTable();showToast('已更新','success',1500)}
 function cyclePriority(i){
   const cycle={P0:'P1',P1:'P2',P2:'P0'};
@@ -1186,12 +1223,14 @@ function addPlatform(){
   formDialog(t('addPlat'),[
     {key:'name',label:'平台名称',type:'text',placeholder:'例：LinkedIn'},
     {key:'limit',label:'字数限制',type:'number',value:'1000'},
+    {key:'styleLabel',label:'内容风格描述',type:'text',placeholder:'例：对话式、简洁专业'},
+    {key:'priority',label:'优先级',type:'select',value:'P1',options:[{v:'P0',l:'P0 (最高)'},{v:'P1',l:'P1'},{v:'P2',l:'P2'}]},
     {key:'os',label:'平台类型',type:'select',value:'false',options:[{v:'false',l:'国内平台'},{v:'true',l:'海外平台'}]}
   ],vals=>{
     if(!vals.name)return;
     const os=vals.os==='true';
     PLATFORMS.push({id:'custom_'+Date.now(),name:vals.name,limit:parseInt(vals.limit)||1000,style:'conversational',tags:['#tag'],os,
-      styleLabel:'自定义风格',hashtags:'3-5',features:'自定义功能',priority:'P1'});
+      styleLabel:vals.styleLabel||'自定义风格',hashtags:'3-5',features:'自定义功能',priority:vals.priority||'P1'});
     savePlatforms();renderPlatformTable();showToast(t('added'),'success');
   });
 }
@@ -1272,7 +1311,7 @@ function renderRegion(){
   const d=REGIONS[k];if(!d)return;
   const editToolbar=`<div class="toolbar" style="margin-top:12px;margin-bottom:0">
     <button class="toolbar-btn${regionEditMode?' active':''}" onclick="toggleRegionEdit()">${regionEditMode?t('exitEdit'):t('editMode')}</button>
-    ${regionEditMode?`<button class="toolbar-btn" onclick="resetRegions()">${t('resetDef')}</button>`:''}
+    ${regionEditMode?`<button class="toolbar-btn primary" onclick="addRegion()">+ 添加地区</button><button class="toolbar-btn" onclick="resetRegions()">${t('resetDef')}</button>`:''}
     <span class="edit-indicator">${regionEditMode?t('editing'):t('readOnly')}</span>
   </div>`;
   const editBtns=regionEditMode?`<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
@@ -1290,7 +1329,7 @@ function renderRegion(){
       <div class="region-section"><div class="section-title">${t('regTimes')}</div><div style="font-size:13px;line-height:1.8">${esc(d.times)}</div><div style="margin-top:16px"><div class="section-title">${t('regAudience')}</div><div style="font-size:13px;line-height:1.7">${esc(d.audience)}</div></div></div>
     </div>${editBtns}</div>`;
 }
-function toggleRegionEdit(){regionEditMode=!regionEditMode;renderRegion()}
+function toggleRegionEdit(){regionEditMode=!regionEditMode;savePrefs();renderRegion()}
 function editRegionField(rk,field){
   const d=REGIONS[rk];if(!d)return;
   const isArr=Array.isArray(d[field]);
@@ -1307,6 +1346,35 @@ function resetRegions(){
   confirmDialog(t('confirmResetRegion'),()=>{
     REGIONS=JSON.parse(JSON.stringify(DEFAULT_REGIONS));saveRegions();renderRegion();showToast(t('reset'),'success');
   },'重置',true);
+}
+function addRegion(){
+  formDialog('添加自定义地区',[
+    {key:'key',label:'地区代码（英文，唯一）',type:'text',placeholder:'例：canada'},
+    {key:'label',label:'地区名称',type:'text',placeholder:'例：加拿大'},
+    {key:'tips',label:'发布技巧（每行一条）',type:'textarea',placeholder:'技巧1\n技巧2'},
+    {key:'taboos',label:'禁忌话题（每行一条）',type:'textarea',placeholder:'禁忌1\n禁忌2'},
+    {key:'tags',label:'推荐标签（每行一个）',type:'textarea',placeholder:'#Tag1\n#Tag2'},
+    {key:'times',label:'最佳发布时间',type:'text',placeholder:'例：工作日 9-11 AM'},
+    {key:'audience',label:'受众画像',type:'textarea',placeholder:'描述目标受众特征'}
+  ],vals=>{
+    if(!vals.key||!vals.label){showToast('地区代码和名称不能为空','warning');return}
+    const k=vals.key.trim().replace(/\s+/g,'_');
+    if(REGIONS[k]){showToast('地区代码已存在，请使用不同的代码','warning');return}
+    REGIONS[k]={
+      label:vals.label,
+      tips:vals.tips?vals.tips.split('\n').map(s=>s.trim()).filter(Boolean):['自定义技巧'],
+      taboos:vals.taboos?vals.taboos.split('\n').map(s=>s.trim()).filter(Boolean):['自定义禁忌'],
+      tags:vals.tags?vals.tags.split('\n').map(s=>s.trim()).filter(Boolean):['#CustomTag'],
+      times:vals.times||'待定',
+      audience:vals.audience||'待定'
+    };
+    saveRegions();
+    // Add option to select
+    const sel=document.getElementById('regionSelect');
+    if(sel){const opt=document.createElement('option');opt.value=k;opt.textContent=vals.label;sel.appendChild(opt);sel.value=k;}
+    renderRegion();
+    showToast('地区已添加','success');
+  });
 }
 
 // ─── OPS-FLOW: TEMPLATES ────────────────────────────────
@@ -1383,10 +1451,12 @@ function renderOps(){
       </div>
     </div></div>`;
   }).join('');
-  document.getElementById('tplGrid').innerHTML=cardsHtml;
+  document.getElementById('tplGrid').innerHTML=filtered.length===0
+    ?`<div style="text-align:center;padding:32px;color:var(--text-dim)">暂无数据。点击"加载示例"开始体验。</div>`
+    :cardsHtml;
 }
 function filterCat(c){activeCat=c;renderOps()}
-function toggleOpsEdit(){opsEditMode=!opsEditMode;renderOps()}
+function toggleOpsEdit(){opsEditMode=!opsEditMode;savePrefs();renderOps()}
 
 function editTemplate(i){
   const tpl=TEMPLATES[i];if(!tpl)return;
@@ -1463,7 +1533,8 @@ function loadSampleSales(){
     {id:'converted',label:'已转化',count:8,color:'#10b981'},
     {id:'lost',label:'已流失',count:12,color:'#ef4444'}
   ];
-  saveDeals();saveLeads();renderSales();showToast(t('sampleLoaded'),'success');
+  CONTACTS=JSON.parse(JSON.stringify(DEF_CONTACTS));
+  saveDeals();saveLeads();saveContacts();renderSales();showToast(t('sampleLoaded'),'success');
 }
 function loadSamplePM(){
   ROADMAP=[
@@ -1500,8 +1571,8 @@ function clearModuleData(mod){
   const msgs={ops:t('confirmClearOps'),sales:t('confirmClearSales'),pm:t('confirmClearPM')};
   confirmDialog(msgs[mod]||'确定清除数据？',()=>{
     if(mod==='ops'){TEMPLATES=[];saveTemplates();renderOps()}
-    else if(mod==='sales'){DEAL_STAGES=[];LEAD_STATUSES=[];saveDeals();saveLeads();renderSales()}
-    else if(mod==='pm'){ROADMAP=[];SPRINT_TASKS={todo:[],in_progress:[],review:[],done:[]};FEEDBACK=[];FISHBONE=JSON.parse(JSON.stringify(DEF_FISHBONE));PDCA=JSON.parse(JSON.stringify(DEF_PDCA));saveRoadmap();saveSprint();saveFeedback();saveFishbone();savePDCA();renderPM()}
+    else if(mod==='sales'){DEAL_STAGES=[];LEAD_STATUSES=[];CONTACTS=[];saveDeals();saveLeads();saveContacts();renderSales()}
+    else if(mod==='pm'){ROADMAP=[];ROADMAP_LANES=['P0','P1','P2','P3'];SPRINT_TASKS={todo:[],in_progress:[],review:[],done:[]};FEEDBACK=[];FISHBONE=JSON.parse(JSON.stringify(DEF_FISHBONE));PDCA=JSON.parse(JSON.stringify(DEF_PDCA));saveRoadmap();saveRoadmapLanes();saveSprint();saveFeedback();saveFishbone();savePDCA();renderPM()}
     showToast(t('dataCleared'),'success');
   },t('clearData'),true);
 }
@@ -1528,7 +1599,9 @@ function runWorkflow(i){
       const mcpRepo=tpl.cat==='crm'?'sales-crm':tpl.cat==='content'?'media-ops':'ops-flow';
       callMCP(mcpRepo,'run_workflow',{id:tpl.id}).then(res=>{
         tpl._runStatus=res?'done':'error';
-        renderOps();showToast('工作流 "'+tpl.name+'" 执行完成','success',3000);
+        renderOps();
+        if(res){showToast('工作流 "'+tpl.name+'" 执行完成','success',3000)}
+        else{showToast('工作流 "'+tpl.name+'" 模拟完成（MCP未连接，仅本地演示）','warning',4000)}
       });
     }
   },800);
@@ -1541,6 +1614,15 @@ let DEAL_STAGES=safeJSON('chub_deals')||JSON.parse(JSON.stringify(DEF_DEAL));
 let LEAD_STATUSES=safeJSON('chub_leads')||JSON.parse(JSON.stringify(DEF_LEAD));
 function saveDeals(){localStorage.setItem('chub_deals',JSON.stringify(DEAL_STAGES));updateStatsBar();logActivity('deals','更新','商机阶段')}
 function saveLeads(){localStorage.setItem('chub_leads',JSON.stringify(LEAD_STATUSES));logActivity('leads','更新','线索状态')}
+const DEF_CONTACTS=[
+  {id:1,name:'张明',company:'华为技术',phone:'138****1234',email:'zhang@example.com',stage:'qualified',note:'对AI方案感兴趣',createdAt:'2026-03-15'},
+  {id:2,name:'李婷',company:'字节跳动',phone:'139****5678',email:'li@example.com',stage:'proposal',note:'需要定制CRM集成',createdAt:'2026-03-18'},
+  {id:3,name:'王强',company:'腾讯科技',phone:'137****9012',email:'wang@example.com',stage:'contact',note:'初次接触，了解需求',createdAt:'2026-03-20'},
+];
+let CONTACTS=safeJSON('chub_contacts')||JSON.parse(JSON.stringify(DEF_CONTACTS));
+let _contactIdCounter=10;
+(function(){let mx=10;CONTACTS.forEach(c=>{if(c.id>=mx)mx=c.id+1});_contactIdCounter=mx})();
+function saveContacts(){localStorage.setItem('chub_contacts',JSON.stringify(CONTACTS));logActivity('contacts','更新','共'+CONTACTS.length+'个联系人')}
 let salesEditMode=false;
 
 function renderSales(){
@@ -1554,19 +1636,23 @@ function renderSales(){
     <button class="toolbar-btn" onclick="exportModule('sales-crm',['chub_deals','chub_leads'])">&#128229; 导出</button>
     <span class="edit-indicator">${salesEditMode?t('salesEditHint'):t('salesReadHint')}</span>`;
 
-  const maxDeal=Math.max(...DEAL_STAGES.map(s=>s.count),1);
-  let fhtml='';
-  DEAL_STAGES.forEach((s,i)=>{
-    const w=Math.max(Math.round(s.count/maxDeal*100),15);
-    const labelClick=salesEditMode?`onclick="editDealStage(${i})" style="cursor:pointer;text-decoration:underline dotted"`:'';
-    const delBtn=salesEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteDealStage(${i})">x</span>`:'';
-    fhtml+=`<div class="funnel-stage"><span class="funnel-label" ${labelClick}>${s.label}${delBtn}</span><div class="funnel-bar" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editDealCount(${i})">${s.count}</span></div></div>`;
-    if(i<DEAL_STAGES.length-1){
-      const conv=s.count>0?Math.round(DEAL_STAGES[i+1].count/s.count*100):0;
-      fhtml+=`<div class="conv-arrow" title="${DEAL_STAGES[i+1].count}/${s.count} = ${conv}%">&darr; ${conv}% ${t('convRate')}</div>`;
-    }
-  });
-  document.getElementById('dealFunnel').innerHTML=fhtml;
+  if(DEAL_STAGES.length===0){
+    document.getElementById('dealFunnel').innerHTML=`<div style="text-align:center;padding:32px;color:var(--text-dim)">暂无数据。点击"加载示例"开始体验。</div>`;
+  }else{
+    const maxDeal=Math.max(...DEAL_STAGES.map(s=>s.count),1);
+    let fhtml='';
+    DEAL_STAGES.forEach((s,i)=>{
+      const w=Math.max(Math.round(s.count/maxDeal*100),15);
+      const labelClick=salesEditMode?`onclick="editDealStage(${i})" style="cursor:pointer;text-decoration:underline dotted"`:'';
+      const delBtn=salesEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteDealStage(${i})">x</span>`:'';
+      fhtml+=`<div class="funnel-stage"><span class="funnel-label" ${labelClick}>${s.label}${delBtn}</span><div class="funnel-bar" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editDealCount(${i})">${s.count}</span></div></div>`;
+      if(i<DEAL_STAGES.length-1){
+        const conv=s.count>0?Math.round(DEAL_STAGES[i+1].count/s.count*100):0;
+        fhtml+=`<div class="conv-arrow" title="${DEAL_STAGES[i+1].count}/${s.count} = ${conv}%">&darr; ${conv}% ${t('convRate')}</div>`;
+      }
+    });
+    document.getElementById('dealFunnel').innerHTML=fhtml;
+  }
 
   const maxLead=Math.max(...LEAD_STATUSES.map(s=>s.count),1);
   document.getElementById('leadBars').innerHTML=LEAD_STATUSES.map((s,i)=>{
@@ -1576,10 +1662,21 @@ function renderSales(){
     const delBtn=salesEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteLeadStatus(${i})">x</span>`:'';
     return`<div class="lead-row"><span class="lead-label" ${labelClick}>${s.label}${delBtn}</span><div class="lead-bar-wrap"><div class="lead-bar-fill" style="width:${w}%;background:${s.color}"><span class="editable-count" onclick="editLeadCount(${i})">${s.count}</span></div></div><span class="lead-stat">${pct}%</span></div>`;
   }).join('')+'<div style="margin-top:12px;font-size:12px;color:var(--text-dim);line-height:1.8">'+
-    '<strong style="color:var(--text-secondary)">线索状态说明：</strong> '+
-    '冷 = 未接触/无回复 | 温 = 有互动但未明确 | 热 = 明确表达兴趣 | 已验证 = 确认预算+需求 | 已转化 = 升级为商机 | 已流失 = 放弃跟进</div>';
+    '<strong style="color:var(--text-secondary)">'+t('leadStatusDesc')+'</strong> '+
+    t('leadStatusLegend')+'</div>';
+  // Contacts Table
+  const contactsHtml=CONTACTS.length?CONTACTS.map((c,i)=>{
+    const stageLabel=DEAL_STAGES.find(s=>s.id===c.stage);
+    const editClick=salesEditMode?`onclick="editContact(${i})" style="cursor:pointer"`:'';
+    const delBtn=salesEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteContact(${i})">x</span>`:'';
+    return`<tr ${editClick}><td>${esc(c.name)}${delBtn}</td><td>${esc(c.company)}</td><td>${esc(c.phone)}</td><td>${esc(c.email)}</td><td><span style="color:${stageLabel?stageLabel.color:'var(--text-dim)'}">${stageLabel?stageLabel.label:c.stage}</span></td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(c.note)}">${esc(c.note)}</td></tr>`;
+  }).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:24px">暂无联系人。'+(salesEditMode?'点击下方按钮添加。':'进入编辑模式添加。')+'</td></tr>';
+  const contactsSection=`<div style="margin-top:24px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><h3 style="font-size:15px;font-weight:600;margin:0">客户联系人</h3><span class="cnt">${CONTACTS.length}</span>${salesEditMode?'<button class="toolbar-btn primary" onclick="addContact()" style="font-size:12px">+ 添加联系人</button>':''}</div><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:8px 6px">姓名</th><th style="text-align:left;padding:8px 6px">公司</th><th style="text-align:left;padding:8px 6px">电话</th><th style="text-align:left;padding:8px 6px">邮箱</th><th style="text-align:left;padding:8px 6px">阶段</th><th style="text-align:left;padding:8px 6px">备注</th></tr></thead><tbody>${contactsHtml}</tbody></table></div></div>`;
+  let contactsEl=document.getElementById('contactsTable');
+  if(!contactsEl){contactsEl=document.createElement('div');contactsEl.id='contactsTable';document.getElementById('leadBars').parentElement.appendChild(contactsEl)}
+  contactsEl.innerHTML=contactsSection;
 }
-function toggleSalesEdit(){salesEditMode=!salesEditMode;renderSales()}
+function toggleSalesEdit(){salesEditMode=!salesEditMode;savePrefs();renderSales()}
 
 function editDealCount(i){
   formDialog('修改 '+DEAL_STAGES[i].label,[
@@ -1603,7 +1700,7 @@ function editDealStage(i){
     {key:'label',label:'名称',type:'text',value:s.label},
     {key:'count',label:'数量',type:'number',value:String(s.count)},
     {key:'color',label:'颜色',type:'colorpicker',value:s.color}
-  ],vals=>{s.label=vals.label;s.count=parseInt(vals.count)||0;s.color=vals.color||s.color;saveDeals();renderSales();showToast('已更新','success')});
+  ],vals=>{s.label=vals.label;s.count=parseInt(vals.count)||0;s.color=isValidColor(vals.color)?vals.color:s.color;saveDeals();renderSales();showToast('已更新','success')});
 }
 function editLeadStage(i){
   const s=LEAD_STATUSES[i];
@@ -1611,7 +1708,7 @@ function editLeadStage(i){
     {key:'label',label:'名称',type:'text',value:s.label},
     {key:'count',label:'数量',type:'number',value:String(s.count)},
     {key:'color',label:'颜色',type:'colorpicker',value:s.color}
-  ],vals=>{s.label=vals.label;s.count=parseInt(vals.count)||0;s.color=vals.color||s.color;saveLeads();renderSales();showToast('已更新','success')});
+  ],vals=>{s.label=vals.label;s.count=parseInt(vals.count)||0;s.color=isValidColor(vals.color)?vals.color:s.color;saveLeads();renderSales();showToast('已更新','success')});
 }
 function addDealStage(){
   formDialog('添加商机阶段',[
@@ -1643,6 +1740,37 @@ function resetSalesData(){
     saveDeals();saveLeads();renderSales();showToast('已重置','success');
   },'重置',true);
 }
+function addContact(){
+  const stageOpts=DEAL_STAGES.map(s=>({v:s.id,l:s.label}));
+  formDialog('添加联系人',[
+    {key:'name',label:'姓名',type:'text',placeholder:'客户姓名'},
+    {key:'company',label:'公司',type:'text',placeholder:'公司名称'},
+    {key:'phone',label:'电话',type:'text',placeholder:'手机号码'},
+    {key:'email',label:'邮箱',type:'text',placeholder:'email@example.com'},
+    {key:'stage',label:'阶段',type:'select',value:DEAL_STAGES[0]?.id||'contact',options:stageOpts},
+    {key:'note',label:'备注',type:'textarea',placeholder:'备注信息'}
+  ],vals=>{
+    if(!vals.name)return;
+    CONTACTS.push({id:_contactIdCounter++,name:vals.name,company:vals.company||'',phone:vals.phone||'',email:vals.email||'',stage:vals.stage||'',note:vals.note||'',createdAt:new Date().toISOString().slice(0,10)});
+    saveContacts();renderSales();showToast('联系人已添加','success');
+  });
+}
+function editContact(i){
+  const c=CONTACTS[i];if(!c)return;
+  const stageOpts=DEAL_STAGES.map(s=>({v:s.id,l:s.label}));
+  formDialog('编辑联系人',[
+    {key:'name',label:'姓名',type:'text',value:c.name},
+    {key:'company',label:'公司',type:'text',value:c.company},
+    {key:'phone',label:'电话',type:'text',value:c.phone},
+    {key:'email',label:'邮箱',type:'text',value:c.email},
+    {key:'stage',label:'阶段',type:'select',value:c.stage,options:stageOpts},
+    {key:'note',label:'备注',type:'textarea',value:c.note}
+  ],vals=>{
+    c.name=vals.name;c.company=vals.company;c.phone=vals.phone;c.email=vals.email;c.stage=vals.stage;c.note=vals.note;
+    saveContacts();renderSales();showToast('已更新','success');
+  });
+}
+function deleteContact(i){confirmDialog('确定删除联系人 "'+CONTACTS[i].name+'"？',()=>{CONTACTS.splice(i,1);saveContacts();renderSales();showToast('已删除','info')},'删除',true)}
 
 // ─── PM-TOOLKIT: ROADMAP + SPRINT + FEEDBACK ────────────
 const DEF_ROADMAP=[
@@ -1683,7 +1811,13 @@ const DEF_FEEDBACK=[
   {text:'添加定时发布提醒通知',votes:12,cat:'feature'},
 ];
 let ROADMAP=safeJSON('chub_roadmap')||JSON.parse(JSON.stringify(DEF_ROADMAP));
+let ROADMAP_LANES=safeJSON('chub_roadmap_lanes')||['P0','P1','P2','P3'];
+function saveRoadmapLanes(){localStorage.setItem('chub_roadmap_lanes',JSON.stringify(ROADMAP_LANES))}
 let SPRINT_TASKS=migrateSprintTasks(safeJSON('chub_sprint'));
+// Fix P1-6: Ensure _sprintIdCounter doesn't duplicate existing IDs
+(function(){let mx=10;Object.values(SPRINT_TASKS).forEach(col=>col.forEach(t=>{if(t&&t.id&&t.id>=mx)mx=t.id+1}));_sprintIdCounter=mx})();
+let SPRINT_META=safeJSON('chub_sprint_meta')||{name:'Sprint 1',startDate:'',endDate:''};
+function saveSprintMeta(){localStorage.setItem('chub_sprint_meta',JSON.stringify(SPRINT_META))}
 let FEEDBACK=safeJSON('chub_feedback')||JSON.parse(JSON.stringify(DEF_FEEDBACK));
 function saveRoadmap(){localStorage.setItem('chub_roadmap',JSON.stringify(ROADMAP));updateStatsBar();logActivity('roadmap','更新','共'+ROADMAP.length+'项')}
 function saveSprint(){localStorage.setItem('chub_sprint',JSON.stringify(SPRINT_TASKS));logActivity('sprint','更新','冲刺看板')}
@@ -1710,30 +1844,40 @@ function renderPM(){
   const tba=document.getElementById('pmToolbarArea');
   if(tba)tba.innerHTML=pmToolbar;
 
-  // Roadmap
-  const rmSearchBar=`<input class="pm-search-input" id="pmSearch_roadmap" placeholder="搜索路线图..." value="${esc(pmSearch.roadmap)}" oninput="searchPM('roadmap',this.value)">`;
-  const lanes=['P0','P1','P2','P3'];
-  const roadmapHtml=lanes.map(l=>{
-    const items=ROADMAP.filter(r=>r.lane===l&&(!pmSearch.roadmap||r.title.toLowerCase().includes(pmSearch.roadmap)));
-    return`<div class="lane"><span class="lane-label">${l}</span><div class="lane-items">${items.map((r,_)=>{
-      const ri=ROADMAP.indexOf(r);
-      const editClick=pmEditMode?`onclick="editRoadmapItem(${ri})"`:'';
-      const delBtn=pmEditMode?`<span style="margin-left:4px;cursor:pointer;color:var(--red);font-size:11px" onclick="event.stopPropagation();deleteRoadmapItem(${ri})">x</span>`:'';
-      return`<div class="ms-chip" style="${pmEditMode?'cursor:pointer':''}" ${editClick}><span class="dot dot-${r.status}"></span>${r.title}<span style="font-size:11px;color:var(--text-dim);margin-left:4px">${r.date}</span>${delBtn}</div>`;
-    }).join('')}${pmEditMode?`<div class="ms-chip" style="cursor:pointer;border-style:dashed;color:var(--accent)" onclick="addRoadmapItem('${l}')">+ 添加</div>`:''}</div></div>`;
-  }).join('');
+  // Roadmap (only render when roadmap or gantt sub-tab is visible)
+  if(sub==='pm-roadmap'||sub==='pm-gantt'){
+    const rmSearchBar=`<input class="pm-search-input" id="pmSearch_roadmap" placeholder="搜索路线图..." value="${esc(pmSearch.roadmap)}" oninput="searchPM('roadmap',this.value)">`;
+    const editLanesBtn=pmEditMode?`<button class="toolbar-btn" onclick="editRoadmapLanes()" style="font-size:12px">&#9998; 编辑泳道</button>`:'';
+    const roadmapHtml=ROADMAP_LANES.map(l=>{
+      const items=ROADMAP.filter(r=>r.lane===l&&(!pmSearch.roadmap||r.title.toLowerCase().includes(pmSearch.roadmap)));
+      return`<div class="lane"><span class="lane-label">${l}</span><div class="lane-items">${items.map((r,_)=>{
+        const ri=ROADMAP.indexOf(r);
+        const editClick=pmEditMode?`onclick="editRoadmapItem(${ri})"`:'';
+        const delBtn=pmEditMode?`<span style="margin-left:4px;cursor:pointer;color:var(--red);font-size:11px" onclick="event.stopPropagation();deleteRoadmapItem(${ri})">x</span>`:'';
+        return`<div class="ms-chip" style="${pmEditMode?'cursor:pointer':''}" ${editClick}><span class="dot dot-${r.status}"></span>${r.title}<span style="font-size:11px;color:var(--text-dim);margin-left:4px">${r.date}</span>${delBtn}</div>`;
+      }).join('')}${pmEditMode?`<div class="ms-chip" style="cursor:pointer;border-style:dashed;color:var(--accent)" onclick="addRoadmapItem('${l}')">+ 添加</div>`:''}</div></div>`;
+    }).join('');
+    document.getElementById('roadmapLanes').innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:15px;font-weight:600">'+t('roadmap')+'</span>'+editLanesBtn+'</div>'+rmSearchBar+roadmapHtml;
+  }
 
-  document.getElementById('roadmapLanes').innerHTML='<div style="margin-bottom:8px;font-size:15px;font-weight:600">'+t('roadmap')+'</div>'+rmSearchBar+roadmapHtml;
-
-  // Sprint Board
+  // Sprint Board (only render when sprint sub-tab is visible)
+  if(sub==='pm-sprint'){
   const priLabel={high:t('priorityHigh'),medium:t('priorityMedium'),low:t('priorityLow')};
   const priCls={high:'task-pri-high',medium:'task-pri-medium',low:'task-pri-low'};
+  const sprintDateRange=SPRINT_META.startDate&&SPRINT_META.endDate?` <span style="font-size:12px;color:var(--text-secondary);font-weight:400">${SPRINT_META.startDate} ~ ${SPRINT_META.endDate}</span>`:'';
+  const sprintEditBtn=`<button class="toolbar-btn" onclick="editSprintMeta()" style="font-size:12px;padding:2px 8px">编辑冲刺</button>`;
+  const sprintHeader=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><strong style="font-size:14px">${esc(SPRINT_META.name||'Sprint')}</strong>${sprintDateRange}${sprintEditBtn}<span style="margin-left:auto;font-size:11px;color:var(--text-dim)">提示：拖拽或点击编辑来移动任务</span></div>`;
   const sprintSearchBar=`<input class="pm-search-input" id="pmSearch_sprint" placeholder="搜索任务..." value="${esc(pmSearch.sprint)}" oninput="searchPM('sprint',this.value)" style="margin-bottom:12px">`;
   const cols=[['todo',t('todo')],['in_progress',t('inProg')],['review',t('review')],['done',t('done')]];
-  document.getElementById('sprintBoard').innerHTML=sprintSearchBar+cols.map(([k,label])=>{
-    const tasks=(SPRINT_TASKS[k]||[]).filter(tk=>{if(!pmSearch.sprint)return true;const title=typeof tk==='string'?tk:(tk.title||'');return title.toLowerCase().includes(pmSearch.sprint)});
+  const totalSprintTasks=Object.values(SPRINT_TASKS).reduce((s,a)=>s+a.length,0);
+  if(totalSprintTasks===0&&!pmEditMode){
+    document.getElementById('sprintBoard').innerHTML=sprintHeader+`<div style="text-align:center;padding:32px;color:var(--text-dim)">暂无数据。点击"加载示例"开始体验。</div>`;
+  }else{document.getElementById('sprintBoard').innerHTML=sprintHeader+sprintSearchBar+cols.map(([k,label])=>{
+    const allTasks=(SPRINT_TASKS[k]||[]);
+    const tasks=allTasks.filter(tk=>{if(!pmSearch.sprint)return true;const title=typeof tk==='string'?tk:(tk.title||'');return title.toLowerCase().includes(pmSearch.sprint)});
+    const cntLabel=pmSearch.sprint&&tasks.length!==allTasks.length?`${tasks.length}/${allTasks.length}`:String(tasks.length);
     const taskHtml=tasks.map((tk,ti)=>{
-      const origIdx=(SPRINT_TASKS[k]||[]).indexOf(tk);
+      const origIdx=allTasks.indexOf(tk);
       const title=typeof tk==='string'?tk:(tk.title||'');
       const due=tk.due||'';const assignee=tk.assignee||'';const pri=tk.priority||'medium';
       const isOverdue=due&&k!=='done'&&due<new Date().toISOString().slice(0,10);
@@ -1743,29 +1887,35 @@ function renderPM(){
       return`<div class="task-chip${isOverdue?' task-overdue':''}" draggable="true" data-col="${k}" data-idx="${origIdx}" style="${pmEditMode?'cursor:pointer':''}" ondragstart="sprintDragStart(event)" ondragend="sprintDragEnd(event)" ${editClick}>${esc(title)}${delBtn}${meta}</div>`;
     }).join('');
     const addBtn=pmEditMode?`<div class="task-chip" style="cursor:pointer;border-style:dashed;color:var(--accent);text-align:center" onclick="addSprintTask('${k}')">+ 添加</div>`:'';
-    return`<div class="sprint-col" data-col="${k}" ondragover="sprintDragOver(event)" ondragleave="sprintDragLeave(event)" ondrop="sprintDrop(event)"><div class="sprint-col-title">${label}<span class="cnt">${tasks.length}</span></div>${taskHtml}${addBtn}</div>`;
-  }).join('');
+    return`<div class="sprint-col" data-col="${k}" ondragover="sprintDragOver(event)" ondragleave="sprintDragLeave(event)" ondrop="sprintDrop(event)"><div class="sprint-col-title">${label}<span class="cnt">${cntLabel}</span></div>${taskHtml}${addBtn}</div>`;
+  }).join('');}  // end else totalSprintTasks
+  }  // end if(sub==='pm-sprint')
 
-  // Feedback
+  // Feedback (only render when feedback sub-tab is visible)
+  if(sub==='pm-feedback'){
   const fbSearchBar=`<input class="pm-search-input" id="pmSearch_feedback" placeholder="搜索反馈..." value="${esc(pmSearch.feedback)}" oninput="searchPM('feedback',this.value)">`;
   const catCls={feature:'fb-feature',bug:'fb-bug',improve:'fb-improve'};
   const catLabel={feature:'新功能',bug:'Bug',improve:'优化'};
   const fbAddBtn=pmEditMode?`<div style="margin-top:12px"><button class="toolbar-btn primary" onclick="addFeedback()">+ 添加反馈</button></div>`:'';
   const sortedFb=[...FEEDBACK].map((f,origIdx)=>({...f,_idx:origIdx})).filter(f=>!pmSearch.feedback||f.text.toLowerCase().includes(pmSearch.feedback)).sort((a,b)=>b.votes-a.votes);
-  document.getElementById('fbList').innerHTML=fbSearchBar+sortedFb.map(f=>{
-    const i=f._idx;
-    const editClick=pmEditMode?`onclick="editFeedback(${i})"`:'';
-    const voteClick=pmEditMode?'':`onclick="voteFeedback(${i})"`;
-    const delBtn=pmEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:8px" onclick="event.stopPropagation();deleteFeedback(${i})">x</span>`:'';
-    return`<div class="fb-item" style="${pmEditMode?'cursor:pointer':''}" ${editClick}><div class="fb-votes" style="cursor:pointer" ${voteClick}>${f.votes}</div><div class="fb-text">${esc(f.text)}</div><span class="fb-cat ${catCls[f.cat]}">${catLabel[f.cat]}</span>${delBtn}</div>`;
-  }).join('')+fbAddBtn;
+  const fbItemsHtml=FEEDBACK.length===0
+    ?`<div style="text-align:center;padding:32px;color:var(--text-dim)">暂无数据。点击"加载示例"开始体验。</div>`
+    :sortedFb.map(f=>{
+      const i=f._idx;
+      const editClick=pmEditMode?`onclick="editFeedback(${i})"`:'';
+      const voteClick=pmEditMode?'':`onclick="voteFeedback(${i})"`;
+      const delBtn=pmEditMode?`<span style="cursor:pointer;color:var(--red);font-size:11px;margin-left:8px" onclick="event.stopPropagation();deleteFeedback(${i})">x</span>`:'';
+      return`<div class="fb-item" style="${pmEditMode?'cursor:pointer':''}" ${editClick}><div class="fb-votes" style="cursor:pointer" ${voteClick}>${f.votes}</div><div class="fb-text">${esc(f.text)}</div><span class="fb-cat ${catCls[f.cat]}">${catLabel[f.cat]}</span>${delBtn}</div>`;
+    }).join('');
+  document.getElementById('fbList').innerHTML=fbSearchBar+fbItemsHtml+fbAddBtn;
+  }  // end if(sub==='pm-feedback')
 }
 
-function togglePmEdit(){pmEditMode=!pmEditMode;renderPM()}
+function togglePmEdit(){pmEditMode=!pmEditMode;savePrefs();renderPM()}
 function resetPmData(){
   confirmDialog('确定重置所有项目管理数据？',()=>{
-    ROADMAP=JSON.parse(JSON.stringify(DEF_ROADMAP));SPRINT_TASKS=JSON.parse(JSON.stringify(DEF_SPRINT));FEEDBACK=JSON.parse(JSON.stringify(DEF_FEEDBACK));
-    saveRoadmap();saveSprint();saveFeedback();renderPM();showToast('已重置','success');
+    ROADMAP=JSON.parse(JSON.stringify(DEF_ROADMAP));ROADMAP_LANES=['P0','P1','P2','P3'];SPRINT_TASKS=JSON.parse(JSON.stringify(DEF_SPRINT));FEEDBACK=JSON.parse(JSON.stringify(DEF_FEEDBACK));
+    saveRoadmap();saveRoadmapLanes();saveSprint();saveFeedback();renderPM();showToast('已重置','success');
   },'重置',true);
 }
 // Roadmap CRUD
@@ -1776,11 +1926,10 @@ function editRoadmapItem(i){
     {key:'date',label:'日期',type:'text',value:r.date,placeholder:'例：2026-04'},
     {key:'status',label:'状态',type:'select',value:r.status,options:[
       {v:'completed',l:'已完成'},{v:'in_progress',l:'进行中'},{v:'planned',l:'计划中'},{v:'delayed',l:'延期'}]},
-    {key:'lane',label:'优先级',type:'select',value:r.lane,options:[
-      {v:'P0',l:'P0 (最高)'},{v:'P1',l:'P1'},{v:'P2',l:'P2'},{v:'P3',l:'P3 (最低)'}]}
+    {key:'lane',label:'泳道',type:'select',value:r.lane,options:ROADMAP_LANES.map((ln,li)=>({v:ln,l:ln+(li===0?' (最高)':li===ROADMAP_LANES.length-1?' (最低)':'')}))}
   ],vals=>{r.title=vals.title;r.date=vals.date;r.status=vals.status;r.lane=vals.lane;saveRoadmap();renderPM();showToast('已更新','success')});
 }
-function deleteRoadmapItem(i){confirmDialog('确定删除 "'+ROADMAP[i].title+'" ？',()=>{ROADMAP.splice(i,1);saveRoadmap();renderPM();showToast('已删除','info',1500)},'删除',true)}
+function deleteRoadmapItem(i){confirmDialog('确定删除 "'+ROADMAP[i].title+'" ？',()=>{deleteWithUndo(ROADMAP,i,saveRoadmap,renderPM,'路线图项目')},'删除',true)}
 function addRoadmapItem(lane){
   formDialog('添加路线图项目',[
     {key:'title',label:'标题',type:'text',placeholder:'例：新功能名称'},
@@ -1788,6 +1937,27 @@ function addRoadmapItem(lane){
   ],vals=>{
     if(!vals.title)return;
     ROADMAP.push({lane,title:vals.title,status:'planned',date:vals.date||'TBD'});saveRoadmap();renderPM();showToast('已添加','success');
+  });
+}
+function editRoadmapLanes(){
+  formDialog('编辑路线图泳道',[
+    {key:'lanes',label:'泳道名称（每行一个）',type:'textarea',value:ROADMAP_LANES.join('\n'),placeholder:'P0\nP1\nP2\nP3'}
+  ],vals=>{
+    const newLanes=(vals.lanes||'').split('\n').map(s=>s.trim()).filter(Boolean);
+    if(!newLanes.length){showToast('至少需要一个泳道','warning');return}
+    ROADMAP_LANES=newLanes;saveRoadmapLanes();renderPM();showToast('泳道已更新','success');
+  });
+}
+function editSprintMeta(){
+  formDialog('编辑冲刺信息',[
+    {key:'name',label:'冲刺名称',type:'text',value:SPRINT_META.name||'Sprint 1',placeholder:'例：Sprint 1'},
+    {key:'startDate',label:'开始日期',type:'date',value:SPRINT_META.startDate||''},
+    {key:'endDate',label:'结束日期',type:'date',value:SPRINT_META.endDate||''}
+  ],vals=>{
+    SPRINT_META.name=vals.name||SPRINT_META.name;
+    SPRINT_META.startDate=vals.startDate||'';
+    SPRINT_META.endDate=vals.endDate||'';
+    saveSprintMeta();renderPM();showToast('冲刺信息已更新','success');
   });
 }
 // Sprint CRUD
@@ -1810,7 +1980,7 @@ function editSprintTask(col,ti){
     saveSprint();renderPM();showToast('已更新','success');
   });
 }
-function deleteSprintTask(col,ti){confirmDialog('确定删除此任务？',()=>{SPRINT_TASKS[col].splice(ti,1);saveSprint();renderPM();showToast('已删除','info',1500)},'删除',true)}
+function deleteSprintTask(col,ti){confirmDialog('确定删除此任务？',()=>{deleteWithUndo(SPRINT_TASKS[col],ti,saveSprint,renderPM,'任务')},'删除',true)}
 let _dragData=null;
 function sprintDragStart(e){const el=e.currentTarget;_dragData={col:el.dataset.col,idx:parseInt(el.dataset.idx)};el.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','')}
 function sprintDragEnd(e){e.currentTarget.classList.remove('dragging');_dragData=null;document.querySelectorAll('.sprint-col').forEach(c=>c.classList.remove('drag-over'))}
@@ -1832,7 +2002,12 @@ function addSprintTask(col){
   });
 }
 // Feedback CRUD
-function voteFeedback(i){FEEDBACK[i].votes++;saveFeedback();renderPM();showToast('+1','success',800)}
+const _votedFeedback=new Set();
+function voteFeedback(i){
+  if(_votedFeedback.has(i)){showToast('你已经投过票了','warning',1500);return}
+  _votedFeedback.add(i);
+  FEEDBACK[i].votes++;saveFeedback();renderPM();showToast('+1','success',800);
+}
 function editFeedback(i){
   formDialog('编辑反馈',[
     {key:'text',label:'反馈内容',type:'textarea',value:FEEDBACK[i].text},
@@ -1841,7 +2016,7 @@ function editFeedback(i){
     {key:'votes',label:'票数',type:'number',value:String(FEEDBACK[i].votes)}
   ],vals=>{FEEDBACK[i].text=vals.text;FEEDBACK[i].cat=vals.cat;FEEDBACK[i].votes=parseInt(vals.votes)||0;saveFeedback();renderPM();showToast('已更新','success')});
 }
-function deleteFeedback(i){FEEDBACK.splice(i,1);saveFeedback();renderPM();showToast('已删除','info',1500)}
+function deleteFeedback(i){deleteWithUndo(FEEDBACK,i,saveFeedback,renderPM,'反馈')}
 function addFeedback(){
   formDialog('添加反馈',[
     {key:'text',label:'反馈内容',type:'textarea',placeholder:'描述你的建议或问题'},
@@ -1857,9 +2032,10 @@ function addFeedback(){
 function renderGantt(){
   const el=document.getElementById('ganttChart');
   const months=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  const items=ROADMAP.filter(r=>r.date&&r.date!=='TBD');
-  const statusColor={completed:'var(--green)',in_progress:'var(--accent)',planned:'var(--text-dim)',delayed:'var(--yellow)'};
   const now=new Date();const curMonth=now.getMonth();
+  const displayYear=now.getFullYear();
+  const items=ROADMAP.filter(r=>r.date&&r.date!=='TBD').filter(r=>{const yr=parseInt(r.date.split('-')[0])||displayYear;return yr===displayYear;});
+  const statusColor={completed:'var(--green)',in_progress:'var(--accent)',planned:'var(--text-dim)',delayed:'var(--yellow)'};
   // Parse date to month index (0-based): "2026-01"->0, "2026-Q2"->3, "2026-Q3"->6
   function dateToMonth(d){
     if(!d||d==='TBD')return -1;
@@ -1875,7 +2051,7 @@ function renderGantt(){
     html+='<tr class="gantt-row"><td title="'+esc(r.title)+'">'+esc(r.title)+'</td>';
     for(let i=0;i<12;i++){
       html+='<td style="position:relative">';
-      if(i===mi)html+='<div class="gantt-bar" style="left:2px;right:2px;background:'+(statusColor[r.status]||'var(--text-dim)')+';width:calc('+(dur*100)+'% - 4px)"></div>';
+      if(i===mi)html+='<div class="gantt-bar" style="left:2px;right:2px;background:'+(statusColor[r.status]||'var(--text-dim)')+';width:calc('+Math.min(dur*100,100)+'% - 4px)"></div>';
       if(i===curMonth)html+='<div class="gantt-today"></div>';
       html+='</td>';
     }
@@ -1931,12 +2107,14 @@ function renderFishbone(){
       const iy=isTop?endY+20+ii*18:endY+24+ii*18;
       if(isTop){
         const ty=spine-20-ii*18;
+        const dt=item.length>10?item.slice(0,9)+'\u2026':item;
         svg+=`<line x1="${x}" y1="${ty}" x2="${x-35}" y2="${ty-10}" stroke="${color}" stroke-width="1" opacity=".5"/>`;
-        svg+=`<text x="${x-38}" y="${ty-6}" font-size="10" fill="var(--text-secondary)" text-anchor="end">${esc(item)}</text>`;
+        svg+=`<text x="${x-38}" y="${ty-6}" font-size="10" fill="var(--text-secondary)" text-anchor="end"><title>${esc(item)}</title>${esc(dt)}</text>`;
       }else{
         const ty=spine+20+ii*18;
+        const dt=item.length>10?item.slice(0,9)+'\u2026':item;
         svg+=`<line x1="${x}" y1="${ty}" x2="${x-35}" y2="${ty+10}" stroke="${color}" stroke-width="1" opacity=".5"/>`;
-        svg+=`<text x="${x-38}" y="${ty+14}" font-size="10" fill="var(--text-secondary)" text-anchor="end">${esc(item)}</text>`;
+        svg+=`<text x="${x-38}" y="${ty+14}" font-size="10" fill="var(--text-secondary)" text-anchor="end"><title>${esc(item)}</title>${esc(dt)}</text>`;
       }
     });
   }
@@ -2042,7 +2220,7 @@ function closeAllPanels(){
 }
 
 // ─── DATA EXPORT / IMPORT ───────────────────────────────
-const DATA_KEYS=['chub_platforms','chub_templates','chub_deals','chub_leads','chub_roadmap','chub_sprint','chub_feedback','chub_regions','chub_fishbone','chub_pdca','chub_history','chub_env_config','chub_activity','chub_prefs','chub_lang','chub_theme'];
+const DATA_KEYS=['chub_platforms','chub_templates','chub_deals','chub_leads','chub_contacts','chub_roadmap','chub_roadmap_lanes','chub_sprint','chub_sprint_meta','chub_feedback','chub_regions','chub_fishbone','chub_pdca','chub_history','chub_env_config','chub_activity','chub_prefs','chub_lang','chub_theme'];
 function exportAllData(){
   const blob={version:'1.0',exportedAt:new Date().toISOString()};
   DATA_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v)try{blob[k]=JSON.parse(v)}catch(e){blob[k]=v}});
@@ -2092,13 +2270,23 @@ function exportModule(name,keys){
 }
 function importAllData(input){
   const file=input.files[0];if(!file)return;
+  if(!file.name.endsWith('.json')){showToast('请选择 .json 格式的备份文件','error');input.value='';return}
   const reader=new FileReader();
   reader.onload=function(e){
     try{
       const d=JSON.parse(e.target.result);
-      if(!d.version){showToast('无效的备份文件','error');return}
+      if(typeof d!=='object'||d===null||Array.isArray(d)){showToast('无效的备份文件：根节点必须是对象','error');return}
+      if(!d.version){showToast('无效的备份文件：缺少 version 字段','error');return}
+      if(typeof d.version!=='string'&&typeof d.version!=='number'){showToast('无效的备份文件：version 字段类型错误','error');return}
+      const knownKeys=['chub_platforms','chub_templates','chub_deals','chub_leads','chub_roadmap','chub_sprint','chub_feedback'];
+      const hasKnownKey=knownKeys.some(k=>k in d);
+      if(!hasKnownKey){showToast('无效的备份文件：未找到已知数据字段','error');return}
+      // Validate critical arrays
+      if(d.chub_platforms&&!Array.isArray(d.chub_platforms)){showToast('备份文件数据格式错误：platforms 必须为数组','error');return}
+      if(d.chub_templates&&!Array.isArray(d.chub_templates)){showToast('备份文件数据格式错误：templates 必须为数组','error');return}
+      if(d.chub_feedback&&!Array.isArray(d.chub_feedback)){showToast('备份文件数据格式错误：feedback 必须为数组','error');return}
       confirmDialog('确定导入数据？当前数据将被覆盖。',()=>{
-        DATA_KEYS.forEach(k=>{if(d[k])localStorage.setItem(k,JSON.stringify(d[k]))});
+        DATA_KEYS.forEach(k=>{if(d[k]!==undefined)localStorage.setItem(k,JSON.stringify(d[k]))});
         showToast('数据已导入 | 2秒后刷新...','success');
         setTimeout(()=>location.reload(),2000);
       },'导入',true);
@@ -2169,7 +2357,8 @@ function deleteHistory(id){
 
 // ─── PREFS PERSISTENCE ──────────────────────────────────
 function savePrefs(){
-  localStorage.setItem('chub_prefs',JSON.stringify({tab:activeMain,sub:activeSub,pmSub:activePmSub,cat:activeCat,region:document.getElementById('regionSelect')?.value||'us',lang:currentLang}));
+  localStorage.setItem('chub_prefs',JSON.stringify({tab:activeMain,sub:activeSub,pmSub:activePmSub,cat:activeCat,region:document.getElementById('regionSelect')?.value||'us',lang:currentLang,
+    platEdit:platEditMode,salesEdit:salesEditMode,pmEdit:pmEditMode,opsEdit:opsEditMode,regionEdit:regionEditMode}));
 }
 function loadPrefs(){
   try{
@@ -2189,6 +2378,11 @@ function loadPrefs(){
     }
     if(p.cat)activeCat=p.cat;
     if(p.region){const sel=document.getElementById('regionSelect');if(sel)sel.value=p.region}
+    if(p.platEdit)platEditMode=!!p.platEdit;
+    if(p.salesEdit)salesEditMode=!!p.salesEdit;
+    if(p.pmEdit)pmEditMode=!!p.pmEdit;
+    if(p.opsEdit)opsEditMode=!!p.opsEdit;
+    if(p.regionEdit)regionEditMode=!!p.regionEdit;
   }catch(e){}
 }
 
@@ -2200,6 +2394,8 @@ function pwaInstall(){if(deferredPWAPrompt){deferredPWAPrompt.prompt();deferredP
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 
 // ─── MCP API INTEGRATION ────────────────────────────────────
+// MCP tool counts per repo — update these when tools change
+const MCP_TOOL_COUNTS={'media-ops':26,'ops-flow':10,'sales-crm':17,'pm-toolkit':20};
 const MCP_ENDPOINTS = {
   'media-ops': { url: '', status: 'offline' },
   'ops-flow': { url: '', status: 'offline' },
@@ -2298,6 +2494,39 @@ async function syncRoadmap() {
   }
   return false;
 }
+
+// ─── GLOBAL SEARCH ──────────────────────────────────────
+function globalSearch(q){
+  const res=document.getElementById('globalSearchResults');
+  if(!q||q.trim().length<1){res.style.display='none';return}
+  const kw=q.trim().toLowerCase();
+  const hits=[];
+  // Platforms
+  if(typeof PLATFORMS!=='undefined')PLATFORMS.forEach((p,i)=>{if(p.name.toLowerCase().includes(kw))hits.push({label:'平台',icon:'&#127909;',text:p.name,tab:'media',hint:p.priority})});
+  // Workflows
+  if(typeof TEMPLATES!=='undefined')TEMPLATES.forEach((tp,i)=>{if(tp.name.toLowerCase().includes(kw)||tp.desc.toLowerCase().includes(kw))hits.push({label:'工作流',icon:'&#9881;',text:tp.name,tab:'ops',hint:tp.cat})});
+  // Roadmap
+  if(typeof ROADMAP!=='undefined')ROADMAP.forEach((r,i)=>{if(r.title.toLowerCase().includes(kw))hits.push({label:'路线图',icon:'&#128203;',text:r.title,tab:'pm',pmSub:'pm-roadmap',hint:r.lane+' · '+r.status})});
+  // Sprint tasks
+  if(typeof SPRINT_TASKS!=='undefined')Object.entries(SPRINT_TASKS).forEach(([col,tasks])=>{tasks.forEach(tk=>{const title=typeof tk==='string'?tk:(tk.title||'');if(title.toLowerCase().includes(kw))hits.push({label:'任务',icon:'&#10003;',text:title,tab:'pm',pmSub:'pm-sprint',hint:col})})});
+  // Feedback
+  if(typeof FEEDBACK!=='undefined')FEEDBACK.forEach((f,i)=>{if(f.text.toLowerCase().includes(kw))hits.push({label:'反馈',icon:'&#128172;',text:f.text,tab:'pm',pmSub:'pm-feedback',hint:f.cat})});
+  // Contacts
+  if(typeof CONTACTS!=='undefined')CONTACTS.forEach((c,i)=>{if(c.name.toLowerCase().includes(kw)||c.company.toLowerCase().includes(kw))hits.push({label:'联系人',icon:'&#128100;',text:c.name+(c.company?' · '+c.company:''),tab:'sales',hint:c.stage})});
+  if(!hits.length){res.innerHTML='<div style="padding:14px 16px;color:var(--text-dim)">未找到相关结果</div>';res.style.display='block';return}
+  res.innerHTML=hits.slice(0,15).map(h=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border)" onmousedown="globalSearchNav('${h.tab}','${h.pmSub||''}');document.getElementById('globalSearchInput').value='';hideGlobalSearch()" onmouseover="this.style.background='var(--card-hover)'" onmouseout="this.style.background=''"><span style="font-size:14px">${h.icon}</span><div style="flex:1;overflow:hidden"><div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(h.text)}</div><div style="font-size:11px;color:var(--text-dim)">${esc(h.label)}${h.hint?' · '+esc(h.hint):''}</div></div></div>`).join('');
+  res.style.display='block';
+}
+function globalSearchNav(tab,pmSub){
+  const btn=document.querySelector(`[data-tab="${tab}"]`);
+  if(btn)switchMain(tab,btn);
+  if(pmSub){
+    const pmBtn=document.querySelector(`[data-pmsub="${pmSub}"]`);
+    if(pmBtn)switchPmSub(pmSub,pmBtn);
+  }
+}
+function showGlobalSearch(){const inp=document.getElementById('globalSearchInput');if(inp&&inp.value.trim())document.getElementById('globalSearchResults').style.display='block'}
+function hideGlobalSearch(){const res=document.getElementById('globalSearchResults');if(res)res.style.display='none'}
 
 // ─── INIT ───────────────────────────────────────────────
 document.documentElement.lang=currentLang==='zh'?'zh-CN':'en';
