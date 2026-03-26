@@ -1,4 +1,4 @@
-const CACHE_NAME = 'career-hub-v3';
+const CACHE_NAME = 'career-hub-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
